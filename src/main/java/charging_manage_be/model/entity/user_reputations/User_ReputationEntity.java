@@ -20,7 +20,7 @@ public class User_ReputationEntity {
 
     @ManyToOne
     @JoinColumn(name = "level_id", nullable = false)
-    private Reputation_LevelEntity level;
+    private Reputation_LevelEntity reputationLevel;
 
     @Column (name = "notes", length = 255)
     private String notes;

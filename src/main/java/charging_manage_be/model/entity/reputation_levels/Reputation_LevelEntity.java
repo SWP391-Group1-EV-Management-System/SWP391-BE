@@ -18,9 +18,8 @@ public class Reputation_LevelEntity {
     @Column(name = "description", length = 255)
     private String description;
 
-    @OneToMany(mappedBy = "level")
+    @OneToMany(mappedBy = "reputationLevel")
     private List<User_ReputationEntity> userReputations;
-
 
 
     public Reputation_LevelEntity() {
