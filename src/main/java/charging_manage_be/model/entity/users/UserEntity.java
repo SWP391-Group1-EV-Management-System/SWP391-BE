@@ -43,12 +43,12 @@ public class UserEntity {
     // @OneToMany(mappedBy = "user, cascade = CascadeType.ALL, fetch = FetchType.LAZY")
     // cascade = CascadeType.ALL, fetch = FetchType.LAZY là để quản lý quan hệ một-nhiều giữa UserEntity và CarEntity
 
-    @OneToMany(mappedBy = "userID" ) // mappedBy = "userID" là tên thuộc tính trong CarEntity tham chiếu đến UserEntity
+    @OneToMany(mappedBy = "user" ) // mappedBy = "userID" là tên thuộc tính trong CarEntity tham chiếu đến UserEntity
     //Trong dòng "private UserEntity userID" ở CarEntity thì userID trong mapped ở đây chính là userID trong CarEntity
     // Và userID đó là khóa ngoại tham chiếu đến UserEntity từ CarEntity
     private List<CarEntity> cars;
 
-    @OneToMany(mappedBy = "userID")
+    @OneToMany(mappedBy = "user")
     private List<User_ReputationEntity> userReputations;
 
 

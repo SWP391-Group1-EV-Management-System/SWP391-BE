@@ -11,8 +11,8 @@ public class CarEntity {
 
     @ManyToOne // Nhiều xe có thể thuộc về một người dùng
     @JoinColumn(name = "user_id", nullable = false) // Khóa ngoại tham chiếu đến bảng users
-    // Với thêm cột user_id trong bảng cars với user_id tham chiếu đến userID trong bảng users
-    private UserEntity userID;
+    // Với thêm cột user_id trong bảng cars để liên kết với bảng users qua khóa chính userID
+    private UserEntity user; // Đây là khóa ngoại tham chiếu đến UserEntity
 
     @Column(name = "type_car", nullable = false, length = 50)
     private String typeCar; // Loại xe

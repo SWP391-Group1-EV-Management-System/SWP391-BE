@@ -16,11 +16,11 @@ public class User_ReputationEntity {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private UserEntity userID;
+    private UserEntity user;
 
     @ManyToOne
     @JoinColumn(name = "level_id", nullable = false)
-    private Reputation_LevelEntity levelID;
+    private Reputation_LevelEntity level;
 
     @Column (name = "notes", length = 255)
     private String notes;
