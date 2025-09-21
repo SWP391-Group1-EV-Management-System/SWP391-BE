@@ -1,6 +1,7 @@
 package charging_manage_be.model.entity.charging_station;
 
 import charging_manage_be.model.entity.charging_post.ChargingPostEntity;
+import charging_manage_be.model.entity.users.UserEntity;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -23,16 +24,28 @@ public class ChargingStationEntity {
     private  int numberOfPosts;
     @OneToMany(mappedBy = "chargingStation")
     private List<ChargingPostEntity> chargingPosts;
+    @OneToOne
+    @JoinColumn(name = "id_user_manager")
+    private UserEntity UserManager;
     // Khóa ngoại bảng user
-    //private  String idUserManager;
+
     public ChargingStationEntity() {
     }
 
-    public ChargingStationEntity(List<ChargingPostEntity> chargingPosts, String status, String address, String nameChargingStation) {
-        this.chargingPosts = chargingPosts;
-        this.status = status;
-        this.address = address;
+    public ChargingStationEntity( String nameChargingStation, String address, String status, String establishedTime,/* int numberOfPosts,*/ UserEntity userManager) {
         this.nameChargingStation = nameChargingStation;
+        this.address = address;
+        this.status = status;
+        //this.numberOfPosts = numberOfPosts; đếm số post tự động
+        UserManager = userManager;
+    }
+
+    public UserEntity getUserManager() {
+        return UserManager;
+    }
+
+    public void setUserManager(UserEntity userManager) {
+        UserManager = userManager;
     }
 
     public List<ChargingPostEntity> getChargingPosts() {
