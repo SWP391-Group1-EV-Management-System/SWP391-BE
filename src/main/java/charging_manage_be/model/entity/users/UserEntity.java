@@ -2,6 +2,7 @@ package charging_manage_be.model.entity.users;
 
 import charging_manage_be.model.entity.cars.CarEntity;
 import charging_manage_be.model.entity.charging_station.ChargingStationEntity;
+import charging_manage_be.model.entity.payments.PaymentEntity;
 import charging_manage_be.model.entity.user_reputations.User_ReputationEntity;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -53,7 +54,8 @@ public class UserEntity {
     private List<User_ReputationEntity> userReputations;
     @OneToOne(mappedBy = "UserManager")
     private ChargingStationEntity chargingStation;
-
+    @OneToMany(mappedBy = "user")
+    private List<PaymentEntity> payments;
 
 
 

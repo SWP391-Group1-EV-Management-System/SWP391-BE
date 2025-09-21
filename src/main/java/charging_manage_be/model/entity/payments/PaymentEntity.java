@@ -1,5 +1,6 @@
 package charging_manage_be.model.entity.payments;
 
+import charging_manage_be.model.entity.users.UserEntity;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -7,20 +8,23 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "payment")
 public class PaymentEntity {
-    private final int characterLength = 4;
-    private final int numberLength = 4;
     @Id
+    @Column(name = "payment_id")
     private String paymentId; // xử lý trên lớp repo random
-    @Column ( nullable = false)
-    private String userId;
-    @Column( nullable = false)
-    private String chargingSessionId;
-    @Column ( nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserEntity user;// khóa ngoại bảng user (người dùng thanh toán)
+    @Column(name = "charging_session_id", nullable = false)
+    private String chargingSessionId; // khóa ngoại bảng phiên sạc
+    @Column (name = "is_paid", nullable = false)
     private boolean isPaid;
-    @Column ( nullable = false)
+    @Column (name = "created_at", nullable = false)
     private LocalDateTime createdAt;
-    @Column ( nullable = true)
+    @Column (name = "paid_at", nullable = true)
     private LocalDateTime paidAt;
+    @Column (name = "payment_method", nullable = true)
+    private String paymentMethod;
+
     @Column ( nullable = false)
     private BigDecimal price;
     // tạo payment chỉ bằng 2 trường input vào đó là userId và chargingSessionId
@@ -30,12 +34,12 @@ public class PaymentEntity {
     public PaymentEntity() {
     }
 
-    public int getCharacterLength() {
-        return characterLength;
+    public String getPaymentMethod() {
+        return paymentMethod;
     }
 
-    public int getNumberLength() {
-        return numberLength;
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
     }
 
     public String getPaymentId() {
@@ -46,12 +50,12 @@ public class PaymentEntity {
         this.paymentId = paymentId;
     }
 
-    public String getUserId() {
-        return userId;
+    public UserEntity getUser() {
+        return user;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setUser(UserEntity user) {
+        this.user = user;
     }
 
     public String getChargingSessionId() {
