@@ -1,11 +1,10 @@
-package charging_manage_be.model.entity.user_reputations;
+package charging_manage_be.model.entity.Reputations;
 
-import charging_manage_be.model.entity.reputation_levels.Reputation_LevelEntity;
 import charging_manage_be.model.entity.users.UserEntity;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table (name = "user_reputations")
@@ -25,14 +24,14 @@ public class User_ReputationEntity {
     @Column (name = "notes", length = 255)
     private String notes;
 
-    @Column (name = "created_at", nullable = false)
+    @Column (name = "created_at", updatable = false , nullable = false)
     @CreationTimestamp
-    private Date createdAt;
+    private LocalDateTime createdAt; // Mặc định là thời gian hiện tại
 
     public User_ReputationEntity() {
     }
 
-    public User_ReputationEntity(String userReputationID, UserEntity user, Reputation_LevelEntity reputationLevel, String notes, Date createdAt) {
+    public User_ReputationEntity(String userReputationID, UserEntity user, Reputation_LevelEntity reputationLevel, String notes, LocalDateTime createdAt) {
         this.userReputationID = userReputationID;
         this.user = user;
         this.reputationLevel = reputationLevel;
@@ -72,11 +71,11 @@ public class User_ReputationEntity {
         this.notes = notes;
     }
 
-    public Date getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 }

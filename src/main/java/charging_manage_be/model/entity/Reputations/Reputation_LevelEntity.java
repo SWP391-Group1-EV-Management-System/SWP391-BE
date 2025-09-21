@@ -1,6 +1,5 @@
-package charging_manage_be.model.entity.reputation_levels;
+package charging_manage_be.model.entity.Reputations;
 
-import charging_manage_be.model.entity.user_reputations.User_ReputationEntity;
 import jakarta.persistence.*;
 
 import java.util.List;
