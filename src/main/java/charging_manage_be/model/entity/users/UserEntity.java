@@ -57,8 +57,7 @@ public class UserEntity {
     public UserEntity() {
     }
 
-    public UserEntity(String userID, String firstName, String lastName, Date birthDate, boolean gender, String role, String email, String password, String phoneNumber, LocalDateTime createdAt, String status, List<CarEntity> cars, List<User_ReputationEntity> userReputations) {
-        this.userID = userID;
+    public UserEntity(String firstName, String lastName, Date birthDate, boolean gender, String role, String email, String password, String phoneNumber, LocalDateTime createdAt, String status, List<CarEntity> cars, List<User_ReputationEntity> userReputations) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.birthDate = birthDate;
