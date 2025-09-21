@@ -20,5 +20,45 @@ public class CarEntity {
     private String chassisNumber; // Số khung xe
 
 
+    public CarEntity() {
+    }
 
+    public CarEntity(String license_plate, UserEntity user, String typeCar, String chassisNumber) {
+        this.license_plate = license_plate;
+        this.user = user;
+        this.typeCar = typeCar;
+        this.chassisNumber = chassisNumber;
+    }
+
+    public String getLicense_plate() {
+        return license_plate;
+    }
+
+    public void setLicense_plate(String license_plate) {
+        this.license_plate = license_plate;
+    }
+
+    public UserEntity getUser() {
+        return user;
+    }
+
+    public void setUser(UserEntity user) {
+        this.user = user;
+    }
+
+    public String getTypeCar() {
+        return typeCar;
+    }
+
+    public void setTypeCar(String typeCar) {
+        this.typeCar = typeCar;
+    }
+
+    public String getChassisNumber() {
+        return chassisNumber;
+    }
+
+    public void setChassisNumber(String chassisNumber) {
+        this.chassisNumber = chassisNumber;
+    }
 }

@@ -28,4 +28,55 @@ public class User_ReputationEntity {
     @Column (name = "created_at", nullable = false)
     @CreationTimestamp
     private Date createdAt;
+
+    public User_ReputationEntity() {
+    }
+
+    public User_ReputationEntity(String userReputationID, UserEntity user, Reputation_LevelEntity reputationLevel, String notes, Date createdAt) {
+        this.userReputationID = userReputationID;
+        this.user = user;
+        this.reputationLevel = reputationLevel;
+        this.notes = notes;
+        this.createdAt = createdAt;
+    }
+
+    public String getUserReputationID() {
+        return userReputationID;
+    }
+
+    public void setUserReputationID(String userReputationID) {
+        this.userReputationID = userReputationID;
+    }
+
+    public UserEntity getUser() {
+        return user;
+    }
+
+    public void setUser(UserEntity user) {
+        this.user = user;
+    }
+
+    public Reputation_LevelEntity getReputationLevel() {
+        return reputationLevel;
+    }
+
+    public void setReputationLevel(Reputation_LevelEntity reputationLevel) {
+        this.reputationLevel = reputationLevel;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
 }
