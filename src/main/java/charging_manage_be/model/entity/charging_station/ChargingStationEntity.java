@@ -4,6 +4,7 @@ import charging_manage_be.model.entity.charging_post.ChargingPostEntity;
 import charging_manage_be.model.entity.users.UserEntity;
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -19,7 +20,7 @@ public class ChargingStationEntity {
     @Column(name = "status", nullable = false)
     private  String status;
     @Column(name = "established_time", nullable = false)
-    private  String establishedTime;
+    private  LocalDateTime establishedTime;
     @Column (name = "number_of_posts", nullable = false)
     private  int numberOfPosts;
     @OneToMany(mappedBy = "chargingStation")
@@ -28,7 +29,11 @@ public class ChargingStationEntity {
     @JoinColumn(name = "id_user_manager")
     private UserEntity UserManager;
     // Khóa ngoại bảng user
+    @PrePersist
+    protected void onCreate() {
+        this.establishedTime = LocalDateTime.now();
 
+    }
     public ChargingStationEntity() {
     }
 
@@ -64,11 +69,11 @@ public class ChargingStationEntity {
         this.numberOfPosts = numberOfPosts;
     }
 
-    public String getEstablishedTime() {
+    public LocalDateTime getEstablishedTime() {
         return establishedTime;
     }
 
-    public void setEstablishedTime(String establishedTime) {
+    public void setEstablishedTime(LocalDateTime establishedTime) {
         this.establishedTime = establishedTime;
     }
 
