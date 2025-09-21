@@ -4,15 +4,16 @@ import charging_manage_be.model.entity.charging_station.ChargingStationEntity;
 import charging_manage_be.model.entity.users.UserEntity;
 import charging_manage_be.repository.charging_station.ChargingStationRepositoryImpl;
 import charging_manage_be.repository.payments.PaymentRepositoryImpl;
+import org.springframework.stereotype.Service;
 
 import static charging_manage_be.util.RandomId.generateRandomId;
-
+@Service
 public class ChargingStationServiceImpl implements  ChargingStationService {
     // cấu hình độ dài của id
     private final int characterLength = 2;
     private final int numberLength = 2;
     private ChargingStationRepositoryImpl chargingStationRepository;
-    public ChargingStationServiceImpl(String JpaName)
+    public ChargingStationServiceImpl()
     {
         this.chargingStationRepository = chargingStationRepository;
     }
