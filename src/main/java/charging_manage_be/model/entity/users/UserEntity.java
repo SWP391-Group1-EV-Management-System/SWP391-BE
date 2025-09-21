@@ -3,7 +3,7 @@ package charging_manage_be.model.entity.users;
 import charging_manage_be.model.entity.cars.CarEntity;
 import charging_manage_be.model.entity.charging_station.ChargingStationEntity;
 import charging_manage_be.model.entity.payments.PaymentEntity;
-import charging_manage_be.model.entity.user_reputations.User_ReputationEntity;
+import charging_manage_be.model.entity.reputations.User_ReputationEntity;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 

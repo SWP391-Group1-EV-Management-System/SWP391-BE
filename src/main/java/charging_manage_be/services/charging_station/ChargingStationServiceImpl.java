@@ -14,14 +14,12 @@ public class ChargingStationServiceImpl implements  ChargingStationService {
     private ChargingStationRepositoryImpl chargingStationRepository;
     public ChargingStationServiceImpl(String JpaName)
     {
-        this.chargingStationRepository = new ChargingStationRepositoryImpl(JpaName);
+        this.chargingStationRepository = chargingStationRepository;
     }
     public void updateNumberOfPosts(ChargingStationEntity station) {
         // cập nhật số lượng trụ theo kích thước của list trụ sạc
         // gọi hàm này sau khi thêm hoặc xóa trụ sạc
-
-
-        station.setNumberOfPosts(station.getChargingPosts().size());
+         station.setNumberOfPosts(station.getChargingPosts().size());
         chargingStationRepository.updateStation(station);
     }
     private String generateUniqueId() {

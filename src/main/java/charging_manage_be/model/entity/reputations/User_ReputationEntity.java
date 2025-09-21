@@ -1,4 +1,4 @@
-package charging_manage_be.model.entity.Reputations;
+package charging_manage_be.model.entity.reputations;
 
 import charging_manage_be.model.entity.users.UserEntity;
 import jakarta.persistence.*;
