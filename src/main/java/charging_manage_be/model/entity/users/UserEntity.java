@@ -1,10 +1,11 @@
 package charging_manage_be.model.entity.users;
 
 import charging_manage_be.model.entity.cars.CarEntity;
-import charging_manage_be.model.entity.user_reputations.User_ReputationEntity;
+import charging_manage_be.model.entity.Reputations.User_ReputationEntity;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -35,7 +36,7 @@ public class UserEntity {
 
     @Column(name = "created_at", nullable = false)
     @CreationTimestamp // Dánh dấu để Hibernate tự động gán giá trị thời gian hiện tại khi bản ghi được tạo
-    private Date createdAt;
+    private LocalDateTime createdAt; // LocalDateTime thay vì Date là để lấy giờ hiện tại dễ dàng hơn
 
     @Column(name = "status", nullable = false, length = 20)
     private String status;
@@ -56,7 +57,8 @@ public class UserEntity {
     public UserEntity() {
     }
 
-    public UserEntity(String firstName, String lastName, Date birthDate, boolean gender, String role, String email, String password, String phoneNumber, Date createdAt, String status) {
+    public UserEntity(String userID, String firstName, String lastName, Date birthDate, boolean gender, String role, String email, String password, String phoneNumber, LocalDateTime createdAt, String status, List<CarEntity> cars, List<User_ReputationEntity> userReputations) {
+        this.userID = userID;
         this.firstName = firstName;
         this.lastName = lastName;
         this.birthDate = birthDate;
@@ -67,6 +69,8 @@ public class UserEntity {
         this.phoneNumber = phoneNumber;
         this.createdAt = createdAt;
         this.status = status;
+        this.cars = cars;
+        this.userReputations = userReputations;
     }
 
     public String getUserID() {
@@ -141,11 +145,11 @@ public class UserEntity {
         this.phoneNumber = phoneNumber;
     }
 
-    public Date getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
@@ -155,5 +159,21 @@ public class UserEntity {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public List<CarEntity> getCars() {
+        return cars;
+    }
+
+    public void setCars(List<CarEntity> cars) {
+        this.cars = cars;
+    }
+
+    public List<User_ReputationEntity> getUserReputations() {
+        return userReputations;
+    }
+
+    public void setUserReputations(List<User_ReputationEntity> userReputations) {
+        this.userReputations = userReputations;
     }
 }
