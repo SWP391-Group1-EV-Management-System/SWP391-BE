@@ -2,6 +2,7 @@ package charging_manage_be;
 
 import charging_manage_be.model.entity.users.UserEntity;
 import charging_manage_be.services.payments.PaymentServiceImpl;
+import charging_manage_be.services.users.UserService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
@@ -21,6 +22,9 @@ public class Main {
     public static void main(String[] args) {
         System.setProperty("spring.main.web-application-type", "none");
         ApplicationContext context = SpringApplication.run(Main.class, args);
+
+        // Inject UserService
+        UserService userService = context.getBean(UserService.class);
         PaymentServiceImpl paymentService = context.getBean(PaymentServiceImpl.class);
 
         UserEntity user = new UserEntity(
@@ -38,19 +42,17 @@ public class Main {
                 null  // userReputations
         );
         user.setUserID("ABC123");
-        boolean saveUser = addUser(user);
+
+        // Sửa thành userService.addUser()
+        boolean saveUser = userService.addUser(user);
         if (!saveUser) {
             System.out.println("Failed to save user.");
             return;
-        }else{
+        } else {
             System.out.println("User saved successfully.");
         }
 
-        paymentService.createPayment( user, "LanSac1", new BigDecimal("120000"));
-        //Scanner scanner = new Scanner(System.in);
+        paymentService.createPayment(user, "LanSac1", new BigDecimal("120000"));
         System.out.print("Success");
-        //String paymentId = scanner.nextLine();
-        //paymentService.invoicePayment(paymentId);
-
     }
 }
