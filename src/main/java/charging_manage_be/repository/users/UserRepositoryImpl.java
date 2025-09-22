@@ -2,7 +2,6 @@ package charging_manage_be.repository.users;
 
 import charging_manage_be.model.entity.users.UserEntity;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.Id;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
@@ -10,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public class UserRepositoryImplement implements UserRepository{
+public class UserRepositoryImpl implements UserRepository{
 
     @PersistenceContext // Dùng để đánh dấu EntityManager sẽ được tiêm bởi container quản lý
     // tiêm có nghĩa là tự động gán giá trị cho biến này khi đối tượng được khởi tạo
