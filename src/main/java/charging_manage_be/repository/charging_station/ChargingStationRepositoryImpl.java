@@ -1,9 +1,8 @@
 package charging_manage_be.repository.charging_station;
 
-import charging_manage_be.model.entity.charging_station.ChargingStationEntity;
+import charging_manage_be.model.entity.Charging.ChargingStationEntity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Repository;
 import org.springframework.beans.factory.annotation.Autowired;

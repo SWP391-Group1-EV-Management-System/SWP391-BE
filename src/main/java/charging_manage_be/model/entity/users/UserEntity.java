@@ -1,7 +1,8 @@
 package charging_manage_be.model.entity.users;
 
+import charging_manage_be.model.entity.Charging.ChargingSessionEntity;
 import charging_manage_be.model.entity.cars.CarEntity;
-import charging_manage_be.model.entity.charging_station.ChargingStationEntity;
+import charging_manage_be.model.entity.Charging.ChargingStationEntity;
 import charging_manage_be.model.entity.payments.PaymentEntity;
 import charging_manage_be.model.entity.reputations.User_ReputationEntity;
 import jakarta.persistence.*;
@@ -57,8 +58,10 @@ public class UserEntity {
     private ChargingStationEntity chargingStation;
     @OneToMany(mappedBy = "user")
     private List<PaymentEntity> payments;
-
-
+    @OneToMany(mappedBy = "user")
+    private List<ChargingSessionEntity> userSession;
+    @OneToMany(mappedBy = "userManage")
+    private List<ChargingSessionEntity> userManagerSession;
 
     public UserEntity() {
     }

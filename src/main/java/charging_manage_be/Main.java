@@ -1,27 +1,18 @@
 package charging_manage_be;
 
-import charging_manage_be.model.entity.users.UserEntity;
-import charging_manage_be.services.payments.PaymentServiceImpl;
-import charging_manage_be.services.users.UserService;
+import charging_manage_be.model.entity.Charging.ChargingTypeEntity;
+import charging_manage_be.services.charging_type.ChargingTypeServiceImpl;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
-
-import java.util.Date;
-import java.util.Random;
-import java.util.UUID;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.math.BigDecimal;
-import java.util.Scanner;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 @SpringBootApplication
 public class Main {
     public static void main(String[] args) {
-//        System.setProperty("spring.main.web-application-type", "none");
-//        ApplicationContext context = SpringApplication.run(Main.class, args);
+        System.setProperty("spring.main.web-application-type", "none");
+        ApplicationContext context = SpringApplication.run(Main.class, args);
 //
 //        // Inject UserService
 //        UserService userService = context.getBean(UserService.class);
@@ -54,6 +45,12 @@ public class Main {
 //
 //        paymentService.createPayment(user, "LanSac1", new BigDecimal("120000"));
 //        System.out.print("Success");
-        SpringApplication.run(Main.class, args);
+     //   SpringApplication.run(Main.class, args);
+        //code test ( xóa database tạo lại để tránh lỗi tăng tự động, do mySQL lấy bản data cũ)
+        ChargingTypeServiceImpl typeService = context.getBean(ChargingTypeServiceImpl.class);
+        ChargingTypeEntity newChargingType = new ChargingTypeEntity();
+        newChargingType.setNameChargingType("Fast Charge");
+        newChargingType.setDescription("High-speed charging for electric vehicles.");
+        typeService.addChargingType(newChargingType);
     }
 }

@@ -1,12 +1,20 @@
 package charging_manage_be.model.entity.payments;
 
+import charging_manage_be.model.entity.Charging.ChargingSessionEntity;
 import charging_manage_be.model.entity.users.UserEntity;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "payment")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class PaymentEntity {
     @Id
     @Column(name = "payment_id")
@@ -30,73 +38,10 @@ public class PaymentEntity {
     // tạo payment chỉ bằng 2 trường input vào đó là userId và chargingSessionId
     // lần đầu tạo isPaid sẽ là false và crate createdAt
     // sau khi driver thanh toán update lại isPaid = true và cập nhật paidAt
+    @OneToOne
+    @JoinColumn(name = "session_id")
+    private ChargingSessionEntity session;
 
-    public PaymentEntity() {
-    }
-
-    public String getPaymentMethod() {
-        return paymentMethod;
-    }
-
-    public void setPaymentMethod(String paymentMethod) {
-        this.paymentMethod = paymentMethod;
-    }
-
-    public String getPaymentId() {
-        return paymentId;
-    }
-
-    public void setPaymentId(String paymentId) {
-        this.paymentId = paymentId;
-    }
-
-    public UserEntity getUser() {
-        return user;
-    }
-
-    public void setUser(UserEntity user) {
-        this.user = user;
-    }
-
-    public String getChargingSessionId() {
-        return chargingSessionId;
-    }
-
-    public void setChargingSessionId(String chargingSessionId) {
-        this.chargingSessionId = chargingSessionId;
-    }
-
-    public boolean isPaid() {
-        return isPaid;
-    }
-
-    public void setPaid(boolean paid) {
-        isPaid = paid;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getPaidAt() {
-        return paidAt;
-    }
-
-    public void setPaidAt(LocalDateTime paidAt) {
-        this.paidAt = paidAt;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
