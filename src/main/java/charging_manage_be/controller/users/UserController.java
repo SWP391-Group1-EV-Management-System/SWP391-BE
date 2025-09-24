@@ -1,59 +1,65 @@
 package charging_manage_be.controller.users;
 
-import charging_manage_be.model.entity.users.UserEntity;
-import charging_manage_be.services.users.UserService;
-import org.springframework.web.bind.annotation.*;
+        import charging_manage_be.model.entity.users.UserEntity;
+        import charging_manage_be.services.users.UserService;
+        import org.springframework.beans.factory.annotation.Autowired;
+        import org.springframework.http.ResponseEntity;
+        import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+        import java.util.List;
+        import java.util.Optional;
 
-@RestController // Đánh dấu lớp này là một controller trong Spring MVC và trả về dữ liệu trực tiếp trong phản hồi HTTP
-@RequestMapping("/api/users")
-// @RequestMapping("/api/users") // Định nghĩa URL cơ sở cho tất cả các phương thức trong controller
-// Ví dụ: tất cả các endpoint trong controller này sẽ bắt đầu bằng /api/users, như /api/users/{id}, /api/users/create, v.v.
-public class UserController {
-    private final UserService userService;
+        @RestController
+        @RequestMapping("/api/users")
+        public class UserController {
 
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
+            @Autowired
+            private UserService userService;
 
-    @GetMapping("/ping")
-    public String ping() {
-        return "Server is running!";
-    }
+            @PostMapping
+            public ResponseEntity<UserEntity> createUser(@RequestBody UserEntity user) {
+                UserEntity savedUser = userService.saveUser(user);
+                return ResponseEntity.ok(savedUser);
+            }
 
-    // CREATE
-    @PostMapping
-    public boolean addUser(@RequestBody UserEntity user) {
-        return userService.addUser(user);
-    }
+            @PutMapping("/{userID}")
+            public ResponseEntity<UserEntity> updateUser(@PathVariable String userID, @RequestBody UserEntity userDetails) {
+                try {
+                    // Lấy user hiện tại để giữ createdAt
+                    Optional<UserEntity> existingUser = userService.getUserByID(userID);
+                    if (existingUser.isPresent()) {
+                        userDetails.setUserID(userID);
+                        userDetails.setCreatedAt(existingUser.get().getCreatedAt());
+                    }
 
-    // UPDATE
-    @PutMapping("/{id}")
-    public boolean updateUser(@PathVariable("id") String userID, @RequestBody UserEntity user) {
-        user.setUserID(userID);
-        return userService.updateUser(user);
-    }
+                    UserEntity updatedUser = userService.saveUser(userDetails);
+                    return ResponseEntity.ok(updatedUser);
+                } catch (RuntimeException e) {
+                    return ResponseEntity.notFound().build();
+                }
+            }
 
-    // READ (by ID)
-    @GetMapping("/{id}")
-    public UserEntity getUserByID(@PathVariable("id") String userID) {
-        // biến userID sẽ lấy giá trị từ phần {id} trong URL
-        return userService.getUserByID(userID);
-    }
+            @DeleteMapping("/{userID}")
+            public ResponseEntity<String> deleteUser(@PathVariable String userID) {
+                boolean deleted = userService.softDeleteUser(userID);
+                if (deleted) {
+                    return ResponseEntity.ok("User deleted successfully");
+                }
+                return ResponseEntity.badRequest().body("Failed to delete user");
+            }
 
-    // READ (all)
-    @GetMapping
-    public List<UserEntity> getAllUsers() {
-        return userService.getAllUsers();
-    }
+            @GetMapping("/{userID}")
+            public ResponseEntity<UserEntity> getUser(@PathVariable String userID) {
+                Optional<UserEntity> user = userService.getUserByID(userID);
+                if (user.isPresent()) {
+                    return ResponseEntity.ok(user.get());
+                }
+                return ResponseEntity.notFound().build();
+            }
 
-    // DELETE
-    @DeleteMapping("/{id}")
-    public boolean deleteUser(@PathVariable("id") String userID) {
-        return userService.deleteUser(userID);
-    }
-
-
-
-}
+            @GetMapping
+            public ResponseEntity<List<UserEntity>> getAllUsers() {
+                List<UserEntity> users = userService.getAllUsers();
+                return ResponseEntity.ok(users);
+            }
+        }

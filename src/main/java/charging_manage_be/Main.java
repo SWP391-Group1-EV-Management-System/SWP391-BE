@@ -1,19 +1,7 @@
 package charging_manage_be;
 
-import charging_manage_be.model.entity.users.UserEntity;
-import charging_manage_be.services.payments.PaymentServiceImpl;
-import charging_manage_be.services.users.UserService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ApplicationContext;
-
-import java.util.Date;
-import java.util.Random;
-import java.util.UUID;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.math.BigDecimal;
-import java.util.Scanner;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
@@ -22,26 +10,27 @@ public class Main {
     public static void main(String[] args) {
 //        System.setProperty("spring.main.web-application-type", "none");
 //        ApplicationContext context = SpringApplication.run(Main.class, args);
-//
-//        // Inject UserService
+
+        // Đoạn này là test service và repository của Payment bằng việc input dữ liệu mẫu và in ra kết quả
+        // Inject UserService
 //        UserService userService = context.getBean(UserService.class);
 //        PaymentServiceImpl paymentService = context.getBean(PaymentServiceImpl.class);
-//
+//        paymentService.invoicePayment("JAPW8217", "VNPAY");
 //        UserEntity user = new UserEntity(
-//                "John",
-//                "Doe",
-//                new Date(),
-//                new Random().nextBoolean(),
-//                "USER",
-//                "john.doe" + new Random().nextInt(1000) + "@example.com",
-//                UUID.randomUUID().toString(),
-//                "09" + (10000000 + new Random().nextInt(90000000)),
-//                LocalDateTime.now(),
-//                "ACTIVE",
+//                "Khanh",
+//                "Việt",
+//                new Date(), // dateOfBirth
+//                new Random().nextBoolean(), // Gender
+//                "USER", // role
+//                "khanhpm12123@gmail.com", // email
+//                UUID.randomUUID().toString(), // password
+//                "0910238902", // phoneNumber
+//                LocalDateTime.now(), // createdAt
+//                "ACTIVE", // status
 //                null, // cars
 //                null  // userReputations
 //        );
-//        user.setUserID("ABC123");
+//        user.setUserID("180305");
 //
 //        // Sửa thành userService.addUser()
 //        boolean saveUser = userService.addUser(user);
@@ -52,8 +41,28 @@ public class Main {
 //            System.out.println("User saved successfully.");
 //        }
 //
-//        paymentService.createPayment(user, "LanSac1", new BigDecimal("120000"));
+//        paymentService.createPayment(user, "Sạc lần 1", new BigDecimal("10000000"));
 //        System.out.print("Success");
-        SpringApplication.run(Main.class, args);
+
+
+
+       SpringApplication.run(Main.class, args); // Đây là test để chạy Spring Boot mà không cần server để test trên Postman
+
+        // Đoạn này là test service và repository của User_Reputation bằng việc input dữ liệu mẫu và in ra kết quả
+//        UserReputationService userReputationService = context.getBean(UserReputationService.class);
+//
+//        List<User_ReputationEntity> reps = userReputationService.getUserReputationByUserID("180305");
+//
+//        // Đoạn này là để chuyển đổi từ Entity sang những gì mình cần lấy ra
+//        // Ví dụ ở đây chỉ cần in ra tên user, level name, max wait và createdAt
+//        reps.forEach(r -> {
+//            System.out.println(
+//                    "User: " + r.getUser().getFirstName() + // Đoạn .getUser() là lấy về UserEntity, sau đó .getFirstName() là lấy tên
+//                            // Tương tự cho những cái bên dưới
+//                            " | Level: " + r.getReputationLevel().getLevelName() +
+//                            " | Max Wait Time: " + r.getReputationLevel().getMaxWaitMinutes() +
+//                            " | CreatedAt: " + r.getCreatedAt()
+//            );
+//        });
     }
 }
