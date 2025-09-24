@@ -67,6 +67,8 @@ public class UserEntity {
 
     @OneToMany(mappedBy = "user")
     private List<PaymentEntity> payments;
+
+
     @OneToMany(mappedBy = "user")
     private List<ChargingSessionEntity> userSession;
     @OneToMany(mappedBy = "userManage")

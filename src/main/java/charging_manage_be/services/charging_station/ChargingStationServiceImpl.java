@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import static charging_manage_be.util.RandomId.generateRandomId;
 @Service
-public class ChargingStationServiceImpl implements  ChargingStationService {
+public class ChargingStationServiceImpl {
     // cấu hình độ dài của id
     private final int characterLength = 2;
     private final int numberLength = 2;
