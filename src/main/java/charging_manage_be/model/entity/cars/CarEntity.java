@@ -17,7 +17,8 @@ import java.util.List;
 @NoArgsConstructor
 public class CarEntity {
     @Id
-    private String license_plate; // Biển số xe
+    @Column(name = "license_plate")
+    private String licensePlate; // Biển số xe
 
     @ManyToOne // Nhiều xe có thể được mua bởi 1 người
     @JoinColumn(name = "user_id", nullable = false) // Khóa ngoại tham chiếu đến bảng users

@@ -29,7 +29,7 @@ public class ChargingPostEntity {
     @JoinColumn(name = "id_charging_station", nullable = false)
     private ChargingStationEntity chargingStation;
     @OneToMany(mappedBy = "chargingPost")
-    private List<ChargingSessionEntity> chargingPost;
+    private List<ChargingSessionEntity> chargingSessions;
     @ManyToMany
     @JoinTable(
             name = "charging_type_post",

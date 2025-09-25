@@ -39,7 +39,7 @@ public class WaitingListEntity {
     private CarEntity car;
 
     @Column(name = "position_waiting", nullable = false)
-    private int position_waiting; // vị trí trong danh sách chờ
+    private int positionWaiting; // vị trí trong danh sách chờ
 
     @Column(name = "created_at", nullable = false)
     @CreationTimestamp // so với @PrePersist thì @CreationTimestamp tự động hơn, không cần viết hàm

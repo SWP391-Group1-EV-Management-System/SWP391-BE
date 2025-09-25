@@ -26,11 +26,11 @@ public class ChargingSessionEntity {
     private BookingEntity booking;
 
     @ManyToOne
-    @JoinColumn(name = "charging_post")
+    @JoinColumn(name = "charging_post_id", nullable = false)
     private ChargingPostEntity chargingPost;
 
     @ManyToOne
-    @JoinColumn(name = "station_id")
+    @JoinColumn(name = "station_id", nullable = false)
     private ChargingStationEntity station;
 
     @ManyToOne
