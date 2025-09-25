@@ -1,4 +1,4 @@
-package charging_manage_be.model.entity.Charging;
+package charging_manage_be.model.entity.charging;
 
 import charging_manage_be.model.entity.payments.PaymentEntity;
 import charging_manage_be.model.entity.users.UserEntity;
@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Data

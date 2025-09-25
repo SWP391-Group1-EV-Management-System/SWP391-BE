@@ -1,6 +1,6 @@
 package charging_manage_be.services.charging_station;
 
-import charging_manage_be.model.entity.Charging.ChargingStationEntity;
+import charging_manage_be.model.entity.charging.ChargingStationEntity;
 import charging_manage_be.repository.charging_station.ChargingStationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

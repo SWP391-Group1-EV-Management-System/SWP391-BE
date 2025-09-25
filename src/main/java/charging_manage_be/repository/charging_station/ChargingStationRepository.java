@@ -1,6 +1,6 @@
 package charging_manage_be.repository.charging_station;
 
-import charging_manage_be.model.entity.Charging.ChargingStationEntity;
+import charging_manage_be.model.entity.charging.ChargingStationEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

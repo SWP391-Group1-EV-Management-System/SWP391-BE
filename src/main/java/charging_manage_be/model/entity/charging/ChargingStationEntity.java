@@ -1,4 +1,4 @@
-package charging_manage_be.model.entity.Charging;
+package charging_manage_be.model.entity.charging;
 
 import charging_manage_be.model.entity.users.UserEntity;
 import jakarta.persistence.*;

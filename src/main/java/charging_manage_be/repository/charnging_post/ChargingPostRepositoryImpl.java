@@ -1,9 +1,8 @@
 package charging_manage_be.repository.charnging_post;
 
-import charging_manage_be.model.entity.Charging.ChargingPostEntity;
+import charging_manage_be.model.entity.charging.ChargingPostEntity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import org.springframework.stereotype.Repository;
 
 
 public class ChargingPostRepositoryImpl {

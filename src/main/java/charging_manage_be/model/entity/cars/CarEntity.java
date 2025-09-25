@@ -1,6 +1,6 @@
 package charging_manage_be.model.entity.cars;
 
-import charging_manage_be.model.entity.charging_type.ChargingTypeEntity;
+import charging_manage_be.model.entity.charging.ChargingTypeEntity;
 import charging_manage_be.model.entity.users.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

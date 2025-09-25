@@ -1,6 +1,6 @@
 package charging_manage_be.model.entity.payments;
 
-import charging_manage_be.model.entity.Charging.ChargingSessionEntity;
+import charging_manage_be.model.entity.charging.ChargingSessionEntity;
 import charging_manage_be.model.entity.users.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

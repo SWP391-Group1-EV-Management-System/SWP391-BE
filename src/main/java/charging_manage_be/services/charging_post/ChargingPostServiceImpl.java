@@ -1,6 +1,6 @@
 package charging_manage_be.services.charging_post;
 
-import charging_manage_be.model.entity.Charging.ChargingPostEntity;
+import charging_manage_be.model.entity.charging.ChargingPostEntity;
 import charging_manage_be.repository.charnging_post.ChargingPostRepository;
 import charging_manage_be.services.charging_station.ChargingStationServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;

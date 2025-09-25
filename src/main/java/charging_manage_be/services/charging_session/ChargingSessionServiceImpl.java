@@ -1,6 +1,6 @@
 package charging_manage_be.services.charging_session;
 
-import charging_manage_be.model.entity.Charging.ChargingSessionEntity;
+import charging_manage_be.model.entity.charging.ChargingSessionEntity;
 import charging_manage_be.model.entity.payments.PaymentEntity;
 import charging_manage_be.repository.charging_session.ChargingSessionRepository;
 import charging_manage_be.services.payments.PaymentServiceImpl;

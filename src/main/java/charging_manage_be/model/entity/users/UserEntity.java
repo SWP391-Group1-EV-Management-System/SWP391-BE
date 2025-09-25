@@ -1,12 +1,9 @@
 package charging_manage_be.model.entity.users;
 
-<<<<<<< HEAD
 import charging_manage_be.model.entity.booking.WaitingListEntity;
-=======
-import charging_manage_be.model.entity.Charging.ChargingSessionEntity;
->>>>>>> fda8566f88f897f6571d18cdb15a01bd51353e20
+import charging_manage_be.model.entity.charging.ChargingSessionEntity;
 import charging_manage_be.model.entity.cars.CarEntity;
-import charging_manage_be.model.entity.Charging.ChargingStationEntity;
+import charging_manage_be.model.entity.charging.ChargingStationEntity;
 import charging_manage_be.model.entity.payments.PaymentEntity;
 import charging_manage_be.model.entity.reputations.UserReputationEntity;
 import jakarta.persistence.*;
@@ -72,14 +69,11 @@ public class UserEntity {
     @OneToMany(mappedBy = "user")
     private List<PaymentEntity> payments;
 
-<<<<<<< HEAD
     @OneToMany(mappedBy = "user" )
     private List<WaitingListEntity> waitingLists;
-=======
 
     @OneToMany(mappedBy = "user")
     private List<ChargingSessionEntity> userSession;
     @OneToMany(mappedBy = "userManage")
     private List<ChargingSessionEntity> userManagerSession;
->>>>>>> fda8566f88f897f6571d18cdb15a01bd51353e20
 }

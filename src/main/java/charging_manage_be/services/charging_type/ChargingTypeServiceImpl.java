@@ -1,6 +1,6 @@
 package charging_manage_be.services.charging_type;
 
-import charging_manage_be.model.entity.Charging.ChargingTypeEntity;
+import charging_manage_be.model.entity.charging.ChargingTypeEntity;
 import charging_manage_be.repository.charging_type.ChargingTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

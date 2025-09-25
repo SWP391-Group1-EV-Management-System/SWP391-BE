@@ -1,8 +1,8 @@
 package charging_manage_be.model.entity.booking;
 
+import charging_manage_be.model.entity.charging.ChargingPostEntity;
+import charging_manage_be.model.entity.charging.ChargingStationEntity;
 import charging_manage_be.model.entity.cars.CarEntity;
-import charging_manage_be.model.entity.charging_post.ChargingPostEntity;
-import charging_manage_be.model.entity.charging_station.ChargingStationEntity;
 import charging_manage_be.model.entity.users.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
