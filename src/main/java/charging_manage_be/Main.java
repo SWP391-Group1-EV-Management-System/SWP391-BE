@@ -46,7 +46,7 @@ public class Main {
 
 
 
-       SpringApplication.run(Main.class, args); // Đây là test để chạy Spring Boot mà không cần server để test trên Postman
+      // SpringApplication.run(Main.class, args); // Đây là test để chạy Spring Boot mà không cần server để test trên Postman
 
         // Đoạn này là test service và repository của User_Reputation bằng việc input dữ liệu mẫu và in ra kết quả
 //        UserReputationService userReputationService = context.getBean(UserReputationService.class);
@@ -64,5 +64,9 @@ public class Main {
 //                            " | CreatedAt: " + r.getCreatedAt()
 //            );
 //        });
+
+
+
+
     }
 }
