@@ -12,6 +12,7 @@ import java.util.List;
 public class ChargingStationEntity {
 //Ma tram/UserId quan ly/Ten Tram/Dia Chi /Trang Thái/moc thơi gian lap / so tru sac
     @Id
+    @Column(name = "id_charging_station")
     private  String idChargingStation;
     @Column(name = "name_charging_station", nullable = false)
     private  String nameChargingStation;
