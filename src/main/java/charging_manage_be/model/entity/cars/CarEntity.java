@@ -1,11 +1,14 @@
 package charging_manage_be.model.entity.cars;
 
+import charging_manage_be.model.entity.booking.WaitingListEntity;
 import charging_manage_be.model.entity.charging.ChargingTypeEntity;
 import charging_manage_be.model.entity.users.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @Table(name = "cars")
@@ -14,7 +17,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CarEntity {
     @Id
-    private String license_plate; // Biển số xe
+    @Column(name = "license_plate")
+    private String licensePlate; // Biển số xe
 
     @ManyToOne // Nhiều xe có thể được mua bởi 1 người
     @JoinColumn(name = "user_id", nullable = false) // Khóa ngoại tham chiếu đến bảng users
@@ -29,4 +33,7 @@ public class CarEntity {
     @ManyToOne
     @JoinColumn(name = "charging_type_id", nullable = false)
     private ChargingTypeEntity chargingType; // Loại sạc
+
+    @OneToMany(mappedBy = "car" )
+    private List<WaitingListEntity> waitingList;
 }

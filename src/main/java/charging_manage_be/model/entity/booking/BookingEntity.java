@@ -4,12 +4,19 @@ import charging_manage_be.model.entity.charging.ChargingPostEntity;
 import charging_manage_be.model.entity.charging.ChargingStationEntity;
 import charging_manage_be.model.entity.users.UserEntity;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "booking")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class BookingEntity {
     @Id
     @Column(name = "booking_id")
@@ -40,4 +47,8 @@ public class BookingEntity {
 
     @Column(name = "status", nullable = false)
     private String status;
+
+    @OneToOne(mappedBy = "booking" )
+    private ChargingSessionEntity chargingSession;
+
 }
