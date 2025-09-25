@@ -1,11 +1,14 @@
 package charging_manage_be.model.entity.cars;
 
+import charging_manage_be.model.entity.booking.WaitingListEntity;
 import charging_manage_be.model.entity.charging.ChargingTypeEntity;
 import charging_manage_be.model.entity.users.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @Table(name = "cars")
@@ -29,4 +32,7 @@ public class CarEntity {
     @ManyToOne
     @JoinColumn(name = "charging_type_id", nullable = false)
     private ChargingTypeEntity chargingType; // Loại sạc
+
+    @OneToMany(mappedBy = "car" )
+    private List<WaitingListEntity> waitingList;
 }

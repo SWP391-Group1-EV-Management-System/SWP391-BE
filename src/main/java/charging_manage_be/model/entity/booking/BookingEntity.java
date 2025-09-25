@@ -1,12 +1,14 @@
 package charging_manage_be.model.entity.booking;
 
 import charging_manage_be.model.entity.charging.ChargingPostEntity;
+import charging_manage_be.model.entity.charging.ChargingSessionEntity;
 import charging_manage_be.model.entity.charging.ChargingStationEntity;
 import charging_manage_be.model.entity.users.UserEntity;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "booking")
@@ -40,5 +42,8 @@ public class BookingEntity {
 
     @Column(name = "status", nullable = false)
     private String status;
+
+    @OneToOne(mappedBy = "booking" )
+    private ChargingSessionEntity chargingSessions;
 
 }

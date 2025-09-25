@@ -1,5 +1,7 @@
 package charging_manage_be.model.entity.charging;
 
+import charging_manage_be.model.entity.booking.BookingEntity;
+import charging_manage_be.model.entity.booking.WaitingListEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -35,5 +37,10 @@ public class ChargingPostEntity {
             inverseJoinColumns = @JoinColumn(name = "id_charging_type")
     )
     private List<ChargingTypeEntity> chargingType;
+    @OneToMany(mappedBy = "chargingPost" )
+    private List<WaitingListEntity> waitingList;
+
+    @OneToMany(mappedBy = "chargingPost" )
+    private List<BookingEntity> bookings;
 
 }

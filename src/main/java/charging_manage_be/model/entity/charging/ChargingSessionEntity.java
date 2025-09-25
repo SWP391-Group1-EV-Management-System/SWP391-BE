@@ -1,5 +1,6 @@
 package charging_manage_be.model.entity.charging;
 
+import charging_manage_be.model.entity.booking.BookingEntity;
 import charging_manage_be.model.entity.payments.PaymentEntity;
 import charging_manage_be.model.entity.users.UserEntity;
 import jakarta.persistence.*;
@@ -19,8 +20,11 @@ public class ChargingSessionEntity {
     @Id
     @Column(name = "charging_session_id")
     private String chargingSessionId;
-    @Column(name = "booking_code")
-    private String bookingCode;
+
+    @OneToOne
+    @JoinColumn(name = "booking_id", nullable = true)
+    private BookingEntity booking;
+
     @ManyToOne
     @JoinColumn(name = "charging_post")
     private ChargingPostEntity chargingPost;

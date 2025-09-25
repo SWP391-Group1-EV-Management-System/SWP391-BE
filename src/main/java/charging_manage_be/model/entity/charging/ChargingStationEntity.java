@@ -1,5 +1,7 @@
 package charging_manage_be.model.entity.charging;
 
+import charging_manage_be.model.entity.booking.BookingEntity;
+import charging_manage_be.model.entity.booking.WaitingListEntity;
 import charging_manage_be.model.entity.users.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -44,6 +46,15 @@ public class ChargingStationEntity {
         this.establishedTime = LocalDateTime.now();
 
     }
+
+    @OneToMany(mappedBy = "chargingStation")
+    private List<WaitingListEntity> waitingList;
+
+    @OneToMany(mappedBy = "chargingStation")
+    private List<BookingEntity> bookings;
+
+
+
 //        public ChargingStationEntity() {
 //        }
 //
