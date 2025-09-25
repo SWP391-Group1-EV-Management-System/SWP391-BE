@@ -1,0 +1,22 @@
+package charging_manage_be.services.charging_type;
+
+import charging_manage_be.model.entity.Charging.ChargingTypeEntity;
+import charging_manage_be.repository.charging_type.ChargingTypeRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class ChargingTypeServiceImpl {
+    @Autowired
+    private ChargingTypeRepository chargingTypeRepository;
+    public ChargingTypeEntity addChargingType(ChargingTypeEntity chargingTypeEntity) {
+        return chargingTypeRepository.save(chargingTypeEntity);
+    }
+    public ChargingTypeEntity getChargingTypeById(int typeId) {
+        return chargingTypeRepository.findById(typeId).orElse(null);
+    }
+    public ChargingTypeEntity updateChargingType(ChargingTypeEntity chargingTypeEntity) {
+        return chargingTypeRepository.save(chargingTypeEntity);
+    }
+
+}

@@ -9,8 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-@Repository
-public class PaymentRepositoryImpl implements PaymentRepository {
+public class PaymentRepositoryImpl  {
     @Autowired
     private EntityManagerFactory entityManagerFactory;
     @PersistenceContext
