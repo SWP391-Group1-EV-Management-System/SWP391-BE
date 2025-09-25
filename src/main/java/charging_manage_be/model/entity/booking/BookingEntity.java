@@ -40,5 +40,4 @@ public class BookingEntity {
 
     @Column(name = "status", nullable = false)
     private String status;
-
 }

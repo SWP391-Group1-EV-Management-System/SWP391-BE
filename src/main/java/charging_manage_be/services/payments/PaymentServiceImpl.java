@@ -1,13 +1,9 @@
 package charging_manage_be.services.payments;
 
 import charging_manage_be.model.entity.payments.PaymentEntity;
-import charging_manage_be.model.entity.users.UserEntity;
 import charging_manage_be.repository.payments.PaymentRepository;
-import charging_manage_be.repository.payments.PaymentRepositoryImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
 
 import static charging_manage_be.util.RandomId.generateRandomId;
 
