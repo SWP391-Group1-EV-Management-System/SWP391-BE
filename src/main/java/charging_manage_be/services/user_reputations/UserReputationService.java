@@ -11,4 +11,5 @@ public interface UserReputationService {
     List<UserReputationEntity> getAllUserReputations();
     Optional<UserReputationEntity> getCurrentUserReputationById(String userID);
 
+    // Đối với này thì không cần update hay delete vì user reputation là lịch sử, không thể sửa hay xóa được
 }

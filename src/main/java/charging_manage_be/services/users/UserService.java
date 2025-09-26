@@ -12,6 +12,7 @@ public interface UserService {
 //    List<UserEntity> getAllUsers();
 
     UserEntity saveUser(UserEntity user); // Phải là kiểu UserEntity vì hàm save trả về entity đã lưu
+    UserEntity updateUser(UserEntity user);
     boolean softDeleteUser(String userID);
     Optional<UserEntity> getUserByID(String userID);
     List<UserEntity> getAllUsers();

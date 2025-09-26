@@ -28,7 +28,7 @@ public class ReputationLevelController {
     public ResponseEntity<ReputationLevelEntity> updateReputationLevel(@PathVariable int levelID, @RequestBody ReputationLevelEntity levelDetails) {
         try {
             levelDetails.setLevelID(levelID);
-            ReputationLevelEntity updatedLevel = reputationLevelService.saveReputationLevel(levelDetails);
+            ReputationLevelEntity updatedLevel = reputationLevelService.updateReputationLevel(levelDetails);
             return ResponseEntity.ok(updatedLevel);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();

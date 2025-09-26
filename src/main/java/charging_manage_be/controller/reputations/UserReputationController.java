@@ -24,6 +24,7 @@ public class UserReputationController {
         return ResponseEntity.ok(savedReputation);
     }
 
+
     // Get user reputation by user ID
     @GetMapping("/{userID}")
     public ResponseEntity<List<UserReputationEntity>> getUserReputationById(@PathVariable String userID) {
@@ -38,7 +39,7 @@ public class UserReputationController {
     @GetMapping("/current/{userID}")
     public ResponseEntity<UserReputationEntity> getCurrentUserReputationByUserId(@PathVariable String userID) {
         Optional<UserReputationEntity> reputation = userReputationService.getCurrentUserReputationById(userID);
-        if (reputation == null) {
+        if (reputation.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(reputation.get());

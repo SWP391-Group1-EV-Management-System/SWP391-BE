@@ -1,5 +1,6 @@
 package charging_manage_be.model.entity.reputations;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,5 +26,6 @@ public class ReputationLevelEntity {
     private String description;
 
     @OneToMany(mappedBy = "reputationLevel")
+    @JsonIgnore
     private List<UserReputationEntity> userReputations;
 }

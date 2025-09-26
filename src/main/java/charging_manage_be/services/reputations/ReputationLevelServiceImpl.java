@@ -16,17 +16,44 @@ public class ReputationLevelServiceImpl implements ReputationLevelService {
 
     @Override
     public ReputationLevelEntity saveReputationLevel(ReputationLevelEntity reputationLevelEntity) {
-        return reputationLevelRepository.save(reputationLevelEntity);
+        if (reputationLevelEntity == null) {
+            throw new IllegalArgumentException("ReputationLevelEntity cannot be null");
+        }
+        else if (reputationLevelRepository.existsById(reputationLevelEntity.getLevelID())){
+            throw new IllegalArgumentException("ReputationLevelEntity with ID " + reputationLevelEntity.getLevelID() + " already exists");
+        }
+        else {
+            return reputationLevelRepository.save(reputationLevelEntity);
+        }
+    }
+
+    @Override
+    public ReputationLevelEntity updateReputationLevel(ReputationLevelEntity reputationLevelEntity) {
+        if (reputationLevelEntity == null) {
+            throw new IllegalArgumentException("ReputationLevelEntity cannot be null");
+        }
+        else if (!reputationLevelRepository.existsById(reputationLevelEntity.getLevelID())){
+            throw new IllegalArgumentException("ReputationLevelEntity with ID " + reputationLevelEntity.getLevelID() + " does not exist");
+        }
+        else {
+            return reputationLevelRepository.save(reputationLevelEntity);
+        }
     }
 
     @Override
     public boolean deleteReputationLevelById(int levelID) {
+        if (!reputationLevelRepository.existsById(levelID)) {
+            throw new IllegalArgumentException("ReputationLevelEntity with ID " + levelID + " does not exist");
+        }
         reputationLevelRepository.deleteById(levelID);
         return true;
     }
 
     @Override
     public Optional<ReputationLevelEntity> getReputationLevelById(int levelID) {
+        if (!reputationLevelRepository.existsById(levelID)) {
+            throw new IllegalArgumentException("ReputationLevelEntity with ID " + levelID + " does not exist");
+        }
         return reputationLevelRepository.findById(levelID);
     }
 
