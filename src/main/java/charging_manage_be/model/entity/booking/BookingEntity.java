@@ -1,6 +1,8 @@
 package charging_manage_be.model.entity.booking;
 
+import charging_manage_be.model.entity.cars.CarEntity;
 import charging_manage_be.model.entity.charging.ChargingPostEntity;
+import charging_manage_be.model.entity.charging.ChargingSessionEntity;
 import charging_manage_be.model.entity.charging.ChargingStationEntity;
 import charging_manage_be.model.entity.users.UserEntity;
 import jakarta.persistence.*;
@@ -38,6 +40,10 @@ public class BookingEntity {
     @JoinColumn(name = "id_charging_post", nullable = false)
     private ChargingPostEntity chargingPost;
 
+    @ManyToOne // Qua Car để chỉnh mối quan hệ lại
+    @JoinColumn(name = "license_plate", nullable = false)
+    private CarEntity car;
+
     @Column(name = "create_at", nullable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -47,6 +53,10 @@ public class BookingEntity {
 
     @Column(name = "status", nullable = false)
     private String status;
+    // đã đặt
+    // đang sạc
+    // đã hủy
+    // đã sạc xong
 
     @OneToOne(mappedBy = "booking" )
     private ChargingSessionEntity chargingSession;
