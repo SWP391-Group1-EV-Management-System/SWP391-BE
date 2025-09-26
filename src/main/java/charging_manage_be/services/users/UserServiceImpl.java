@@ -16,29 +16,41 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserEntity saveUser(UserEntity user) {
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be null");
+        }
         return userRepository.save(user);
     }
 
     @Override
-    public boolean softDeleteUser(String userID) {
-         try{
-                Optional<UserEntity> userFound = userRepository.findById(userID);
-                if (!userFound.isEmpty()) { // có thể dùng isPresent()
-                    UserEntity user = userFound.get();
-                    user.setStatus(false); // Assuming there's an 'active' field to indicate soft deletion
-                    userRepository.save(user);
-                    return true;
-                }
-                else {
-                    return false; // User not found
-                }
-            } catch (Exception e) {
-                return false; // Handle exception (e.g., log it)
+    public UserEntity updateUser(UserEntity user) {
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be null");
+        }
+        if (!userRepository.existsById(user.getUserID())) {
+            throw  new IllegalArgumentException("User does not exist");
+        }
+        return userRepository.save(user);
+    }
+
+    @Override
+    public boolean softDeleteUser(String userID) { // Hàm xóa này chỉ là xóa mềm, tức là chỉ set status = false
+         if (!userRepository.existsById(userID)) {
+             throw  new IllegalArgumentException("User does not exist");
+         }
+         else{
+             UserEntity user = userRepository.findById(userID).get();
+             user.setStatus(false);
+             userRepository.save(user);
+             return true;
          }
     }
 
     @Override
     public Optional<UserEntity> getUserByID(String userID) {
+        if (!userRepository.existsById(userID)) {
+            throw  new IllegalArgumentException("User does not exist");
+        }
         return userRepository.findById(userID);
     }
 

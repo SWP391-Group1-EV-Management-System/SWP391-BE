@@ -8,6 +8,7 @@ import java.util.Optional;
 public interface ReputationLevelService {
 
     ReputationLevelEntity saveReputationLevel(ReputationLevelEntity reputationLevelEntity);
+    ReputationLevelEntity updateReputationLevel(ReputationLevelEntity reputationLevelEntity);
     boolean deleteReputationLevelById(int levelID);
     Optional<ReputationLevelEntity> getReputationLevelById(int levelID);
     List<ReputationLevelEntity> getAllReputationLevels();

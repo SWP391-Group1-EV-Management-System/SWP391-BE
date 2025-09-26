@@ -1,5 +1,6 @@
 package charging_manage_be.model.entity.cars;
 
+import charging_manage_be.model.entity.booking.BookingEntity;
 import charging_manage_be.model.entity.booking.WaitingListEntity;
 import charging_manage_be.model.entity.charging.ChargingTypeEntity;
 import charging_manage_be.model.entity.users.UserEntity;
@@ -36,4 +37,7 @@ public class CarEntity {
 
     @OneToMany(mappedBy = "car" )
     private List<WaitingListEntity> waitingList;
+
+    @OneToMany(mappedBy = "car" )
+    private List<BookingEntity> bookings;
 }

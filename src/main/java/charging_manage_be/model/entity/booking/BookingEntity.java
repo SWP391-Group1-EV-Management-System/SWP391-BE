@@ -1,5 +1,6 @@
 package charging_manage_be.model.entity.booking;
 
+import charging_manage_be.model.entity.cars.CarEntity;
 import charging_manage_be.model.entity.charging.ChargingPostEntity;
 import charging_manage_be.model.entity.charging.ChargingSessionEntity;
 import charging_manage_be.model.entity.charging.ChargingStationEntity;
@@ -21,7 +22,7 @@ import java.util.List;
 public class BookingEntity {
     @Id
     @Column(name = "booking_id")
-    private String bookingId;
+    private String bookingId ;
 
     @OneToOne
     @JoinColumn(name = "waiting_list_id",  nullable = false)
@@ -38,6 +39,10 @@ public class BookingEntity {
     @ManyToOne // Cần qua ChargingStationEntity chỉnh lại mối quan hệ với Booking
     @JoinColumn(name = "id_charging_post", nullable = false)
     private ChargingPostEntity chargingPost;
+
+    @ManyToOne
+    @JoinColumn(name = "license_plate", nullable = false)
+    private CarEntity car;
 
     @Column(name = "create_at", nullable = false)
     @CreationTimestamp

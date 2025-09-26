@@ -32,7 +32,7 @@ package charging_manage_be.controller.users;
                         userDetails.setCreatedAt(existingUser.get().getCreatedAt());
                     }
 
-                    UserEntity updatedUser = userService.saveUser(userDetails);
+                    UserEntity updatedUser = userService.updateUser(userDetails);
                     return ResponseEntity.ok(updatedUser);
                 } catch (RuntimeException e) {
                     return ResponseEntity.notFound().build();

@@ -45,6 +45,9 @@ public class WaitingListEntity {
     @CreationTimestamp // so với @PrePersist thì @CreationTimestamp tự động hơn, không cần viết hàm
     private LocalDateTime createdAt; // thời gian tạo
 
+    @Column(name = "status", nullable = false)
+    private String status;
+
     @OneToOne(mappedBy = "waitingList")
     private BookingEntity booking;
 

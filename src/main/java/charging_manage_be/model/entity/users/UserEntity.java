@@ -7,6 +7,7 @@ import charging_manage_be.model.entity.cars.CarEntity;
 import charging_manage_be.model.entity.charging.ChargingStationEntity;
 import charging_manage_be.model.entity.payments.PaymentEntity;
 import charging_manage_be.model.entity.reputations.UserReputationEntity;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -62,6 +63,7 @@ public class UserEntity {
     private List<CarEntity> cars;
 
     @OneToMany(mappedBy = "user")
+    @JsonManagedReference
     private List<UserReputationEntity> userReputations;
 
     @OneToOne(mappedBy = "UserManager")
