@@ -10,6 +10,6 @@ public interface CarService {
     CarEntity insertCar(CarEntity carEntity);
     CarEntity updateCar(CarEntity carEntity);
     boolean deleteCarByLicensePlate(String licensePlate);
-    Optional<CarEntity> getCarByLicensePlate(String licensePlate);
+    Optional<CarEntity> getCarByCarId(String carId);
     List<CarEntity> findAllCar();
 }

@@ -18,6 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 public class ChargingPostEntity {
     @Id
+    @Column (name = "id_charging_post")
     private String idChargingPost;
     @Column (name = "is_active",nullable = false)
     private boolean isActive;

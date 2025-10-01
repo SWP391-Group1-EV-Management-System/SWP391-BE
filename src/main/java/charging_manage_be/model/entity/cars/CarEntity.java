@@ -18,6 +18,9 @@ import java.util.List;
 @NoArgsConstructor
 public class CarEntity {
     @Id
+    @Column (name = "car_id")
+    private String carId;
+
     @Column(name = "license_plate")
     private String licensePlate; // Biển số xe
 

@@ -2,6 +2,8 @@ package charging_manage_be.repository.charging_station;
 
 import charging_manage_be.model.entity.charging.ChargingStationEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -11,4 +13,7 @@ public interface ChargingStationRepository extends JpaRepository<ChargingStation
    // public boolean updateStation(ChargingStationEntity station);
   //  public boolean isExistById(String stationId);
     //public ChargingStationEntity getStationById(String stationId);
+    @Query ("SELECT c FROM ChargingStationEntity c JOIN c.chargingPosts p WHERE p.idChargingPost = :idChargingPostEntity")
+    ChargingStationEntity findStationByChargingPostEntity(@Param("idChargingPostEntity") String idChargingPostEntity);
+
 }

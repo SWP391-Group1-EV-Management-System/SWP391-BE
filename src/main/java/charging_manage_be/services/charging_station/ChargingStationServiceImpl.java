@@ -57,6 +57,11 @@ public class ChargingStationServiceImpl {
         chargingStationRepository.save(station);
         return true;
     }
+    public ChargingStationEntity findStationByChargingPostEntity(String postId)
+    {
+        return chargingStationRepository.findStationByChargingPostEntity(postId);
+    }
+
 
 
 }

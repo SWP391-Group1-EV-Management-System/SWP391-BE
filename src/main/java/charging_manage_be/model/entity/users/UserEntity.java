@@ -24,9 +24,10 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserEntity {
-    @Id
+
 //    @GeneratedValue(strategy = GenerationType.IDENTITY)
     // Làm cho userID tự động random 4 chữ cái và 4 chữ số
+    @Id
     @Column(name = "user_id")
     private String userID;
 

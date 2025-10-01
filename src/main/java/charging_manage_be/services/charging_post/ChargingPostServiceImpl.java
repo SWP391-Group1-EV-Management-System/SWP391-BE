@@ -1,7 +1,7 @@
 package charging_manage_be.services.charging_post;
 
 import charging_manage_be.model.entity.charging.ChargingPostEntity;
-import charging_manage_be.repository.charnging_post.ChargingPostRepository;
+import charging_manage_be.repository.charging_post.ChargingPostRepository;
 import charging_manage_be.services.charging_station.ChargingStationServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +20,14 @@ public class ChargingPostServiceImpl {
             newId = generateRandomId(characterLength, numberLength);
         } while (isPaymentIdExists(newId));
         return newId;
+    }
+    public ChargingPostEntity getChargingPostById(String id)
+    {
+        if(!ChargingPostRepository.existsById(id))
+        {
+            return null;
+        }
+        return ChargingPostRepository.findById(id).get();
     }
     public boolean isPaymentIdExists(String id) {
         return ChargingPostRepository.existsById(id);
@@ -47,6 +55,7 @@ public class ChargingPostServiceImpl {
         ChargingPostRepository.save(post);
         return true;
     }
+
 
 //    public boolean addPost(String stationId, boolean isActive, BigDecimal changingFeePerKWh, BigDecimal maxPower)
 //    {

@@ -18,8 +18,8 @@ public interface BookingRepository extends JpaRepository <BookingEntity, String>
 //    );
     @Query("SELECT CASE WHEN COUNT(u) > 0 THEN false ELSE true END " +
             "FROM BookingEntity u " +
-            "WHERE u.chargingPost = :chargingPost " +
-            "AND u.status IN ('Reserved', 'Charging')")
+            "WHERE u.chargingPost.idChargingPost = :chargingPost " +
+            "AND u.status IN ('waiting', 'charging')")
     boolean isChargingPostAvailable(@Param("chargingPost") String chargingPost);
 
 }

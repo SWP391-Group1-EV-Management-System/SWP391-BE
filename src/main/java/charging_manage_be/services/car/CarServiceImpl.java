@@ -39,25 +39,25 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    public boolean deleteCarByLicensePlate(String licensePlate) {
-        if (licensePlate == null) {
-            throw new NullPointerException("licensePlate is null");
+    public boolean deleteCarByLicensePlate(String carId) {
+        if (carId == null) {
+            throw new NullPointerException("carId is null");
         }
-        else if (!carRepository.existsById(licensePlate)){
+        else if (!carRepository.existsById(carId)){
             throw new IllegalStateException("carEntity is not exists");
         }
         else {
-            carRepository.deleteById(licensePlate);
+            carRepository.deleteById(carId);
             return true;
         }
     }
 
     @Override
-    public Optional<CarEntity> getCarByLicensePlate(String licensePlate) {
-        if (licensePlate == null) {
-            throw new NullPointerException("licensePlate is null");
+    public Optional<CarEntity> getCarByCarId(String carId) {
+        if (carId == null) {
+            throw new NullPointerException("carId is null");
         }
-        return carRepository.findById(licensePlate);
+        return carRepository.findById(carId);
     }
 
     @Override

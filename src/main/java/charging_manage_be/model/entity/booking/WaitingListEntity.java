@@ -35,11 +35,8 @@ public class WaitingListEntity {
     private ChargingPostEntity chargingPost; // mã trụ sạc
 
     @ManyToOne // Qua Car để chỉnh mối quan hệ lại
-    @JoinColumn(name = "license_plate", nullable = false)
+    @JoinColumn(name = "car_id", nullable = false)
     private CarEntity car;
-
-    @Column(name = "position_waiting", nullable = false)
-    private int positionWaiting; // vị trí trong danh sách chờ
 
     @Column(name = "created_at", nullable = false)
     @CreationTimestamp // so với @PrePersist thì @CreationTimestamp tự động hơn, không cần viết hàm
@@ -48,8 +45,15 @@ public class WaitingListEntity {
     @Column(name = "status", nullable = false)
     private String status;
 
+    @Column(name = "quit_at")
+    private LocalDateTime quitAt;
+
     @OneToOne(mappedBy = "waitingList")
     private BookingEntity booking;
+    @PreUpdate //call save or merge
+    protected void onUpdate() {
+        this.quitAt = LocalDateTime.now();
+    }
 
 
 }

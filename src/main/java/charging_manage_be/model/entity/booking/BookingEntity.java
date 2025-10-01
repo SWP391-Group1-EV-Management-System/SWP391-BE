@@ -25,7 +25,7 @@ public class BookingEntity {
     private String bookingId;
 
     @OneToOne
-    @JoinColumn(name = "waiting_list_id",  nullable = false)
+    @JoinColumn(name = "waiting_list_id",  nullable = true)
     private WaitingListEntity waitingList;
 
     @ManyToOne // Cần qua UserEntity chỉnh lại mối quan hệ với Booking
@@ -45,8 +45,10 @@ public class BookingEntity {
     private CarEntity car;
 
     @Column(name = "create_at", nullable = false)
-    @CreationTimestamp
+    //@CreationTimestamp set thủ công cho an toàn
     private LocalDateTime createdAt;
+    @Column(name = "done_at", nullable = true)
+    private LocalDateTime doneAt;
 
     @Column(name = "max_waiting_time", nullable = false)
     private int maxWaitingTime;
@@ -54,9 +56,9 @@ public class BookingEntity {
     @Column(name = "status", nullable = false)
     private String status;
     // đã đặt
-    // đang sạc
     // đã hủy
-    // đã sạc xong
+    // đã đến
+    // hết giờ
 
     @OneToOne(mappedBy = "booking" )
     private ChargingSessionEntity chargingSession;

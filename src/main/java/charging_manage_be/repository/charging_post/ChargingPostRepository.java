@@ -1,4 +1,4 @@
-package charging_manage_be.repository.charnging_post;
+package charging_manage_be.repository.charging_post;
 
 import charging_manage_be.model.entity.charging.ChargingPostEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
