@@ -25,7 +25,7 @@ public class BookingEntity {
     private String bookingId;
 
     @OneToOne
-    @JoinColumn(name = "waiting_list_id", nullable = true)
+    @JoinColumn(name = "waiting_list_id",  nullable = false)
     private WaitingListEntity waitingList;
 
     @ManyToOne // Cần qua UserEntity chỉnh lại mối quan hệ với Booking
