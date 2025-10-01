@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Booking Dashboard</title>
+    <style>
+        .station {
+            border: 1px solid #ccc;
+            margin-bottom: 24px;
+            padding: 16px;
+            border-radius: 8px;
+        }
+        .station-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+        .chargers {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .charger {
+            border: 1px solid #aaa;
+            border-radius: 6px;
+            padding: 12px;
+            min-width: 160px;
+            text-align: center;
+            background: #f9f9f9;
+        }
+        .booking-btn {
+            margin-top: 8px;
+            padding: 6px 16px;
+            background: #1976d2;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .booking-btn:hover {
+            background: #1565c0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Charging Stations</h1>
+    <!-- Example data, replace with server-side rendering or JS as needed -->
+
+    <div th:each="i : ${stations} " class="station">
+        <div class="station-title">Station 1 - Central Park</div>
+        <div class="chargers">
+            <div class="charger">
+                <div>Charger #1</div>
+                <div>Status: Available</div>
+                <button class="booking-btn">Booking</button>
+            </div>
+            <div class="charger">
+                <div>Charger #2</div>
+                <div>Status: In Use</div>
+                <button class="booking-btn" disabled>Booking</button>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <div class="station">
+        <div class="station-title">Station 2 - City Mall</div>
+        <div class="chargers">
+            <div class="charger">
+                <div>Charger #1</div>
+                <div>Status: Available</div>
+                <button class="booking-btn">Booking</button>
+            </div>
+            <div class="charger">
+                <div>Charger #2</div>
+                <div>Status: Available</div>
+                <button class="booking-btn">Booking</button>
+            </div>
+            <div class="charger">
+                <div>Charger #3</div>
+                <div>Status: Maintenance</div>
+                <button class="booking-btn" disabled>Booking</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

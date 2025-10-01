@@ -1,25 +1,38 @@
 package charging_manage_be.services.charging_session;
 
+import charging_manage_be.model.entity.booking.BookingEntity;
+import charging_manage_be.model.entity.charging.ChargingPostEntity;
 import charging_manage_be.model.entity.charging.ChargingSessionEntity;
 import charging_manage_be.model.entity.payments.PaymentEntity;
+import charging_manage_be.model.entity.users.UserEntity;
+import charging_manage_be.repository.booking.BookingRepository;
+import charging_manage_be.repository.charging_post.ChargingPostRepository;
 import charging_manage_be.repository.charging_session.ChargingSessionRepository;
+import charging_manage_be.repository.users.UserRepository;
+import charging_manage_be.services.booking.BookingService;
 import charging_manage_be.services.payments.PaymentServiceImpl;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static charging_manage_be.util.RandomId.generateRandomId;
 
 @Service
+@RequiredArgsConstructor
 public class ChargingSessionServiceImpl {
     private final int characterLength = 5;
     private final int numberLength = 4;
-    @Autowired
-    private ChargingSessionRepository chargingSession;
-    @Autowired
-    private PaymentServiceImpl paymentService;
+
+    private final ChargingSessionRepository chargingSession;
+    private final PaymentServiceImpl paymentService;
+    private final BookingRepository bookingRepository;
+    private final UserRepository userRepository;
+    private final ChargingPostRepository chargingPostRepository;
     public boolean isExistById(String sessionId) {
         return chargingSession.existsById(sessionId);
     }
@@ -30,14 +43,56 @@ public class ChargingSessionServiceImpl {
         } while (isExistById(newId));
         return newId;
     }
-    public boolean addSession(ChargingSessionEntity session) {
+    // khi driver quẹt QR thì sẽ lấy thông tin userId, carId, và lấy booking nếu có để tạo session
+    public boolean addSessionWithBooking(String bookingId) {
         try {
-            if(session == null) {
+            Optional<BookingEntity> optionalBooking = bookingRepository.findById(bookingId);
+            if (optionalBooking.isEmpty() || !optionalBooking.get().getStatus().equals("WAITING")) {
                 return false;
             }
+
+            BookingEntity booking = optionalBooking.get();
+        ChargingSessionEntity session = new ChargingSessionEntity();
+        session.setChargingSessionId(generateUniqueId());
+        session.setUser(booking.getUser());// trạm trụ trạng thái KWh tổng tiền
+        session.setBooking(booking);
+        UserEntity userManager = booking.getChargingStation().getUserManager();
+        session.setUserManage(userManager);
+        session.setStation(booking.getChargingStation());
+        session.setChargingPost(booking.getChargingPost());
+        session.setKWh(booking.getChargingPost().getChargingFeePerKWh());
+        chargingSession.save(session);
+        return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    public boolean addSessionWithoutBooking(String userId,String postId)
+    {
+        try {
+
+        Optional<UserEntity> optional = userRepository.findById(userId);
+        if (optional.isEmpty()) {
+            return false;
+        }
+            Optional<ChargingPostEntity> optional2 = chargingPostRepository.findById(postId);
+            if (optional2.isEmpty()) {
+                return false;
+            }
+            ChargingPostEntity post = optional2.get();
+            UserEntity user = optional.get();
+
+            ChargingSessionEntity session = new ChargingSessionEntity();
             session.setChargingSessionId(generateUniqueId());
+            session.setUser(user);// trạm trụ trạng thái KWh tổng tiền
+            UserEntity userManager = post.getChargingStation().getUserManager();
+            session.setUserManage(userManager);
+            session.setStation(post.getChargingStation());
+            session.setChargingPost(post);
+            session.setKWh(post.getChargingFeePerKWh());
             chargingSession.save(session);
-            return true;
+        return true;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -61,7 +116,15 @@ public class ChargingSessionServiceImpl {
         var duration = java.time.Duration.between(session.getStartTime(), session.getEndTime()).toHours();
         return rate.multiply(BigDecimal.valueOf(duration));
     }
-    public boolean endSession(ChargingSessionEntity session) {
+    public boolean endSession(String sessionId) {
+        Optional<ChargingSessionEntity> optional = chargingSession.findById(sessionId);
+        if (optional.isEmpty()) {
+            return false;
+        }
+        ChargingSessionEntity session = optional.get();
+        if (session.isDone()) {
+            return false; // session đã kết thúc rồi
+        }
         try {
             session.setDone(true);
             session.setEndTime(LocalDateTime.now());

@@ -5,6 +5,9 @@ import charging_manage_be.repository.charging_post.ChargingPostRepository;
 import charging_manage_be.services.charging_station.ChargingStationServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+
 import static charging_manage_be.util.RandomId.generateRandomId;
 @Service
 public class ChargingPostServiceImpl {
@@ -55,6 +58,7 @@ public class ChargingPostServiceImpl {
         ChargingPostRepository.save(post);
         return true;
     }
+
 
 
 //    public boolean addPost(String stationId, boolean isActive, BigDecimal changingFeePerKWh, BigDecimal maxPower)
