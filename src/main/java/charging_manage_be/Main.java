@@ -1,50 +1,24 @@
 package charging_manage_be;
 
+import charging_manage_be.model.entity.booking.BookingEntity;
+import charging_manage_be.model.entity.booking.WaitingListEntity;
+import charging_manage_be.model.entity.cars.CarEntity;
+import charging_manage_be.model.entity.charging.ChargingPostEntity;
+import charging_manage_be.model.entity.charging.ChargingStationEntity;
+import charging_manage_be.model.entity.users.UserEntity;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.Date;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 @SpringBootApplication
 public class Main {
     public static void main(String[] args) {
-//        System.setProperty("spring.main.web-application-type", "none");
-//        ApplicationContext context = SpringApplication.run(Main.class, args);
-
-        // Đoạn này là test service và repository của Payment bằng việc input dữ liệu mẫu và in ra kết quả
-        // Inject UserService
-//        UserService userService = context.getBean(UserService.class);
-//        PaymentServiceImpl paymentService = context.getBean(PaymentServiceImpl.class);
-//        paymentService.invoicePayment("JAPW8217", "VNPAY");
-//        UserEntity user = new UserEntity(
-//                "Khanh",
-//                "Việt",
-//                new Date(), // dateOfBirth
-//                new Random().nextBoolean(), // Gender
-//                "USER", // role
-//                "khanhpm12123@gmail.com", // email
-//                UUID.randomUUID().toString(), // password
-//                "0910238902", // phoneNumber
-//                LocalDateTime.now(), // createdAt
-//                "ACTIVE", // status
-//                null, // cars
-//                null  // userReputations
-//        );
-//        user.setUserID("180305");
-//
-//        // Sửa thành userService.addUser()
-//        boolean saveUser = userService.addUser(user);
-//        if (!saveUser) {
-//            System.out.println("Failed to save user.");
-//            return;
-//        } else {
-//            System.out.println("User saved successfully.");
-//        }
-//
-//        paymentService.createPayment(user, "Sạc lần 1", new BigDecimal("10000000"));
-//        System.out.print("Success");
-
-
 
       SpringApplication.run(Main.class, args); // Đây là test để chạy Spring Boot mà không cần server để test trên Postman
 

@@ -9,7 +9,7 @@ public interface CarService {
 
     CarEntity insertCar(CarEntity carEntity);
     CarEntity updateCar(CarEntity carEntity);
-    boolean deleteCarByLicensePlate(String licensePlate);
-    Optional<CarEntity> getCarByLicensePlate(String licensePlate);
+    boolean deleteCarByCarID(String carID);
+    Optional<CarEntity> getCarByCarID(String carID);
     List<CarEntity> findAllCar();
 }

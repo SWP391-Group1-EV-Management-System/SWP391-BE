@@ -35,18 +35,19 @@ public class WaitingListEntity {
     private ChargingPostEntity chargingPost; // mã trụ sạc
 
     @ManyToOne // Qua Car để chỉnh mối quan hệ lại
-    @JoinColumn(name = "license_plate", nullable = false)
+    @JoinColumn(name = "car_id", nullable = false)
     private CarEntity car;
 
-    @Column(name = "position_waiting", nullable = false)
-    private int positionWaiting; // vị trí trong danh sách chờ
+    @Column(name = "outed_at", nullable = false)
+    @CreationTimestamp
+    private LocalDateTime outedAt; // vị trí trong danh sách chờ
 
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     @CreationTimestamp // so với @PrePersist thì @CreationTimestamp tự động hơn, không cần viết hàm
     private LocalDateTime createdAt; // thời gian tạo
 
     @Column(name = "status", nullable = false)
-    private String status;
+    private String status; // trạng thái chờ: waiting, canceled, completed
 
     @OneToOne(mappedBy = "waitingList")
     private BookingEntity booking;

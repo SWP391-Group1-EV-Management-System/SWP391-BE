@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourcePerFileMappings">
+<<<<<<< HEAD
     <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/ed33d08f-4911-4d4b-bc8e-21772b840c22/console.sql" value="ed33d08f-4911-4d4b-bc8e-21772b840c22" />
     <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/ed33d08f-4911-4d4b-bc8e-21772b840c22/console_2.sql" value="ed33d08f-4911-4d4b-bc8e-21772b840c22" />
+=======
+    <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/c7580eb0-d457-4f96-96e9-261ead64a564/console.sql" value="c7580eb0-d457-4f96-96e9-261ead64a564" />
+>>>>>>> 28dd984 (Code about Waiting and Booking Service)
   </component>
 </project>

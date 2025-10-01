@@ -18,7 +18,10 @@ import java.util.List;
 @NoArgsConstructor
 public class CarEntity {
     @Id
-    @Column(name = "license_plate")
+    @Column(name = "car_id", nullable = false)
+    private String carID; // Mã xe
+
+    @Column(name = "license_plate", nullable = false, unique = true)
     private String licensePlate; // Biển số xe
 
     @ManyToOne // Nhiều xe có thể được mua bởi 1 người
@@ -41,3 +44,4 @@ public class CarEntity {
     @OneToMany(mappedBy = "car" )
     private List<BookingEntity> bookingList;
 }
+
