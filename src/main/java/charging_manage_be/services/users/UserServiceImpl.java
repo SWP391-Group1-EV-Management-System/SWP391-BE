@@ -28,28 +28,27 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("User cannot be null");
         }
         if (!userRepository.existsById(user.getUserID())) {
-            throw  new IllegalArgumentException("User does not exist");
+            throw new IllegalArgumentException("User does not exist");
         }
         return userRepository.save(user);
     }
 
     @Override
     public boolean softDeleteUser(String userID) { // Hàm xóa này chỉ là xóa mềm, tức là chỉ set status = false
-         if (!userRepository.existsById(userID)) {
-             throw  new IllegalArgumentException("User does not exist");
-         }
-         else{
-             UserEntity user = userRepository.findById(userID).get();
-             user.setStatus(false);
-             userRepository.save(user);
-             return true;
-         }
+        if (!userRepository.existsById(userID)) {
+            throw new IllegalArgumentException("User does not exist");
+        } else {
+            UserEntity user = userRepository.findById(userID).get();
+            user.setStatus(false);
+            userRepository.save(user);
+            return true;
+        }
     }
 
     @Override
     public Optional<UserEntity> getUserByID(String userID) {
         if (!userRepository.existsById(userID)) {
-            throw  new IllegalArgumentException("User does not exist");
+            throw new IllegalArgumentException("User does not exist");
         }
         return userRepository.findById(userID);
     }
@@ -62,5 +61,18 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean existID(String userID) {
         return userRepository.existsById(userID);
+    }
+
+    @Override
+    public UserEntity loginUser(String userID, String password) {
+        Optional<UserEntity> optionalUser = userRepository.findById(userID);
+        if (optionalUser.isPresent()) {
+            UserEntity user = optionalUser.get();
+            if (user.getPassword().equals(password) && user.isStatus()) {
+                return user;
+            }
+            return null;
+        }
+        return null;
     }
 }

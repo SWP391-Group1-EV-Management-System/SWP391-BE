@@ -17,4 +17,5 @@ public interface UserService {
     Optional<UserEntity> getUserByID(String userID);
     List<UserEntity> getAllUsers();
     boolean existID(String userID);
+    UserEntity loginUser(String userID, String password);
 }

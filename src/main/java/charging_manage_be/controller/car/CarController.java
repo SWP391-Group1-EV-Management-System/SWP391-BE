@@ -25,7 +25,6 @@ public class CarController {
         CarEntity savedCar = carService.insertCar(carEntity);
         return ResponseEntity.ok(savedCar);
     }
-
     @PutMapping("/{carID}")
     public ResponseEntity<CarEntity> updateCar(@PathVariable String carID, @RequestBody CarEntity carDetails) {
         try {

@@ -1,11 +1,14 @@
 package charging_manage_be.services.charging_station;
 
+import charging_manage_be.model.entity.charging.ChargingPostEntity;
 import charging_manage_be.model.entity.charging.ChargingStationEntity;
 import charging_manage_be.repository.charging_station.ChargingStationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.Option;
+
+import java.util.List;
 
 import static charging_manage_be.util.RandomId.generateRandomId;
 @Service
@@ -58,6 +61,19 @@ public class ChargingStationServiceImpl {
         }
         chargingStationRepository.save(station);
         return true;
+    }
+    public List<ChargingStationEntity> getAllStations()
+    {
+        return chargingStationRepository.findAll();
+    }
+    public List<ChargingPostEntity> getAllPostsInStation(String stationId)
+    {
+        ChargingStationEntity station = chargingStationRepository.findByIdChargingStation(stationId);
+        if(station == null)
+        {
+            return null;
+        }
+        return station.getChargingPosts();
     }
 
 
