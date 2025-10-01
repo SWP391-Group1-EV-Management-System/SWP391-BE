@@ -40,7 +40,7 @@ package charging_manage_be.controller.users;
             }
 
             @DeleteMapping("/{userID}")
-            public ResponseEntity<String> deleteUser(@PathVariable String userID) {
+            public ResponseEntity<String> deleteUser(@PathVariable String userID) { // @PathVariable để lấy userID từ URL
                 boolean deleted = userService.softDeleteUser(userID);
                 if (deleted) {
                     return ResponseEntity.ok("User deleted successfully");

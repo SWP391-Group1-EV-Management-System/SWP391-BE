@@ -30,8 +30,9 @@ public class PaymentEntity {
     private LocalDateTime createdAt;
     @Column (name = "paid_at", nullable = true)
     private LocalDateTime paidAt;
-    @Column (name = "payment_method", nullable = true)
-    private String paymentMethod;
+    @ManyToOne
+    @JoinColumn(name = "payment_method_id", nullable = false)
+    private PaymentMethodEntity paymentMethod; // khóa ngoại bảng phương thức thanh toán
 
     @Column ( nullable = false)
     private BigDecimal price;
