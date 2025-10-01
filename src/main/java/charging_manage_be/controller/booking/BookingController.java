@@ -16,8 +16,8 @@ public class BookingController {
     private BookingService bookingService;
 
     @PostMapping("/create")
-    public ResponseEntity<?> processBooking(@RequestBody String userId, String chargingPostId, String carId) { // ? có nghĩa là có thể là Booking hoặc WaitingList
-        int result = bookingService.handleBookingNavigation(userId,chargingPostId, carId); // Trả về một result có thể là Booking hoặc WaitingList
+    public ResponseEntity<?> processBooking(@RequestBody BookingEntity booking) { // ? có nghĩa là có thể là Booking hoặc WaitingList
+        int result = bookingService.handleBookingNavigation(booking.getUser().getUserID(), booking.getChargingPost().getIdChargingPost(), booking.getCar().getCarID()); // Trả về một result có thể là Booking hoặc WaitingList
         return ResponseEntity.ok(result);
     }
 

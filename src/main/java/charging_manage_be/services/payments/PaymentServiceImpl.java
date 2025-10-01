@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import static charging_manage_be.util.RandomId.generateRandomId;
 
@@ -60,11 +61,15 @@ public class PaymentServiceImpl implements PaymentService {
 
         return true;
     }
+
+    @Override
     public boolean processPayment(String paymentId,String paymentMethodId)
     {
         PaymentMethodEntity paymentMethod = paymentMethodRepository.findById(paymentMethodId).orElseThrow(() -> new RuntimeException("Payment method not found"));
         PaymentEntity payment = paymentRepository.findById(paymentId).orElseThrow(() -> new RuntimeException("Payment not found"));
         payment.setPaymentMethod(paymentMethod);
+
+        paymentRepository.save(payment);
         return true;
     }
 
@@ -115,6 +120,7 @@ public class PaymentServiceImpl implements PaymentService {
             return false;
         }
         payment.setPaid(true);
+        payment.setPaidAt(LocalDateTime.now());
         paymentRepository.save(payment);
         return true;
     }

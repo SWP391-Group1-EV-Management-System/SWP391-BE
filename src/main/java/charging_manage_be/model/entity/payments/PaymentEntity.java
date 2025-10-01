@@ -48,10 +48,6 @@ public class PaymentEntity {
         this.createdAt = LocalDateTime.now();
         this.isPaid = false;
     }
-    @PreUpdate //call save or merge
-    protected void onUpdate() {
-        this.paidAt = LocalDateTime.now();
-    }
 
 }
 /*

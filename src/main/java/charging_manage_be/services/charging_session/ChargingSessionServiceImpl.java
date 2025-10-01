@@ -48,7 +48,7 @@ public class ChargingSessionServiceImpl {
     public boolean addSessionWithBooking(String bookingId) {
         try {
             Optional<BookingEntity> optionalBooking = bookingRepository.findById(bookingId);
-            if (optionalBooking.isEmpty() || !optionalBooking.get().getStatus().equals("WAITING")) {
+            if (optionalBooking.isEmpty()) {
                 return false;
             }
 

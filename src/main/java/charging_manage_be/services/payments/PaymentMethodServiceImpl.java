@@ -9,25 +9,39 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+import static charging_manage_be.util.RandomId.generateRandomId;
+
 @Service
 public class PaymentMethodServiceImpl implements PaymentMethodService {
+
+
 
     @Autowired
     private PaymentMethodRepository paymentMethodRepository;
 
-    @Override
-    public boolean insertPaymentMethod(PaymentMethodEntity paymentMethod) {
-         if (paymentMethod == null){
-             throw new IllegalArgumentException("Payment method cannot be null");
-         }
-         else if (paymentMethodRepository.existsById(paymentMethod.getIdPaymentMethod())){
-             throw new IllegalArgumentException("Payment method with ID " + paymentMethod.getIdPaymentMethod() + " already exists");
-         }
+    private int characterLength = 5;
+    private int numberLength = 5;
 
-         else{
-            paymentMethodRepository.save(paymentMethod);
-            return true;
-         }
+    public String generateUniqueId() {
+        String newId;
+        do {
+            newId = generateRandomId(characterLength, numberLength);
+        } while (paymentMethodRepository.existsById(newId));
+        return newId;
+    }
+
+    @Override
+    public boolean insertPaymentMethod(String methodName) {
+        if (methodName == null || methodName.isEmpty()){
+            throw new IllegalArgumentException("Payment method name cannot be null or empty");
+        }
+        PaymentMethodEntity paymentMethod = new PaymentMethodEntity();
+        paymentMethod.setIdPaymentMethod(generateUniqueId());
+        paymentMethod.setNamePaymentMethod(methodName);
+
+        paymentMethodRepository.save(paymentMethod);
+        return true;
+
     }
 
     @Override

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PaymentMethodService {
-    boolean insertPaymentMethod(PaymentMethodEntity paymentMethod);
+    boolean insertPaymentMethod(String methodName);
     boolean updatePaymentMethod(PaymentMethodEntity paymentMethod);
     boolean deletePaymentMethod(String paymentMethodId);
     Optional<PaymentMethodEntity> getPaymentMethodById(String paymentMethodId);

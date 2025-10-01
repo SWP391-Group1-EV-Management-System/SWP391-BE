@@ -16,25 +16,21 @@ import java.util.Date;
 @SpringBootApplication
 public class Main {
     public static void main(String[] args) {
-        System.setProperty("spring.main.web-application-type", "none");
-        ApplicationContext context = SpringApplication.run(Main.class, args);
+//        System.setProperty("spring.main.web-application-type", "none");
+//        ApplicationContext context = SpringApplication.run(Main.class, args);
 
         // Đoạn này là test service và repository của Payment bằng việc input dữ liệu mẫu và in ra kết quả
         // Inject UserService
 //        UserService userService = context.getBean(UserService.class);
 //        PaymentServiceImpl paymentService = context.getBean(PaymentServiceImpl.class);
 
-     //SpringApplication.run(Main.class, args); // Đây là test để chạy Spring Boot mà không cần server để test trên Postman
-        BookingServiceImpl bookingService = context.getBean(BookingServiceImpl.class);
-        WaitingListServiceImpl waitingListService = context.getBean(WaitingListServiceImpl.class);
+        SpringApplication.run(Main.class, args); // Đây là test để chạy Spring Boot mà không cần server để test trên Postman
+//        BookingServiceImpl bookingService = context.getBean(BookingServiceImpl.class);
+//        WaitingListServiceImpl waitingListService = context.getBean(WaitingListServiceImpl.class);
         //bookingService.handleBookingNavigation("DRV001", "POST001", "CAR001");
         //bookingService.handleBookingNavigation("DRV002", "POST001", "CAR002");
         //bookingService.handleBookingNavigation("DRV003", "POST001", "CAR003");
-        bookingService.completeBooking("URGUI80727");
-
-
-
-
+//        bookingService.completeBooking("URGUI80727");
 
     }
 }

@@ -1,6 +1,7 @@
 package charging_manage_be.controller.charging;
 
 
+import charging_manage_be.model.entity.booking.BookingEntity;
 import charging_manage_be.model.entity.charging.ChargingSessionEntity;
 import charging_manage_be.services.booking.BookingService;
 import charging_manage_be.services.charging_session.ChargingSessionServiceImpl;
@@ -16,21 +17,18 @@ public class ChargingSession {
     private ChargingSessionServiceImpl sessionService;
 
     @PostMapping("/create")
-    public ResponseEntity<String> createChargingSession(@RequestBody String bookingId,
-                                                        String userId,
-                                                        String postId) {
-        if (bookingId == null) {
-            sessionService.addSessionWithoutBooking(userId, postId);
+    public ResponseEntity<String> createChargingSession( @RequestBody BookingEntity booking) {
+        if (booking == null) {
+            sessionService.addSessionWithoutBooking(booking.getUser().getUserID(), booking.getChargingPost().getIdChargingPost());
         } else {
-            sessionService.addSessionWithBooking(bookingId);
+            sessionService.addSessionWithBooking(booking.getBookingId());
         }
 
         return ResponseEntity.ok("Charging Session create completed successfully");
     }
-    @PostMapping("/finish/{bookingId}")
-    public ResponseEntity<String> createChargingSession(@PathVariable String bookingId){
-        sessionService.endSession(bookingId);
-
+    @PostMapping("/finish/{sessionId}")
+    public ResponseEntity<String> endChargingSession(@PathVariable String sessionId){
+        sessionService.endSession(sessionId);
         return ResponseEntity.ok("Charging Session finish completed successfully");
     }
 }

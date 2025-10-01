@@ -10,5 +10,6 @@ public interface PaymentService {
     boolean updatePayment(PaymentEntity payment);
     PaymentEntity getPaymentByPaymentId(String paymentId);
     PaymentEntity getPaymentByUserID(String userID, String paymentId);
-    boolean processPayment(String sessionId,String paymentMethodId);
+    boolean processPayment(String paymentId,String paymentMethodId);
+    boolean invoicePayment (String paymentId);
 }
