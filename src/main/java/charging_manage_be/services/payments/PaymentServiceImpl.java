@@ -43,24 +43,31 @@ public class PaymentServiceImpl implements PaymentService {
 
 
     @Override
-    public boolean addPayment(String sessionId, String paymentMethodId, BigDecimal price)
+    public boolean addPayment(String sessionId)
     {
         PaymentEntity paymentEntity = new PaymentEntity();
         paymentEntity.setPaymentId(generateUniquePaymentId());
 
         ChargingSessionEntity session = chargingSessionRepository.findById(sessionId).orElseThrow(() -> new RuntimeException("Session not found"));
-        PaymentMethodEntity paymentMethod = paymentMethodRepository.findById(paymentMethodId).orElseThrow(() -> new RuntimeException("Payment method not found"));
-
         paymentEntity.setSession(session);
         paymentEntity.setUser(session.getUser());
         paymentEntity.setChargingSessionId(sessionId);
-        paymentEntity.setPaymentMethod(paymentMethod);
-        paymentEntity.setPrice(price);
+        //paymentEntity.setPaymentMethod(paymentMethod);
+        // tạo hàm riêng chọn phương thức thanh toán
+        paymentEntity.setPrice(session.getTotalAmount());
 
         paymentRepository.save(paymentEntity);
 
         return true;
     }
+    public boolean processPayment(String paymentId,String paymentMethodId)
+    {
+        PaymentMethodEntity paymentMethod = paymentMethodRepository.findById(paymentMethodId).orElseThrow(() -> new RuntimeException("Payment method not found"));
+        PaymentEntity payment = paymentRepository.findById(paymentId).orElseThrow(() -> new RuntimeException("Payment not found"));
+        payment.setPaymentMethod(paymentMethod);
+        return true;
+    }
+
 
     @Override
     public boolean updatePayment(PaymentEntity payment)
@@ -100,7 +107,17 @@ public class PaymentServiceImpl implements PaymentService {
             }
         }
     }
-
+    public boolean invoicePayment(String paymentId)
+    {
+        PaymentEntity payment = paymentRepository.findById(paymentId).orElseThrow(() -> new RuntimeException("Payment not found"));
+        if(payment == null)
+        {
+            return false;
+        }
+        payment.setPaid(true);
+        paymentRepository.save(payment);
+        return true;
+    }
 
     /*
     public PaymentEntity createPayment(UserEntity userId, String chargingSessionId, BigDecimal price) {

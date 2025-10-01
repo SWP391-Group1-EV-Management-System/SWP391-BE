@@ -31,7 +31,7 @@ public class PaymentEntity {
     @Column (name = "paid_at", nullable = true)
     private LocalDateTime paidAt;
     @ManyToOne
-    @JoinColumn(name = "payment_method_id", nullable = false)
+    @JoinColumn(name = "payment_method_id", nullable = true)
     private PaymentMethodEntity paymentMethod; // khóa ngoại bảng phương thức thanh toán
 
     @Column ( nullable = false)

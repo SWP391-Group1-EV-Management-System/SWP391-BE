@@ -6,8 +6,9 @@ import charging_manage_be.model.entity.payments.PaymentMethodEntity;
 import java.math.BigDecimal;
 
 public interface PaymentService {
-    boolean addPayment(String sessionId, String paymentMethodId, BigDecimal price);
+    boolean addPayment(String sessionId);
     boolean updatePayment(PaymentEntity payment);
     PaymentEntity getPaymentByPaymentId(String paymentId);
     PaymentEntity getPaymentByUserID(String userID, String paymentId);
+    boolean processPayment(String sessionId,String paymentMethodId);
 }

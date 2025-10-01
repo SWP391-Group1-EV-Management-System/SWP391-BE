@@ -4,6 +4,7 @@ import charging_manage_be.model.entity.booking.BookingEntity;
 import charging_manage_be.model.entity.charging.ChargingPostEntity;
 import charging_manage_be.model.entity.charging.ChargingSessionEntity;
 import charging_manage_be.model.entity.payments.PaymentEntity;
+import charging_manage_be.model.entity.payments.PaymentMethodEntity;
 import charging_manage_be.model.entity.users.UserEntity;
 import charging_manage_be.repository.booking.BookingRepository;
 import charging_manage_be.repository.charging_post.ChargingPostRepository;
@@ -131,11 +132,8 @@ public class ChargingSessionServiceImpl {
             session.setTotalAmount(calculateAmount(session));
             updateSession(session);
             // gọi hóa đơn và tính tiền từ trụ sạc
-            PaymentEntity payment = new PaymentEntity();
-            payment.setUser(session.getUser());
-            payment.setChargingSessionId(session.getChargingSessionId());
-            payment.setPrice(session.getTotalAmount());
-            paymentService.addPayment(payment);
+            //PaymentEntity payment = new PaymentEntity();
+            paymentService.addPayment(sessionId);
             return true;
         } catch (Exception e) {
             e.printStackTrace();

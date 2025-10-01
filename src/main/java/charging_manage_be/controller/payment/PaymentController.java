@@ -19,16 +19,16 @@ public class PaymentController {
     private PaymentService paymentService;
     @Autowired
     private PaymentMethodService paymentMethodService;
-
-    @PostMapping
-    public ResponseEntity<PaymentEntity> createPayment(@RequestBody PaymentEntity payment) {
-        boolean isCreated = paymentService.addPayment(payment.getChargingSessionId(), payment.getPaymentMethod().getIdPaymentMethod(), payment.getPrice());
-        if (isCreated) {
-            return ResponseEntity.ok(payment);
-        } else {
-            return ResponseEntity.status(500).build();
-        }
-    }
+// hàm end session tự động tạo
+//    @PostMapping
+//    public ResponseEntity<PaymentEntity> createPayment(@RequestBody PaymentEntity payment) {
+//        boolean isCreated = paymentService.addPayment(payment.getChargingSessionId(), payment.getPaymentMethod().getIdPaymentMethod(), payment.getPrice());
+//        if (isCreated) {
+//            return ResponseEntity.ok(payment);
+//        } else {
+//            return ResponseEntity.status(500).build();
+//        }
+//    }
 
     @GetMapping("/{paymentId}")
     public ResponseEntity<PaymentEntity> getPaymentByPaymentId(String paymentId) {
