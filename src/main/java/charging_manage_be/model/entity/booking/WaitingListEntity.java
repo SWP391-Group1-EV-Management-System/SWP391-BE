@@ -38,8 +38,7 @@ public class WaitingListEntity {
     @JoinColumn(name = "car_id", nullable = false)
     private CarEntity car;
 
-    @Column(name = "outed_at", nullable = false)
-    @CreationTimestamp
+    @Column(name = "outed_at", nullable = true)
     private LocalDateTime outedAt; // vị trí trong danh sách chờ
 
     @Column(name = "created_at", nullable = false, updatable = false)

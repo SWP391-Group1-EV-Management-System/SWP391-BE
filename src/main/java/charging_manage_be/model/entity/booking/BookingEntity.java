@@ -67,7 +67,6 @@ public class BookingEntity {
     private String status; // booked, canceled, done
 
     @Column(name = "done_at", nullable = true)
-    @CreationTimestamp
     private LocalDateTime doneAt;
 >>>>>>> 28dd984 (Code about Waiting and Booking Service)
 
