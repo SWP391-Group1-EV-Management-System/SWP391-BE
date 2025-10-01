@@ -23,7 +23,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class BookingServiceImpl implements BookingService{
+public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final WaitingListRepository waitingListRepository;
     private final WaitingListService waitingListService;
@@ -40,7 +40,7 @@ public class BookingServiceImpl implements BookingService{
         return "queue:post:" + chargingPostId;
     }
 
-    private String randomIdMethod(){
+    private String randomIdMethod() {
         // Tạo ID ngẫu nhiên cho booking với 4 ký tư tự chữ và 4 ký tự số
         alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         integer = "0123456789";
@@ -51,8 +51,8 @@ public class BookingServiceImpl implements BookingService{
         }
         // Đây chỉ là lấy ký tự ngẫu nhiên từ chuỗi alphabet, không đảm bảo không trùng lặp
         // Bây giờ ta có 4 ký tự chữ, tiếp theo ta sẽ thêm 4 ký tự số
-        for (int i = 0; i < 4; i++){
-            int indexInteger = (int)(integer.length()*Math.random());
+        for (int i = 0; i < 4; i++) {
+            int indexInteger = (int) (integer.length() * Math.random());
             idBuilder.append(integer.charAt(indexInteger));
         }
 
@@ -103,15 +103,13 @@ public class BookingServiceImpl implements BookingService{
             bookingEntity.setStatus("CONFIRMED");
             BookingEntity savedBooking = bookingRepository.save(bookingEntity);
 
-            simpMessagingTemplate.convertAndSendToUser( waitingRequest.getUser().getUserID(),
+            simpMessagingTemplate.convertAndSendToUser(waitingRequest.getUser().getUserID(),
                     "/queue/notifications/" + chargingPostID,
                     "User " + waitingRequest.getUser().getUserID() + " booked successfully");
 
             return savedBooking;
 
-        }
-
-        else{
+        } else {
             // Khi có các trạng thái "waiting" hoặc "charging" thì sẽ vào danh sách chờ
             // Lưu record vào bảng waitingList
             WaitingListEntity savedWaiting = waitingListService.addToWaitingList(waitingRequest);
@@ -131,7 +129,6 @@ public class BookingServiceImpl implements BookingService{
     }
 
 
-
     @Override
     public BookingEntity completeBooking(String bookingID) {
         BookingEntity booking = bookingRepository.findById(bookingID).orElseThrow();
@@ -140,7 +137,7 @@ public class BookingServiceImpl implements BookingService{
         booking.setDoneAt(LocalDateTime.now());
 
         // Gửi thông báo đến user rằng booking đã hoàn thành
-        simpMessagingTemplate.convertAndSendToUser(booking.getUser().getUserID(),"/queue/notifications",
+        simpMessagingTemplate.convertAndSendToUser(booking.getUser().getUserID(), "/queue/notifications",
                 "Your Booking: " + booking.getBookingId() + " completed successfully");
 
         return bookingRepository.save(booking);
@@ -159,7 +156,6 @@ public class BookingServiceImpl implements BookingService{
 
         return bookingRepository.save(booking);
     }
-
 
 
     @Transactional
@@ -209,6 +205,8 @@ public class BookingServiceImpl implements BookingService{
 
         return saved;
     }
+
+}
 
 
 //    @Override
