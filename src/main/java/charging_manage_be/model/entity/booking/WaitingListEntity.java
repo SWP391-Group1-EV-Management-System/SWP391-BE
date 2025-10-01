@@ -38,22 +38,18 @@ public class WaitingListEntity {
     @JoinColumn(name = "car_id", nullable = false)
     private CarEntity car;
 
+    @Column(name = "outed_at", nullable = true)
+    private LocalDateTime outedAt; // vị trí trong danh sách chờ
+
     @Column(name = "created_at", nullable = false)
     @CreationTimestamp // so với @PrePersist thì @CreationTimestamp tự động hơn, không cần viết hàm
     private LocalDateTime createdAt; // thời gian tạo
 
     @Column(name = "status", nullable = false)
-    private String status;
-
-    @Column(name = "quit_at")
-    private LocalDateTime quitAt;
+    private String status; // trạng thái chờ: waiting, canceled, completed
 
     @OneToOne(mappedBy = "waitingList")
     private BookingEntity booking;
-    @PreUpdate //call save or merge
-    protected void onUpdate() {
-        this.quitAt = LocalDateTime.now();
-    }
 
 
 }

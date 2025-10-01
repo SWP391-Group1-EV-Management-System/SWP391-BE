@@ -6,6 +6,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.Date;
+
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 @SpringBootApplication
@@ -23,8 +28,9 @@ public class Main {
         BookingServiceImpl bookingService = context.getBean(BookingServiceImpl.class);
         WaitingListServiceImpl waitingListService = context.getBean(WaitingListServiceImpl.class);
         //bookingService.handleBookingNavigation("DRV001", "POST001", "CAR001");
-        bookingService.handleBookingNavigation("DRV002", "POST001", "CAR002");
-        //waitingListService.popQueue("POST001");
+        //bookingService.handleBookingNavigation("DRV002", "POST001", "CAR002");
+        //bookingService.handleBookingNavigation("DRV003", "POST001", "CAR003");
+        bookingService.completeBooking("URGUI80727");
 
 
 

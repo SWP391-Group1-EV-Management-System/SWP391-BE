@@ -5,6 +5,8 @@ import charging_manage_be.repository.charging_station.ChargingStationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
+
 import static charging_manage_be.util.RandomId.generateRandomId;
 @Service
 public class ChargingStationServiceImpl {
@@ -57,10 +59,7 @@ public class ChargingStationServiceImpl {
         chargingStationRepository.save(station);
         return true;
     }
-    public ChargingStationEntity findStationByChargingPostEntity(String postId)
-    {
-        return chargingStationRepository.findStationByChargingPostEntity(postId);
-    }
+
 
 
 

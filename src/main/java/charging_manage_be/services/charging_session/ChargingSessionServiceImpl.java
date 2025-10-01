@@ -18,6 +18,7 @@ public class ChargingSessionServiceImpl {
     private final int numberLength = 4;
     @Autowired
     private ChargingSessionRepository chargingSession;
+    @Autowired
     private PaymentServiceImpl paymentService;
     public boolean isExistById(String sessionId) {
         return chargingSession.existsById(sessionId);

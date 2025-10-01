@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface ChargingStationRepository extends JpaRepository<ChargingStationEntity, String> {
     ChargingStationEntity findByIdChargingStation(String idChargingStation);
@@ -14,6 +16,6 @@ public interface ChargingStationRepository extends JpaRepository<ChargingStation
   //  public boolean isExistById(String stationId);
     //public ChargingStationEntity getStationById(String stationId);
     @Query ("SELECT c FROM ChargingStationEntity c JOIN c.chargingPosts p WHERE p.idChargingPost = :idChargingPostEntity")
-    ChargingStationEntity findStationByChargingPostEntity(@Param("idChargingPostEntity") String idChargingPostEntity);
+    Optional<ChargingStationEntity> findStationByChargingPostEntity(@Param("idChargingPostEntity") String idChargingPostEntity);
 
 }

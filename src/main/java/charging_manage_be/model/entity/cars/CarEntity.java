@@ -18,10 +18,10 @@ import java.util.List;
 @NoArgsConstructor
 public class CarEntity {
     @Id
-    @Column (name = "car_id")
-    private String carId;
+    @Column(name = "car_id", nullable = false)
+    private String carID; // Mã xe
 
-    @Column(name = "license_plate")
+    @Column(name = "license_plate", nullable = false)
     private String licensePlate; // Biển số xe
 
     @ManyToOne // Nhiều xe có thể được mua bởi 1 người

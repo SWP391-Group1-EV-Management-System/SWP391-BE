@@ -21,7 +21,7 @@ public class CarServiceImpl implements CarService {
             throw new NullPointerException("carEntity is null");
         }
 
-        else if (carRepository.existsById(carEntity.getLicensePlate())){
+        else if (carRepository.existsById(carEntity.getCarID())){
             throw new IllegalStateException("carEntity already exists");
         }
         return carRepository.save(carEntity);
@@ -32,32 +32,32 @@ public class CarServiceImpl implements CarService {
         if (carEntity == null) {
             throw new NullPointerException("carEntity is null");
         }
-        else if (!carRepository.existsById(carEntity.getLicensePlate())){
+        else if (!carRepository.existsById(carEntity.getCarID())){
             throw new IllegalStateException("carEntity is not exists");
         }
         return carRepository.save(carEntity);
     }
 
     @Override
-    public boolean deleteCarByLicensePlate(String carId) {
-        if (carId == null) {
-            throw new NullPointerException("carId is null");
+    public boolean deleteCarByCarID(String carID) {
+        if (carID == null) {
+            throw new NullPointerException("carID is null");
         }
-        else if (!carRepository.existsById(carId)){
+        else if (!carRepository.existsById(carID)){
             throw new IllegalStateException("carEntity is not exists");
         }
         else {
-            carRepository.deleteById(carId);
+            carRepository.deleteById(carID);
             return true;
         }
     }
 
     @Override
-    public Optional<CarEntity> getCarByCarId(String carId) {
-        if (carId == null) {
-            throw new NullPointerException("carId is null");
+    public Optional<CarEntity> getCarByCarID(String carID) {
+        if (carID == null) {
+            throw new NullPointerException("carID is null");
         }
-        return carRepository.findById(carId);
+        return carRepository.findById(carID);
     }
 
     @Override
