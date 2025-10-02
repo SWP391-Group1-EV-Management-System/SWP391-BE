@@ -15,6 +15,7 @@ public class ChargingPostServiceImpl implements ChargingPostSevice {
     private final int characterLength = 2;
     private final int numberLength = 1;
     @Autowired // vì sử dụng bản spring boot khá cao nên không cần @Autowired vẫn chạy được
+
     private ChargingPostRepository ChargingPostRepository;
     private ChargingStationService stationService;
    // ChargingPostServiceImpl postService = context.getBean(ChargingPostServiceImpl.class); gọi trong main
