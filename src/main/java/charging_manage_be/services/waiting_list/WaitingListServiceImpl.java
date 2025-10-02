@@ -13,17 +13,12 @@ import charging_manage_be.repository.charging_station.ChargingStationRepository;
 import charging_manage_be.repository.users.UserRepository;
 import charging_manage_be.repository.waiting_list.WaitingListRepository;
 import lombok.RequiredArgsConstructor;
-import charging_manage_be.services.booking.BookingServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.time.LocalDateTime;
-import java.util.List;
-
 import static charging_manage_be.util.RandomId.generateRandomId;
 
 @Service

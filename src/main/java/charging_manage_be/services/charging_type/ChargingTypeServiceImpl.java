@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ChargingTypeServiceImpl {
+public class ChargingTypeServiceImpl implements  ChargingTypeService {
     @Autowired
     private ChargingTypeRepository chargingTypeRepository;
     public ChargingTypeEntity addChargingType(ChargingTypeEntity chargingTypeEntity) {

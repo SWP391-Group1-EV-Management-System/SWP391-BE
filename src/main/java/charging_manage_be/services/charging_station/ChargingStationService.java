@@ -5,8 +5,8 @@ import charging_manage_be.model.entity.users.UserEntity;
 
 public interface ChargingStationService {
     public boolean isPaymentIdExists(String id);
-    public boolean addStation(String addressStation, String  statusStation, String nameStation, UserEntity userManager);
+    public boolean addStation(ChargingStationEntity station);
     public ChargingStationEntity getStationById(String stationId);
-    public boolean updateFullStation(String stationId, String addressStation, String  statusStation, String nameStation, UserEntity userManager);
+    public boolean updateFullStation(ChargingStationEntity station);
 
 }
