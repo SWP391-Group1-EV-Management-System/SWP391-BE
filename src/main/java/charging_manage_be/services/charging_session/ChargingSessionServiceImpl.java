@@ -29,6 +29,8 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final ChargingPostRepository chargingPostRepository;
+
+
     public boolean isExistById(String sessionId) {
         return chargingSession.existsById(sessionId);
     }
@@ -40,6 +42,7 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
         return newId;
     }
     // khi driver quẹt QR thì sẽ lấy thông tin userId, carId, và lấy booking nếu có để tạo session
+    @Override
     public boolean addSessionWithBooking(String bookingId) {
         try {
             Optional<BookingEntity> optionalBooking = bookingRepository.findById(bookingId);
@@ -64,6 +67,8 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
             return false;
         }
     }
+
+    @Override
     public boolean addSessionWithoutBooking(String userId,String postId)
     {
         try {
@@ -94,6 +99,8 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
             return false;
         }
     }
+
+    @Override
     public boolean updateSession(ChargingSessionEntity session) {
         try {
             if (session == null || !isExistById(session.getChargingSessionId())) {
@@ -106,12 +113,16 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
             return false;
         }
     }
+
+    @Override
     public BigDecimal calculateAmount(ChargingSessionEntity session) {
         // lấy giá của trụ sạc và thời gian sạc để tính tiền
         var rate = session.getChargingPost().getChargingFeePerKWh();
         var duration = java.time.Duration.between(session.getStartTime(), session.getEndTime()).toHours();
         return rate.multiply(BigDecimal.valueOf(duration));
     }
+
+    @Override
     public boolean endSession(String sessionId) {
         Optional<ChargingSessionEntity> optional = chargingSession.findById(sessionId);
         if (optional.isEmpty()) {
