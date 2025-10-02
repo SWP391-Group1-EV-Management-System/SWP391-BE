@@ -6,8 +6,6 @@ import charging_manage_be.repository.charging_station.ChargingStationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
-
 import java.util.List;
 
 import static charging_manage_be.util.RandomId.generateRandomId;

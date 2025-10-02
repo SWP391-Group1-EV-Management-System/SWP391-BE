@@ -2,9 +2,7 @@ package charging_manage_be.controller.charging;
 
 
 import charging_manage_be.model.entity.booking.BookingEntity;
-import charging_manage_be.model.entity.charging.ChargingSessionEntity;
-import charging_manage_be.services.booking.BookingService;
-import charging_manage_be.services.charging_session.ChargingSessionServiceImpl;
+import charging_manage_be.services.charging_session.ChargingSessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,11 +12,11 @@ import org.springframework.web.bind.annotation.*;
 public class ChargingSession {
 
     @Autowired
-    private ChargingSessionServiceImpl sessionService;
+    private ChargingSessionService sessionService;
 
     @PostMapping("/create")
     public ResponseEntity<String> createChargingSession( @RequestBody BookingEntity booking) {
-        if (booking == null) {
+        if (booking.getBookingId() == null) {
             sessionService.addSessionWithoutBooking(booking.getUser().getUserID(), booking.getChargingPost().getIdChargingPost());
         } else {
             sessionService.addSessionWithBooking(booking.getBookingId());

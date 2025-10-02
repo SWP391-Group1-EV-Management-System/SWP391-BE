@@ -3,19 +3,13 @@ package charging_manage_be.services.charging_session;
 import charging_manage_be.model.entity.booking.BookingEntity;
 import charging_manage_be.model.entity.charging.ChargingPostEntity;
 import charging_manage_be.model.entity.charging.ChargingSessionEntity;
-import charging_manage_be.model.entity.payments.PaymentEntity;
-import charging_manage_be.model.entity.payments.PaymentMethodEntity;
 import charging_manage_be.model.entity.users.UserEntity;
 import charging_manage_be.repository.booking.BookingRepository;
 import charging_manage_be.repository.charging_post.ChargingPostRepository;
 import charging_manage_be.repository.charging_session.ChargingSessionRepository;
 import charging_manage_be.repository.users.UserRepository;
-import charging_manage_be.services.booking.BookingService;
 import charging_manage_be.services.payments.PaymentService;
-import charging_manage_be.services.payments.PaymentServiceImpl;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -26,7 +20,7 @@ import static charging_manage_be.util.RandomId.generateRandomId;
 
 @Service
 @RequiredArgsConstructor
-public class ChargingSessionServiceImpl implements ChargingSessionService {
+public class ChargingSessionServiceImpl  implements ChargingSessionService {
     private final int characterLength = 5;
     private final int numberLength = 4;
 
@@ -37,7 +31,6 @@ public class ChargingSessionServiceImpl implements ChargingSessionService {
     private final ChargingPostRepository chargingPostRepository;
 
 
-    @Override
     public boolean isExistById(String sessionId) {
         return chargingSession.existsById(sessionId);
     }

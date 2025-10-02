@@ -1,22 +1,26 @@
 package charging_manage_be.services.charging_post;
 
 import charging_manage_be.model.entity.charging.ChargingPostEntity;
+import charging_manage_be.model.entity.charging.ChargingTypeEntity;
 import charging_manage_be.repository.charging_post.ChargingPostRepository;
+import charging_manage_be.repository.charging_type.ChargingTypeRepository;
 import charging_manage_be.services.charging_station.ChargingStationService;
-import charging_manage_be.services.charging_station.ChargingStationServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import static charging_manage_be.util.RandomId.generateRandomId;
 @Service
-public class ChargingPostServiceImpl implements ChargingPostSevice {
+public class ChargingPostServiceImpl implements ChargingPostService {
     private final int characterLength = 2;
     private final int numberLength = 1;
     @Autowired // vì sử dụng bản spring boot khá cao nên không cần @Autowired vẫn chạy được
 
     private ChargingPostRepository ChargingPostRepository;
+    private ChargingTypeRepository chargingTypeRepository;
     private ChargingStationService stationService;
    // ChargingPostServiceImpl postService = context.getBean(ChargingPostServiceImpl.class); gọi trong main
     private String generateUniqueId() {
@@ -39,21 +43,31 @@ public class ChargingPostServiceImpl implements ChargingPostSevice {
     public boolean isPaymentIdExists(String id) {
         return ChargingPostRepository.existsById(id);
     }
-    @Override
-    public boolean addPost(ChargingPostEntity post)
+    public boolean addPost(String stationId, boolean isActive, List<Integer> listType, BigDecimal maxPower, BigDecimal chargingFeePerKWh)
     {
-
-        if(post == null)
+        var post = new ChargingPostEntity();
+        post.setIdChargingPost(generateUniqueId());
+        post.setActive(isActive);
+        List<ChargingTypeEntity> listChargingType =  new ArrayList<>();
+        for(int i : listType)
+        {
+            if(chargingTypeRepository.findById(i).isPresent()) {
+                listChargingType.add(chargingTypeRepository.findById(i).get());
+            }
+        }
+        post.setChargingType(listChargingType);
+        post.setMaxPower(maxPower);
+        post.setChargingFeePerKWh(chargingFeePerKWh);
+        var station = stationService.getStationById(stationId);
+        if(station == null)
         {
             return false;
         }
-        post.setIdChargingPost(generateUniqueId());
+        post.setChargingStation(station);
         ChargingPostRepository.save(post);
-        //update số trụ sạc trong station
-        stationService.updateNumberOfPosts(post.getChargingStation());
         return true;
     }
-    @Override
+
     public boolean updatePost(ChargingPostEntity post)
 
     {

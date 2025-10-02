@@ -1,14 +1,14 @@
 package charging_manage_be.controller.booking;
 
 import charging_manage_be.model.entity.charging.ChargingStationEntity;
-import charging_manage_be.services.charging_station.ChargingStationServiceImpl;
+import charging_manage_be.services.charging_station.ChargingStationService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
 
 public class ShowBooking {
-    private ChargingStationServiceImpl chargingStationService;
+    private ChargingStationService chargingStationService;
     /*
      @GetMapping("/users/list")
     public ModelAndView listUsers() {
