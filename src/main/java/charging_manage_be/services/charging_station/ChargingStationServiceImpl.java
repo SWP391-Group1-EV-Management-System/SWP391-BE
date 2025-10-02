@@ -12,12 +12,14 @@ import java.util.List;
 
 import static charging_manage_be.util.RandomId.generateRandomId;
 @Service
-public class ChargingStationServiceImpl {
+public class ChargingStationServiceImpl implements  ChargingStationService {
     // cấu hình độ dài của id
     private final int characterLength = 2;
     private final int numberLength = 2;
     @Autowired
     private ChargingStationRepository chargingStationRepository;
+
+    @Override
     public void updateNumberOfPosts(ChargingStationEntity station) {
         // cập nhật số lượng trụ theo kích thước của list trụ sạc
         // gọi hàm này sau khi thêm hoặc xóa trụ sạc
@@ -32,10 +34,12 @@ public class ChargingStationServiceImpl {
         return newId;
     }
 
+    @Override
     public boolean isPaymentIdExists(String id) {
         return chargingStationRepository.existsById(id);
     }
 
+    @Override
     public boolean addStation(ChargingStationEntity station)
     {
 
@@ -48,11 +52,13 @@ public class ChargingStationServiceImpl {
         return true;
     }
 
+    @Override
     public ChargingStationEntity getStationById(String stationId)
     {
         return chargingStationRepository.findByIdChargingStation(stationId);
     }
 
+    @Override
     public boolean updateFullStation(ChargingStationEntity station)
     {
         if(station == null || !isPaymentIdExists(station.getIdChargingStation()))
@@ -62,10 +68,12 @@ public class ChargingStationServiceImpl {
         chargingStationRepository.save(station);
         return true;
     }
+    @Override
     public List<ChargingStationEntity> getAllStations()
     {
         return chargingStationRepository.findAll();
     }
+    @Override
     public List<ChargingPostEntity> getAllPostsInStation(String stationId)
     {
         ChargingStationEntity station = chargingStationRepository.findByIdChargingStation(stationId);
