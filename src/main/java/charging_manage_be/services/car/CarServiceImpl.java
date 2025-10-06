@@ -2,17 +2,31 @@ package charging_manage_be.services.car;
 
 import charging_manage_be.model.entity.cars.CarEntity;
 import charging_manage_be.repository.cars.CarRepository;
+import charging_manage_be.repository.payments.PaymentMethodRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
+import static charging_manage_be.util.RandomId.generateRandomId;
+
 @Service
 public class CarServiceImpl implements CarService {
 
     @Autowired
     private CarRepository carRepository;
+
+    private int characterLength = 5;
+    private int numberLength = 5;
+
+    public String generateUniqueId() {
+        String newId;
+        do {
+            newId = generateRandomId(characterLength, numberLength);
+        } while (carRepository.existsById(newId));
+        return newId;
+    }
 
 
     @Override
@@ -21,10 +35,14 @@ public class CarServiceImpl implements CarService {
             throw new NullPointerException("carEntity is null");
         }
 
+        else if (carEntity.getCarID() == null) {
+            carEntity.setCarID(generateUniqueId());
+        }
+
         else if (carRepository.existsById(carEntity.getCarID())){
             throw new IllegalStateException("carEntity already exists");
         }
-        return carRepository.save(carEntity);
+        return carRepository.save(carEntity); // Lúc này chỉ cần truyền những tham số cần thiết chứ không cần truyền id
     }
 
     @Override

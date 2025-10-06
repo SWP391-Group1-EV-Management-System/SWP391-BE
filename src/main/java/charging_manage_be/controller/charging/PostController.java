@@ -32,6 +32,7 @@ public class PostController {
     @PostMapping ("/update")
     public ResponseEntity<String> updateChargingPost(@PathVariable String postId)
     {
+        ChargingPostEntity ChargingPostEntity = chargingPostService.getChargingPostById(postId);
         chargingPostService.updatePost(ChargingPostEntity);
         return ResponseEntity.ok("Post update completed successfully");
     }

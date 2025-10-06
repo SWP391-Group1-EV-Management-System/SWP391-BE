@@ -18,4 +18,8 @@ public interface UserService {
     List<UserEntity> getAllUsers();
     boolean existID(String userID);
     UserEntity loginUser(String userID, String password);
+    UserEntity registerUser(UserEntity userEntity);
+    Optional<UserEntity> findByEmail(String email);
+    public void saveUserTemp(UserEntity userEntity);
+    UserEntity getUserByEmail(String email);
 }

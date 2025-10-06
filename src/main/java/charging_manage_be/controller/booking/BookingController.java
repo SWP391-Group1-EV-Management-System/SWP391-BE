@@ -43,13 +43,13 @@ public class BookingController {
         }
     }
 
-    @PostMapping("/process/{chargingPostID}")
-    public ResponseEntity<String> processNextBooking(@PathVariable String chargingPostID) {
-        BookingEntity processedBooking = bookingService.processBooking(chargingPostID);
-        if (processedBooking != null) {
-            return ResponseEntity.ok("Processed next booking successfully");
-        } else {
-            return ResponseEntity.ok("No pending bookings to process");
-        }
-    }
+//    @PostMapping("/process/{chargingPostID}") // này không cần thiết vì sẽ tự động xử lý khi hoàn thành hoặc hủy booking
+//    public ResponseEntity<String> processNextBooking(@PathVariable String chargingPostID) {
+//        BookingEntity processedBooking = bookingService.processBooking(chargingPostID);
+//        if (processedBooking != null) {
+//            return ResponseEntity.ok("Processed next booking successfully");
+//        } else {
+//            return ResponseEntity.ok("No pending bookings to process");
+//        }
+//    }
 }

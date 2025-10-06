@@ -39,10 +39,12 @@ public class ChargingPostServiceImpl implements ChargingPostService {
         }
         return ChargingPostRepository.findById(id).get();
     }
-    @Override
+
     public boolean isPaymentIdExists(String id) {
         return ChargingPostRepository.existsById(id);
     }
+
+    @Override
     public boolean addPost(String stationId, boolean isActive, List<Integer> listType, BigDecimal maxPower, BigDecimal chargingFeePerKWh)
     {
         var post = new ChargingPostEntity();
@@ -68,6 +70,7 @@ public class ChargingPostServiceImpl implements ChargingPostService {
         return true;
     }
 
+    @Override
     public boolean updatePost(ChargingPostEntity post)
 
     {
