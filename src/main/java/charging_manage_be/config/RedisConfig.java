@@ -17,10 +17,10 @@ public class RedisConfig {
 
     @Bean
     public RedisTemplate<String, String> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
-        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(redisConnectionFactory);
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>(); // Khai báo RedisTemplate với kiểu key và value là String
+        redisTemplate.setConnectionFactory(redisConnectionFactory); // Thiết lập connection factory
+        redisTemplate.setKeySerializer(new StringRedisSerializer()); // Sử dụng StringRedisSerializer cho key với StringRedisSerializer có nghĩa là key sẽ được lưu dưới dạng chuỗi
+        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer()); // Sử dụng GenericJackson2JsonRedisSerializer cho value với GenericJackson2JsonRedisSerializer có nghĩa là value sẽ được lưu dưới dạng JSON
         return redisTemplate;
     }
 }

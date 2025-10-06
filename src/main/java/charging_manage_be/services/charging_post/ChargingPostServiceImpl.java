@@ -18,6 +18,7 @@ public class ChargingPostServiceImpl implements ChargingPostService {
     private final int characterLength = 2;
     private final int numberLength = 1;
     @Autowired // vì sử dụng bản spring boot khá cao nên không cần @Autowired vẫn chạy được
+
     private ChargingPostRepository ChargingPostRepository;
     private ChargingTypeRepository chargingTypeRepository;
     private ChargingStationService stationService;
@@ -42,6 +43,8 @@ public class ChargingPostServiceImpl implements ChargingPostService {
     public boolean isPaymentIdExists(String id) {
         return ChargingPostRepository.existsById(id);
     }
+
+    @Override
     public boolean addPost(String stationId, boolean isActive, List<Integer> listType, BigDecimal maxPower, BigDecimal chargingFeePerKWh)
     {
         var post = new ChargingPostEntity();
@@ -67,6 +70,7 @@ public class ChargingPostServiceImpl implements ChargingPostService {
         return true;
     }
 
+    @Override
     public boolean updatePost(ChargingPostEntity post)
 
     {

@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+import static charging_manage_be.util.RandomId.generateRandomId;
+
 @Service
 public class UserReputationServiceImpl implements UserReputationService{
 
@@ -21,6 +23,17 @@ public class UserReputationServiceImpl implements UserReputationService{
     private UserRepository userRepository;
     @Autowired
     private ReputationLevelRepository reputationLevelRepository;
+
+    private int characterLength = 5;
+    private int numberLength = 5;
+
+    public String generateUniqueId() {
+        String newId;
+        do {
+            newId = generateRandomId(characterLength, numberLength);
+        } while (userReputationRepository.existsById(newId));
+        return newId;
+    }
 
 
     @Override
@@ -41,6 +54,13 @@ public class UserReputationServiceImpl implements UserReputationService{
         // Bởi vì userReputationEntity tham chiếu đến một UserEntity và ReputationLevelEntity chưa được lưu trong cơ sở dữ liệu
         // Nhưng mặc dù đã có UserEntity và ReputationLevelEntity trong DB rồi thì Hibernate vẫn không biết được điều đó và insert một bản ghi mới với userID và levelID đã tồn tại chứ không phải là tham chiếu đến bản ghi đã có trong DB
         // Nên ta phải check và gán lại cho userReputationEntity trước khi save
+        if (userReputationEntity.getUserReputationID() == null) {
+            userReputationEntity.setUserReputationID(generateUniqueId());
+        }
+        else if (userRepository.existsById(userReputationEntity.getUserReputationID())) {
+            throw new IllegalArgumentException("User Reputation already exists");
+        }
+
         return userReputationRepository.save(userReputationEntity);
     }
 

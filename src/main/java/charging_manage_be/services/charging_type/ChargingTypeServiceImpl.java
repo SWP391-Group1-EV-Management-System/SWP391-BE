@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 public class ChargingTypeServiceImpl implements  ChargingTypeService {
     @Autowired
     private ChargingTypeRepository chargingTypeRepository;
+
+
     public ChargingTypeEntity addChargingType(ChargingTypeEntity chargingTypeEntity) {
         return chargingTypeRepository.save(chargingTypeEntity);
     }

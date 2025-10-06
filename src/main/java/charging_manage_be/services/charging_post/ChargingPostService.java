@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface ChargingPostService {
     public ChargingPostEntity getChargingPostById(String id);
-     boolean addPost(String stationId, boolean isActive, List<Integer> listType, BigDecimal maxPower, BigDecimal chargingFeePerKWh);
+    boolean addPost(String stationId, boolean isActive, List<Integer> listType, BigDecimal maxPower, BigDecimal chargingFeePerKWh);
 
-     boolean updatePost(ChargingPostEntity post);
+    boolean updatePost(ChargingPostEntity post);
 }

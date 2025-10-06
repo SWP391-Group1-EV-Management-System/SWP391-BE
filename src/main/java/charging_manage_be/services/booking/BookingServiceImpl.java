@@ -169,6 +169,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional
     public BookingEntity cancelBooking(String bookingID) {
         BookingEntity booking = bookingRepository.findById(bookingID).orElseThrow();
 
@@ -179,6 +180,14 @@ public class BookingServiceImpl implements BookingService {
         simpMessagingTemplate.convertAndSendToUser(booking.getUser().getUserID(), "/queue/notifications",
                 "Your Booking: " + booking.getBookingId() + " cancel booking successfully");
 
+        // tự động thay thế bằng một booking mới từ waiting chờ nếu có
+        boolean isWaitingDriver = waitingListRepository
+                .findFirstByChargingPost_IdChargingPostAndStatusOrderByCreatedAtAsc(
+                        booking.getChargingPost().getIdChargingPost(), "WAITING")
+                .isPresent();
+        if(isWaitingDriver) {
+            processBooking(booking.getChargingPost().getIdChargingPost());
+        }
         return bookingRepository.save(booking);
     }
 
