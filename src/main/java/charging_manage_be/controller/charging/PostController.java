@@ -32,7 +32,7 @@ public class PostController {
     @PostMapping ("/update")
     public ResponseEntity<String> updateChargingPost(@PathVariable String postId)
     {
-        chargingPostService.updatePost(ChargingPostEntity);
+        //chargingPostService.updatePost(ChargingPostEntity);
         return ResponseEntity.ok("Post update completed successfully");
     }
 

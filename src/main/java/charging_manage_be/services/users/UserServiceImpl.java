@@ -64,8 +64,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserEntity loginUser(String userID, String password) {
-        Optional<UserEntity> optionalUser = userRepository.findById(userID);
+    public UserEntity loginUser(String email, String password) {
+        Optional<UserEntity> optionalUser = userRepository.findByEmail(email);
         if (optionalUser.isPresent()) {
             UserEntity user = optionalUser.get();
             if (user.getPassword().equals(password) && user.isStatus()) {

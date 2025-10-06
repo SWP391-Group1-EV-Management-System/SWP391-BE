@@ -38,7 +38,7 @@ public class ChargingPostServiceImpl implements ChargingPostService {
         }
         return ChargingPostRepository.findById(id).get();
     }
-    @Override
+
     public boolean isPaymentIdExists(String id) {
         return ChargingPostRepository.existsById(id);
     }

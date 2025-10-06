@@ -9,8 +9,11 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
+
 @Repository
 public interface UserRepository extends JpaRepository<UserEntity, String> {
+    Optional<UserEntity> findByEmail(String email);
 
 //    // Bởi vì softDeleteUser không có sẵn trong JpaRepository nên ta phải tự modi
 //    // Câu lệnh SQL này sẽ được thực thi khi ta gọi phương thức softDeleteUser
