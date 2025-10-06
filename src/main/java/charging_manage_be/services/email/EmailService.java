@@ -38,7 +38,7 @@ public class EmailService {
         MimeMessageHelper helper = new MimeMessageHelper(message, true); // lớp helper giúp thiết lập các thuộc tính của email
 
         // Set thông tin email
-        helper.setFrom("tommyviet183@gmail.com");
+        helper.setFrom("tramsacecoz@gmail.com");
         helper.setTo(toEmail);
         helper.setSubject("Your OTP Code");
         helper.setText("Your OTP is: " + otp);
@@ -55,7 +55,8 @@ public class EmailService {
 
     public boolean verifyOtp(String email, String otp) {
         String storedOtp = redisTemplate.opsForValue().get("otp:" + email);
-        // Đoạn này sẽ lấy OTP từ redis theo email
+        // Sẽ lấy OTP từ redis dựa theo email và trả ra value là OTP
+
         // Sẽ có 2 trường hợp xảy ra:
         // 1. OTP đúng và chưa hết hạn: storedOtp sẽ khác null và bằng otp
         // 2. OTP sai hoặc đã hết hạn: storedOtp sẽ là null hoặc khác otp
