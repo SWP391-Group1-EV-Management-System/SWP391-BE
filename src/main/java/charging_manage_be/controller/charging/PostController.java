@@ -37,6 +37,21 @@ public class PostController {
         return ResponseEntity.ok("Post update completed successfully");
     }
 
+    @GetMapping("/{postId}")
+    public ResponseEntity<ChargingPostEntity> getChargingPostById(@PathVariable String postId) {
+        ChargingPostEntity post = chargingPostService.getChargingPostById(postId);
+        if (post != null) {
+            return ResponseEntity.ok(post);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<ChargingPostEntity>> getAllChargingPosts() {
+        List<ChargingPostEntity> posts = chargingPostService.getAllPosts();
+        return ResponseEntity.ok(posts);
+    }
 }
 /*
     @Id

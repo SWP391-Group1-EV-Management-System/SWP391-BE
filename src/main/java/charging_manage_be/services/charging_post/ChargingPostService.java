@@ -10,4 +10,5 @@ public interface ChargingPostService {
     boolean addPost(String stationId, boolean isActive, List<Integer> listType, BigDecimal maxPower, BigDecimal chargingFeePerKWh);
 
     boolean updatePost(ChargingPostEntity post);
+    List<ChargingPostEntity> getAllPosts();
 }

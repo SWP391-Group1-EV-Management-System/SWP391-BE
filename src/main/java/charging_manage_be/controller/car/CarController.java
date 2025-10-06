@@ -13,7 +13,7 @@ import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
-@Controller
+@RestController
 @RequestMapping("/api/car")
 public class CarController {
 

@@ -82,6 +82,10 @@ public class ChargingPostServiceImpl implements ChargingPostService {
         return true;
     }
 
+    @Override
+    public List<ChargingPostEntity> getAllPosts() {
+        return ChargingPostRepository.findAll();
+    }
 
 
 //    public boolean addPost(String stationId, boolean isActive, BigDecimal changingFeePerKWh, BigDecimal maxPower)
