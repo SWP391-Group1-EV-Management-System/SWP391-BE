@@ -21,13 +21,13 @@ public class BookingController {
         return ResponseEntity.ok(result);
     }
 
-    @PostMapping("/complete/{bookingID}")
+   @PostMapping("/complete/{bookingID}")
     public ResponseEntity<String> completeBooking(@PathVariable String bookingID) {
         BookingEntity completedBooking = bookingService.completeBooking(bookingID);
         if (completedBooking != null) {
             return ResponseEntity.ok("Booking completed successfully" );
         }
-        else {
+       else {
             return ResponseEntity.notFound().build();
         }
     }

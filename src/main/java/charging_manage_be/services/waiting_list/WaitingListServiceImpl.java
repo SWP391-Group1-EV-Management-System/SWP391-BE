@@ -1,5 +1,6 @@
 package charging_manage_be.services.waiting_list;
 
+import charging_manage_be.controller.charging.ChargingSession;
 import charging_manage_be.model.entity.booking.BookingEntity;
 import charging_manage_be.model.entity.booking.WaitingListEntity;
 import charging_manage_be.model.entity.cars.CarEntity;
@@ -12,6 +13,9 @@ import charging_manage_be.repository.charging_post.ChargingPostRepository;
 import charging_manage_be.repository.charging_station.ChargingStationRepository;
 import charging_manage_be.repository.users.UserRepository;
 import charging_manage_be.repository.waiting_list.WaitingListRepository;
+import charging_manage_be.services.charging_session.ChargingSessionService;
+import charging_manage_be.services.users.UserService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -31,6 +35,8 @@ public class WaitingListServiceImpl implements WaitingListService{
     private final CarRepository carRepository;
     private final ChargingPostRepository chargingPostRepository;
     private final ChargingStationRepository chargingStationRepository;
+    private final UserService userService;
+    private  final ChargingSessionService chargingSessionService;
     // RedisTemplate là một lớp trong Spring Data Redis, nó cung cấp các phương thức để tương tác với Redis
     // Ở đây, RedisTemplate<String, String> có nghĩa là cả key và value trong Redis đều là String
     private final SimpMessagingTemplate simpMessagingTemplate;
@@ -69,7 +75,10 @@ public class WaitingListServiceImpl implements WaitingListService{
                 .orElseThrow(() -> new RuntimeException("Post not found"));
         ChargingStationEntity station = chargingStationRepository.findStationByChargingPostEntity(chargingPostId)
                 .orElseThrow(() -> new RuntimeException("Station not found"));
-
+        // xử lý trường hợp vô sau ( trụ đó có người cắm sạc và đã có expected end time trên session)
+        // còn bên API bên sessionController sẽ xử lý case khi driver đợi 1 driver chưa tới trạm ( tức driver booking chưa cắm sạc chưa lấy đuọc time)
+        LocalDateTime timeEnd = chargingSessionService.getExpectedEndTime(chargingPostId);
+        waitingListEntity.setExpectedWaitingTime(timeEnd);
         waitingListEntity.setUser(user);
         waitingListEntity.setCar(car);
         waitingListEntity.setChargingPost(post);
@@ -148,6 +157,26 @@ public class WaitingListServiceImpl implements WaitingListService{
                     "/queue/notifications/" + queueName,
                     "Bạn đang ở vị trí số " + position);
         }
+    }
+
+    // truyền ID trụ vào sau đó check thử có ai ở vị trí đầu không rồi update expected waiting time cho nó
+    @Override
+    @Transactional
+    public boolean addExpectedWaitingTime(String postId, LocalDateTime expectedWaitingTime) {
+        String userID = redisTemplate.opsForList().index(redisKey(postId), 0);
+        if (userID == null) {
+            return false;
+        }
+        UserEntity user = userService.getUserByID(userID).orElse(null);
+        // thiếu phải lấy được ID booking của thằng user đó để update expectted waiting time
+        WaitingListEntity waiting  = waitingListRepository.findByUserAndStatus(user, "WAITING").orElse(null);
+        //WaitingListEntity entity = waitingListRepository.findById(waitingListId).orElse(null);
+        if (waiting == null) {
+            return false;
+        }
+        waiting.setExpectedWaitingTime(expectedWaitingTime);
+        waitingListRepository.save(waiting);
+        return true;
     }
 }
 /*

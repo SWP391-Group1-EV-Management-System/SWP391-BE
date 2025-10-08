@@ -52,6 +52,7 @@ public class BookingServiceImpl implements BookingService {
         } while (bookingRepository.existsById(newId));
         return newId;
     }
+
     /*
     Trong thực tế, ở tầng controller hoặc API, người ta thường nhận các tham số đơn giản như userID, postID, carId (hoặc một DTO chứa các trường này). Sau đó, ở tầng service, các tham số này sẽ được dùng để truy vấn và tạo ra entity (WaitingListEntity) trước khi xử lý logic.
 
@@ -73,7 +74,7 @@ public class BookingServiceImpl implements BookingService {
         redisTemplate.opsForList().rightPush(redisKey(chargingPostId), userId);
         int positionInQueue;
         Optional<BookingEntity> latestStatusChargingPost = bookingRepository
-                .findFirstByChargingPost_IdChargingPostAndStatusInOrderByCreatedAtAsc(chargingPostId, List.of("CONFIRMED", "PENDING"));
+                .findFirstByChargingPost_IdChargingPostAndStatusInOrderByCreatedAtAsc(chargingPostId, List.of("CONFIRMED", "CHARGING"));
         // Câu lệnh trên sẽ lấy trạng thái mới nhất của trạm sạc với ID trụ sạc là chargingPostID
         // Và trạng thái của booking là "waiting" hoặc "charging"
         // Status là status của trụ ở trong bảng booking chứ không phải trong bảng chargingPost
@@ -124,20 +125,20 @@ public class BookingServiceImpl implements BookingService {
         } else {
             // Khi có các trạng thái "waiting" hoặc "charging" thì sẽ vào danh sách chờ
             // Lưu record vào bảng waitingList
-           // WaitingListEntity savedWaiting = waitingListService.addToWaitingList(waitingRequest);
+            // WaitingListEntity savedWaiting = waitingListService.addToWaitingList(waitingRequest);
                 /*
                 Bạn nên forward các tham số đơn giản như userId, postId, carId sang service của waiting list để service đó tự xử lý
                 việc tạo WaitingListEntity. Điều này giúp tách biệt logic, dễ bảo trì, kiểm soát dữ liệu đầu vào tốt hơn
                 và tuân thủ nguyên tắc phân tầng trong Spring Boot. Không nên tạo entity trực tiếp ở service booking
                  */
-             waitingListService.addToWaitingList(userId, chargingPostId, carId);
+            waitingListService.addToWaitingList(userId, chargingPostId, carId);
             // Thêm userID vào danh sách chờ trong Redis
 //            redisTemplate.opsForList().rightPush(redisKey(chargingPostID), waitingRequest.getUser().getUserID());
 
             // Trả về thông báo tới user rằng đã vào danh sách chờ
             // Nếu muốn gửi thông báo đến đích danh người dùng thì sẽ gửi đến kênh "/user/{userID}/queue/notifications"
             // Muốn lấy số thứ tự của user trong danh sách chờ thì sẽ lấy vị trí của userID trong danh sách Redis
-            positionInQueue  =  redisTemplate.opsForList().range(redisKey(chargingPostId), 0, -1).indexOf(userId) + 1;
+            positionInQueue = redisTemplate.opsForList().range(redisKey(chargingPostId), 0, -1).indexOf(userId) + 1;
             //simpMessagingTemplate.convertAndSendToUser(userId, "/queue/notifications",
             //        "Your position in queue: " + positionInQueue);
 
@@ -152,17 +153,19 @@ public class BookingServiceImpl implements BookingService {
         BookingEntity booking = bookingRepository.findById(bookingID).orElseThrow();
 
         booking.setStatus("COMPLETED");
-        booking.setDoneAt(LocalDateTime.now());
+        // bỏ vì đã thay đổi cột này thành trạng thái đến trụ
+        //booking.setArrivalTime(LocalDateTime.now());
 
         // Gửi thông báo đến user rằng booking đã hoàn thành
         simpMessagingTemplate.convertAndSendToUser(booking.getUser().getUserID(), "/queue/notifications",
                 "Your Booking: " + booking.getBookingId() + " completed successfully");
         // tự động thay thế bằng một booking mới từ waiting chờ nếu có
+        // phải set nếu end time bên session bằng với thời gian expected end bên session thì mới gọi hàm này
         boolean isWaitingDriver = waitingListRepository
                 .findFirstByChargingPost_IdChargingPostAndStatusOrderByCreatedAtAsc(
                         booking.getChargingPost().getIdChargingPost(), "WAITING")
                 .isPresent();
-        if(isWaitingDriver) {
+        if (isWaitingDriver) {
             processBooking(booking.getChargingPost().getIdChargingPost());
         }
         return bookingRepository.save(booking);
@@ -174,26 +177,35 @@ public class BookingServiceImpl implements BookingService {
         BookingEntity booking = bookingRepository.findById(bookingID).orElseThrow();
 
         booking.setStatus("CANCELLED");
-        booking.setDoneAt(LocalDateTime.now());
+        booking.setArrivalTime(LocalDateTime.now());
 
         // Gửi thông báo đến user rằng booking đã bị hủy
         simpMessagingTemplate.convertAndSendToUser(booking.getUser().getUserID(), "/queue/notifications",
                 "Your Booking: " + booking.getBookingId() + " cancel booking successfully");
 
-        // tự động thay thế bằng một booking mới từ waiting chờ nếu có
-        boolean isWaitingDriver = waitingListRepository
-                .findFirstByChargingPost_IdChargingPostAndStatusOrderByCreatedAtAsc(
-                        booking.getChargingPost().getIdChargingPost(), "WAITING")
-                .isPresent();
-        if(isWaitingDriver) {
-            processBooking(booking.getChargingPost().getIdChargingPost());
-        }
+
+        // theo flow mới ( khi chưa đủ giờ) phải hỏi driver trong waiting rằng có muốn sạc luôn hay không, nếu đồng ý thì chuyển từ waiting ra
+        // không muôn sạc luôn thì phải chờ đến giờ
+        // khi đã đủ giờ tự động driver trong hàng đợi sẽ được lấy ra
+//        boolean isWaitingDriver = waitingListRepository
+//                .findFirstByChargingPost_IdChargingPostAndStatusOrderByCreatedAtAsc(
+//                        booking.getChargingPost().getIdChargingPost(), "WAITING")
+//                .isPresent();
+//        if (isWaitingDriver) {
+//            processBooking(booking.getChargingPost().getIdChargingPost());
+//        }
         return bookingRepository.save(booking);
     }
 
 
     @Transactional
     public BookingEntity processBooking(String chargingPostId) {
+        BookingEntity saved = new BookingEntity();
+        boolean isWaitingDriver = waitingListRepository
+                .findFirstByChargingPost_IdChargingPostAndStatusOrderByCreatedAtAsc(
+                        chargingPostId, "WAITING")
+                .isPresent();
+        if (isWaitingDriver){
 
         boolean busy = bookingRepository
                 .findFirstByChargingPost_IdChargingPostAndStatusInOrderByCreatedAtAsc(
@@ -223,7 +235,7 @@ public class BookingServiceImpl implements BookingService {
                         .max().orElse(15) // fallback
         );
         booking.setStatus("CONFIRMED");
-        BookingEntity saved = bookingRepository.save(booking);
+        saved = bookingRepository.save(booking);
 
         waitingList.setStatus("COMPLETED");
         waitingList.setOutedAt(LocalDateTime.now());
@@ -236,10 +248,23 @@ public class BookingServiceImpl implements BookingService {
                 "/queue/notifications",
                 "Your booking " + saved.getBookingId() + " has been confirmed."
         );
-
+        }
         return saved;
     }
+    @Override
+    @Transactional
+    public boolean updateChargingBookingStatus(String bookingId) {
 
+
+        BookingEntity booking = bookingRepository.findById(bookingId).orElse(null);
+        if (booking == null) {
+            return false; // Booking không tồn tại
+        }
+        booking.setStatus("CHARGING");
+        booking.setArrivalTime(LocalDateTime.now());
+        bookingRepository.save(booking);
+        return true;
+    }
 }
 /*
 @Transactional

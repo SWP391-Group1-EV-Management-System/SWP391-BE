@@ -128,6 +128,13 @@ public class DataInitializer  implements CommandLineRunner {
         driverARep.setNotes("Initial reputation");
         userReputationRepository.save(driverARep);
 
+        UserReputationEntity driverBRep = new UserReputationEntity();
+        driverBRep.setUserReputationID("REP002");
+        driverBRep.setUser(driverB);
+        driverBRep.setReputationLevel(bad);
+        driverBRep.setNotes("Initial reputation");
+        userReputationRepository.save(driverBRep);
+
         // Initialize Charging Types
         ChargingTypeEntity ccs = new ChargingTypeEntity();
         ccs.setIdChargingType(1);
