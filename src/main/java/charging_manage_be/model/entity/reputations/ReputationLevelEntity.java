@@ -20,6 +20,10 @@ public class ReputationLevelEntity {
 
     @Column(name = "level_name", nullable = false, length = 50)
     private String levelName;
+    @Column(name = "min_score", nullable = false)
+    private int minScore;
+    @Column(name = "max_score", nullable = false)
+    private int maxScore;
     @Column(name = "max_wait_minutes", nullable = false)
     private int maxWaitMinutes;
     @Column(name = "description", length = 255)

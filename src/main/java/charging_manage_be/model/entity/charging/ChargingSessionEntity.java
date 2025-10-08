@@ -44,7 +44,8 @@ public class ChargingSessionEntity {
     @Column(name = "is_done")
     private boolean isDone;
 
-
+    @Column(name = "expected_end_time") // thời gian mong muốn thi rút sạc
+    private LocalDateTime expectedEndTime;
 
     @Column(name = "start_time")
     private LocalDateTime startTime;

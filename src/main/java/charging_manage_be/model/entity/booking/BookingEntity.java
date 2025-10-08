@@ -23,8 +23,7 @@ public class BookingEntity {
     @Id
     @Column(name = "booking_id")
     private String bookingId;
-    @Column(name = "expected_end_time") // thời gian mong muốn thi rút sạc
-    private LocalDateTime expectedEndTime;
+
     @OneToOne
     @JoinColumn(name = "waiting_list_id",  nullable = true)
     private WaitingListEntity waitingList;
