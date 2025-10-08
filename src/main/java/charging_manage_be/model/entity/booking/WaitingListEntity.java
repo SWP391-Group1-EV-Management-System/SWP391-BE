@@ -22,7 +22,7 @@ public class WaitingListEntity {
     @Column(name = "waiting_list_id")
     private String waitingListId;
     @Column(name = "expected_waiting_time") // thời gian dự kiến chờ tham chiếu theo thời gian expected end bên booking
-    private LocalDateTime expectedWaitingTime;
+    private LocalDateTime expectedWaitingTime; // có thể lấy thời gian driver 1 đến trạm (15p) + thời gian sạc dự kiến
     @ManyToOne // Qua User để chỉnh mối quan hệ lại
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;

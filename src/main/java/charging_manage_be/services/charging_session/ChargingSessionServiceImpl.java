@@ -1,5 +1,6 @@
 package charging_manage_be.services.charging_session;
 
+import charging_manage_be.controller.charging.ChargingSession;
 import charging_manage_be.model.entity.booking.BookingEntity;
 import charging_manage_be.model.entity.charging.ChargingPostEntity;
 import charging_manage_be.model.entity.charging.ChargingSessionEntity;
@@ -8,7 +9,9 @@ import charging_manage_be.repository.booking.BookingRepository;
 import charging_manage_be.repository.charging_post.ChargingPostRepository;
 import charging_manage_be.repository.charging_session.ChargingSessionRepository;
 import charging_manage_be.repository.users.UserRepository;
+import charging_manage_be.services.charging_post.ChargingPostService;
 import charging_manage_be.services.payments.PaymentService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +32,7 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final ChargingPostRepository chargingPostRepository;
-
+    private final ChargingPostService ChargingPostService;
 
     public boolean isExistById(String sessionId) {
         return chargingSession.existsById(sessionId);
@@ -41,9 +44,10 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
         } while (isExistById(newId));
         return newId;
     }
+    // phải add thời gian dự kiến sạc vào session
     // khi driver quẹt QR thì sẽ lấy thông tin userId, carId, và lấy booking nếu có để tạo session
     @Override
-    public boolean addSessionWithBooking(String bookingId) {
+    public boolean addSessionWithBooking(String bookingId, LocalDateTime expectedEndTime) {
         try {
             Optional<BookingEntity> optionalBooking = bookingRepository.findById(bookingId);
             if (optionalBooking.isEmpty()) {
@@ -60,6 +64,7 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
         session.setStation(booking.getChargingStation());
         session.setChargingPost(booking.getChargingPost());
         session.setKWh(booking.getChargingPost().getChargingFeePerKWh());
+        session.setExpectedEndTime(expectedEndTime);
         chargingSession.save(session);
         return true;
         } catch (Exception e) {
@@ -67,9 +72,9 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
             return false;
         }
     }
-
+    // phải add thời gian dự kiến sạc vào session
     @Override
-    public boolean addSessionWithoutBooking(String userId,String postId)
+    public boolean addSessionWithoutBooking(String userId,String postId, LocalDateTime expectedEndTime)
     {
         try {
 
@@ -92,6 +97,7 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
             session.setStation(post.getChargingStation());
             session.setChargingPost(post);
             session.setKWh(post.getChargingFeePerKWh());
+            session.setExpectedEndTime(expectedEndTime);
             chargingSession.save(session);
         return true;
         } catch (Exception e) {
@@ -124,11 +130,11 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
 
     @Override
     public boolean endSession(String sessionId) {
-        Optional<ChargingSessionEntity> optional = chargingSession.findById(sessionId);
-        if (optional.isEmpty()) {
-            return false;
+        ChargingSessionEntity session = getSessionById(sessionId);
+        if(session == null)
+        {
+            return false; // session không tồn tại
         }
-        ChargingSessionEntity session = optional.get();
         if (session.isDone()) {
             return false; // session đã kết thúc rồi
         }
@@ -146,6 +152,30 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
             return false;
         }
     }
+    @Override
+    public ChargingSessionEntity getSessionById(String sessionId) {
+        Optional<ChargingSessionEntity> optional = chargingSession.findById(sessionId);
+        return optional.orElse(null);
+    }
+
+    @Override
+    public LocalDateTime getExpectedEndTime(String chargingPost) {
+        ChargingPostEntity post = ChargingPostService.getChargingPostById(chargingPost);
+        return chargingSession.findExpectedEndTimeByChargingPostAndIsDone(post, false).orElse(null);
+    }
+//    @Override
+//    @Transactional
+//    public boolean addExpectedEndTime(String bookingID, LocalDateTime expectedEndTime) {
+//        BookingEntity booking = bookingRepository.findById(bookingID).orElse(null);;
+//        if(booking == null)
+//        {
+//            return false;
+//        }
+//        booking.setExpectedEndTime(expectedEndTime);
+//        bookingRepository.save(booking);
+//        waitingListService.addExpectedWaitingTime(booking.getChargingPost().getIdChargingPost(), expectedEndTime);
+//        return true;
+//    }
 
 
 }

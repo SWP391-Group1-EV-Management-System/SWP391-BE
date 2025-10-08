@@ -20,6 +20,8 @@ public class ChargingSessionEntity {
     @Id
     @Column(name = "charging_session_id")
     private String chargingSessionId;
+    @Column(name = "expected_end_time") // thời gian mong muốn thi rút sạc
+    private LocalDateTime expectedEndTime; // chỉ insert khi đã đến trạm và bấm bắt đầu sạc
 
     @OneToOne
     @JoinColumn(name = "booking_id", nullable = true)

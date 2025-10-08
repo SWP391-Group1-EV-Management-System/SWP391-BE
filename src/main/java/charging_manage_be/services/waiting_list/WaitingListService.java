@@ -4,6 +4,7 @@ package charging_manage_be.services.waiting_list;
 import charging_manage_be.model.entity.booking.WaitingListEntity;
 import charging_manage_be.model.entity.cars.CarEntity;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface WaitingListService{
@@ -11,9 +12,9 @@ public interface WaitingListService{
     // Có nghĩa là từ lúc vừa vào danh sách chờ đến lúc rời khỏi danh sách chờ (vào được bãi sạc hoặc hủy chờ)
     // Và các hàm lấy thông tin danh sách của userID với thời gian mới nhất
 
-   public WaitingListEntity addToWaitingList(String userID, String chargingPostId,String carID);
+    WaitingListEntity addToWaitingList(String userID, String chargingPostId,String carID);
    // Đây là hàm khi hủy chờ, tức là userID sẽ bị xóa khỏi danh sách chờ trong Redis và status của record trong DB sẽ được cập nhật thành "CANCELED"
-   public void cancelWaiting(String waitingListId);
-   public List<String> getWaitingListForPost(String chargingPostID);
-
+    void cancelWaiting(String waitingListId);
+    List<String> getWaitingListForPost(String chargingPostID);
+    boolean addExpectedWaitingTime(String postId, LocalDateTime expectedWaitingTime);
 }

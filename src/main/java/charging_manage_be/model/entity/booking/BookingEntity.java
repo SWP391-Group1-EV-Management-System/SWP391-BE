@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(name = "booking")
@@ -54,8 +53,8 @@ public class BookingEntity {
     @Column(name = "status", nullable = false)
     private String status; // booked, canceled, done
 
-    @Column(name = "done_at", nullable = true)
-    private LocalDateTime doneAt;
+    @Column(name = "arrival_time", nullable = true)
+    private LocalDateTime arrivalTime;
 
     @OneToOne(mappedBy = "booking" )
     private ChargingSessionEntity chargingSession;
