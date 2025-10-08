@@ -12,7 +12,9 @@ public class    WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        // client sẽ subscribe từ /topic/*
+        // server gửi message tới /topic/* với một simple broker là một
+        // message broker là một thành phần trung gian chịu trách nhiệm nhận,
+        // lưu trữ và chuyển tiếp các tin nhắn giữa các client và server.
         config.enableSimpleBroker("/topic");
         // client gửi message tới /app/*
         config.setApplicationDestinationPrefixes("/app");

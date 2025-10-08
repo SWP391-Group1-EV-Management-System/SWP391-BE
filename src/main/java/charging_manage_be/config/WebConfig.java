@@ -15,7 +15,8 @@ import java.util.List;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-    @Bean
+    @Bean // Bean là để Spring quản lý và tái sử dụng đối tượng này
+    // Cấu hình CORS để cho phép các yêu cầu CRUD từ frontend (ví dụ: localhost:5173)
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(Boolean.TRUE);
