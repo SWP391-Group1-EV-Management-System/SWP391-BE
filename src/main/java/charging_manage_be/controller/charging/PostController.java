@@ -52,6 +52,7 @@ public class PostController {
         List<ChargingPostEntity> posts = chargingPostService.getAllPosts();
         return ResponseEntity.ok(posts);
     }
+
 }
 /*
     @Id

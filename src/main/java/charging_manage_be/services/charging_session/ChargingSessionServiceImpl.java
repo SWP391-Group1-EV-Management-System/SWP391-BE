@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -124,7 +125,7 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
     public BigDecimal calculateAmount(ChargingSessionEntity session) {
         // lấy giá của trụ sạc và thời gian sạc để tính tiền
         var rate = session.getChargingPost().getChargingFeePerKWh();
-        var duration = java.time.Duration.between(session.getStartTime(), session.getEndTime()).toHours();
+        var duration = Duration.between(session.getStartTime(), session.getEndTime()).toMinutes();
         return rate.multiply(BigDecimal.valueOf(duration));
     }
 
