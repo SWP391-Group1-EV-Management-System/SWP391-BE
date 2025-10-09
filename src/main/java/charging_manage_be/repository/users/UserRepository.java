@@ -17,7 +17,6 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<UserEntity, String> {
     // Tìm user theo email đã đăng kí hay chưa
     Optional<UserEntity> findByEmail(String email);
-
 //    // Bởi vì softDeleteUser không có sẵn trong JpaRepository nên ta phải tự modi
 //    // Câu lệnh SQL này sẽ được thực thi khi ta gọi phương thức softDeleteUser
 //

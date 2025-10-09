@@ -30,6 +30,9 @@ public class UserReputationEntity {
     @JoinColumn(name = "level_id", nullable = false)
     private ReputationLevelEntity reputationLevel;
 
+    @Column(name = "current_score", nullable = false)
+    private int currentScore;
+
     @Column (name = "notes", length = 255)
     private String notes;
 

@@ -1,14 +1,19 @@
 package charging_manage_be.services.user_reputations;
 
+import charging_manage_be.model.entity.charging.ChargingSessionEntity;
 import charging_manage_be.model.entity.reputations.ReputationLevelEntity;
 import charging_manage_be.model.entity.reputations.UserReputationEntity;
 import charging_manage_be.model.entity.users.UserEntity;
 import charging_manage_be.repository.reputations.ReputationLevelRepository;
 import charging_manage_be.repository.user_reputations.UserReputationRepository;
 import charging_manage_be.repository.users.UserRepository;
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,19 +50,17 @@ public class UserReputationServiceImpl implements UserReputationService{
         userReputationEntity.setUser(userEntity);
 
         // Kiểm tra và gán levelID đã tồn tại trong bảng ReputationLevelEntity
-        ReputationLevelEntity levelEntity = reputationLevelRepository.findById(userReputationEntity.getReputationLevel().getLevelID())
-                .orElseThrow(() -> new IllegalArgumentException("Reputation Level not found with ID: " + userReputationEntity.getReputationLevel().getLevelID()));
+        ReputationLevelEntity levelEntity = reputationLevelRepository.findLevelByScore(userReputationEntity.getCurrentScore());
+        if (levelEntity == null) {
+            throw new IllegalArgumentException("No reputation level found for score: " + userReputationEntity.getCurrentScore());
+        }
+
         userReputationEntity.setReputationLevel(levelEntity);
 
-        // Nếu không check trước khi save thì sẽ bị lỗi:
-        // org.hibernate.TransientPropertyValueException: object references an unsaved transient instance - save the transient instance before flushing
-        // Bởi vì userReputationEntity tham chiếu đến một UserEntity và ReputationLevelEntity chưa được lưu trong cơ sở dữ liệu
-        // Nhưng mặc dù đã có UserEntity và ReputationLevelEntity trong DB rồi thì Hibernate vẫn không biết được điều đó và insert một bản ghi mới với userID và levelID đã tồn tại chứ không phải là tham chiếu đến bản ghi đã có trong DB
-        // Nên ta phải check và gán lại cho userReputationEntity trước khi save
         if (userReputationEntity.getUserReputationID() == null) {
             userReputationEntity.setUserReputationID(generateUniqueId());
         }
-        else if (userRepository.existsById(userReputationEntity.getUserReputationID())) {
+        else if (userReputationRepository.existsById(userReputationEntity.getUserReputationID())) {
             throw new IllegalArgumentException("User Reputation already exists");
         }
 
@@ -82,9 +85,103 @@ public class UserReputationServiceImpl implements UserReputationService{
     }
 
     @Override
-    public List<UserReputationEntity> getAllUserReputations() {
-        return userReputationRepository.findAll();
+    public int calculateReputationPoints(LocalDateTime startTime, LocalDateTime expectedEndTime, LocalDateTime actualEndTime) {
+        if (startTime == null || expectedEndTime == null || actualEndTime == null) {
+            throw new IllegalArgumentException("Invalid time values provided.");
+        }
+
+        long totalExpectedTime = Duration.between(startTime, expectedEndTime).toMinutes();
+        long totalActualTime = Duration.between(startTime, actualEndTime).toMinutes();
+        int penaltyPoints = 0;
+        int rewardPoints = 0;
+
+        // Lấy mốc thời gian 90% của tổng thời gian sạc dự kiến
+        long ninetyPercentageTimeLimitation = (90 * totalExpectedTime)/100;
+
+        // Nếu sạc xong sớm hơn 90% thời gian dự kiến thì sẽ bị trừ điểm theo công thức 90% thời gian - thời gian thực tế chia 5 phút
+        if (totalActualTime < ninetyPercentageTimeLimitation) {
+            penaltyPoints = (int)Math.ceil((ninetyPercentageTimeLimitation - totalActualTime)/5.0); // Làm tròn lên đối với điểm bị trừ
+            return -penaltyPoints;
+        }
+
+        // Nếu sạc đúng giờ hoặc trong khoảng 90% thời gian dự kiến thì sẽ được cộng điểm theo công thức (thời gian dự kiến - thời gian thực tế)/10 phút
+        else if (totalActualTime >= ninetyPercentageTimeLimitation && totalActualTime <= totalExpectedTime) {
+            rewardPoints = (int) Math.floor((totalExpectedTime - totalActualTime)/10.0); // Làm tròn xuống đối với điểm được cộng
+            return rewardPoints;
+
+        }
+
+        else if (totalActualTime == totalExpectedTime){
+            return 1;
+        }
+
+        return 0;
+    }
+
+    @Override
+    public boolean updatePointsUserReputation(String userID, int pointsChange, String notes) {
+        //  Lấy thông tin uy tín hiện tại của user
+        UserReputationEntity currentUser = getCurrentUserReputationById(userID)
+                .orElseThrow(() -> new IllegalArgumentException("User reputation not found for user ID: " + userID));
+        int currentScore = currentUser.getCurrentScore();
+        int newScore = Math.max(0, currentScore + pointsChange); // Tính điểm mới và đảm bảo không âm, nhỏ nhất là 0
+
+        // lấy level tương ứng với điểm mới
+        ReputationLevelEntity levelEntity = reputationLevelRepository.findLevelByScore(newScore);
+        if (levelEntity == null) {
+            throw new IllegalArgumentException("No reputation level found for score: " + newScore);
+        }
+
+        UserReputationEntity newUserReputationEntity = new UserReputationEntity();
+
+        newUserReputationEntity.setUserReputationID(generateUniqueId());
+        newUserReputationEntity.setCreatedAt(LocalDateTime.now());
+        newUserReputationEntity.setUser(currentUser.getUser());
+        newUserReputationEntity.setCurrentScore(newScore);
+        newUserReputationEntity.setReputationLevel(levelEntity);
+        newUserReputationEntity.setNotes(notes);
+
+        userReputationRepository.save(newUserReputationEntity);
+        return true;
+    }
+
+    @Override
+    public void handleEarlyUnplugPenalty(ChargingSessionEntity chargingSession) {
+        if (chargingSession == null ||
+                chargingSession.getUser() == null ||
+                chargingSession.getStartTime() == null ||
+                chargingSession.getEndTime() == null ||
+                chargingSession.getExpectedEndTime() == null) {
+            throw new IllegalArgumentException("Invalid charging session or user.");
+        }
+
+        LocalDateTime startTime = chargingSession.getStartTime();
+        LocalDateTime expectedEndTime = chargingSession.getExpectedEndTime();
+        LocalDateTime actualEndTime = chargingSession.getEndTime();
+
+        int pointChange  = calculateReputationPoints(startTime, expectedEndTime, actualEndTime);
+
+        // Nếu không có thay đổi điểm thì không cần cập nhật
+        // Lấy phần trăm để in ra thông báo
+        double percentage = ((Duration.between(startTime, actualEndTime).toMinutes() / (0.9 * Duration.between(startTime, expectedEndTime).toMinutes()) )*100) ;
+        String notes = "";
+        if (pointChange < 0) {
+            notes = "Người dùng đã rút sạc trước " + (int)(100 - percentage) + "% thời gian dự kiến so với mốc 90% thời gian dự kiến, bị trừ " + Math.abs(pointChange) + " điểm uy tín.";
+        }
+        else if (pointChange > 0){
+            notes = "Người dùng đã rút sạc đúng giờ dự kiến hoặc và được hoặc hơn 10' kể từ 90% thời gian dự kiến, được cộng " + pointChange + " điểm uy tín.";
+        }
+        else{
+            notes = "Người dùng tuy không rút sớm nhưng chưa đủ thời gian 10' kể từ 90% của thời gian dự kiến hoặc chưa đủ thời gian dự kiến nên điểm không đổi.";
+        }
+
+        updatePointsUserReputation(chargingSession.getUser().getUserID(), pointChange, notes);
+
     }
 
 
+    @Override
+    public List<UserReputationEntity> getAllUserReputations() {
+        return userReputationRepository.findAll();
+    }
 }

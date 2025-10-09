@@ -46,8 +46,6 @@ public class ChargingSessionEntity {
     @Column(name = "is_done")
     private boolean isDone;
 
-
-
     @Column(name = "start_time")
     private LocalDateTime startTime;
 
