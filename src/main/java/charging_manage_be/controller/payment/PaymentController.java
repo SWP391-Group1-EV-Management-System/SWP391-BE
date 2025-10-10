@@ -1,5 +1,6 @@
 package charging_manage_be.controller.payment;
 
+import charging_manage_be.model.dto.payment.PaymentResponse;
 import charging_manage_be.model.entity.payments.PaymentEntity;
 import charging_manage_be.services.payments.PaymentMethodService;
 import charging_manage_be.services.payments.PaymentService;
@@ -8,8 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/payment")
+@RequestMapping("/api/payment")
 public class PaymentController {
 
     @Autowired
@@ -48,25 +51,63 @@ public class PaymentController {
     }
 
     @GetMapping("/{paymentId}")
-    public ResponseEntity<PaymentEntity> getPaymentByPaymentId(@PathVariable String paymentId) {
+    public ResponseEntity<PaymentResponse> getPaymentByPaymentId(@PathVariable String paymentId) {
         PaymentEntity payment = paymentService.getPaymentByPaymentId(paymentId);
+        PaymentResponse paymentResponse = new PaymentResponse(
+                payment.getPaymentId(),
+                payment.getUser().getUserID(),
+                payment.getSession().getChargingSessionId(),
+                payment.isPaid(),
+                payment.getCreatedAt(),
+                payment.getPaidAt(),
+                payment.getPaymentMethod() != null ? payment.getPaymentMethod().getIdPaymentMethod() : null,
+                payment.getPrice(),
+                payment.getSession().getChargingSessionId()
+        );
         if (payment != null) {
-            return ResponseEntity.ok(payment);
+            return ResponseEntity.ok(paymentResponse);
         } else {
             return ResponseEntity.notFound().build();
         }
     }
 
     @GetMapping("/paymentByUser/{userId}")
-    public ResponseEntity<PaymentEntity> getPaymentByUserId(@PathVariable String userId, String paymentId) {
-        PaymentEntity payment = paymentService.getPaymentByUserID(userId, paymentId);
-        if (payment != null) {
-            return ResponseEntity.ok(payment);
+    public ResponseEntity<List<PaymentResponse>> getPaymentByUserId(@PathVariable String userId) {
+        List<PaymentEntity> payments = paymentService.getPaymentByUserID(userId);
+        List<PaymentResponse> paymentResponses = payments.stream().map(payment -> new PaymentResponse(
+                payment.getPaymentId(),
+                payment.getUser().getUserID(),
+                payment.getSession().getChargingSessionId(),
+                payment.isPaid(),
+                payment.getCreatedAt(),
+                payment.getPaidAt(),
+                payment.getPaymentMethod() != null ? payment.getPaymentMethod().getIdPaymentMethod() : null,
+                payment.getPrice(),
+                payment.getSession().getChargingSessionId()
+        )).toList();
+        if (paymentResponses != null) {
+            return ResponseEntity.ok(paymentResponses);
         } else {
             return ResponseEntity.notFound().build();
         }
     }
+    @GetMapping("/all")
+    public ResponseEntity<List<PaymentResponse>> getAllPayments() {
+        List<PaymentEntity> payments = paymentService.findAllPayment();
+        List<PaymentResponse> paymentResponses = payments.stream().map(payment -> new PaymentResponse(
+                payment.getPaymentId(),
+                payment.getUser().getUserID(),
+                payment.getSession().getChargingSessionId(),
+                payment.isPaid(),
+                payment.getCreatedAt(),
+                payment.getPaidAt(),
+                payment.getPaymentMethod() != null ? payment.getPaymentMethod().getIdPaymentMethod() : null,
+                payment.getPrice(),
+                payment.getSession().getChargingSessionId()
+        )).toList();
 
+        return ResponseEntity.ok(paymentResponses);
+    }
 
 
 
