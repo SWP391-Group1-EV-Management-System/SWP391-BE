@@ -1,4 +1,4 @@
-package charging_manage_be.model.dto.otpRequest;
+package charging_manage_be.model.dto.otp_request;
 
 
 import lombok.AllArgsConstructor;

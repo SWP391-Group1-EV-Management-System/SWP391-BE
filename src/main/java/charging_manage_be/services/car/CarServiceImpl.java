@@ -1,8 +1,10 @@
 package charging_manage_be.services.car;
 
 import charging_manage_be.model.entity.cars.CarEntity;
+import charging_manage_be.model.entity.users.UserEntity;
 import charging_manage_be.repository.cars.CarRepository;
 import charging_manage_be.repository.payments.PaymentMethodRepository;
+import charging_manage_be.services.users.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +18,8 @@ public class CarServiceImpl implements CarService {
 
     @Autowired
     private CarRepository carRepository;
+    @Autowired
+    private UserService userService;
 
     private int characterLength = 5;
     private int numberLength = 5;
@@ -81,5 +85,11 @@ public class CarServiceImpl implements CarService {
     @Override
     public List<CarEntity> findAllCar() {
         return carRepository.findAll();
+    }
+
+    @Override
+    public List<CarEntity> findAllCarByUserID(String userID) {
+        UserEntity user  = userService.getUserByID(userID).orElse(null);
+        return carRepository.findByUser(user);
     }
 }

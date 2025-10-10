@@ -12,4 +12,5 @@ public interface CarService {
     boolean deleteCarByCarID(String carID);
     Optional<CarEntity> getCarByCarID(String carID);
     List<CarEntity> findAllCar();
+    List<CarEntity> findAllCarByUserID(String userID);
 }

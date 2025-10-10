@@ -37,6 +37,7 @@ public class ChargingPostEntity {
             joinColumns = @JoinColumn(name = "id_charging_post"),
             inverseJoinColumns = @JoinColumn(name = "id_charging_type")
     )
+
     private List<ChargingTypeEntity> chargingType;
     @OneToMany(mappedBy = "chargingPost" )
     private List<WaitingListEntity> waitingList;

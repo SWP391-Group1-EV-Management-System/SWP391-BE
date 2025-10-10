@@ -2,6 +2,7 @@ package charging_manage_be.controller.charging;
 
 
 import charging_manage_be.model.dto.session.ChargingSessionRequest;
+import charging_manage_be.model.dto.session.ChargingSessionResponse;
 import charging_manage_be.model.entity.booking.BookingEntity;
 import charging_manage_be.model.entity.charging.ChargingSessionEntity;
 import charging_manage_be.services.booking.BookingService;
@@ -66,5 +67,19 @@ public class ChargingSession {
         }
         // không thì phải request cho người trong hàng đợi sau có muốn vào luôn hay không
         return ResponseEntity.ok("Charging Session finish completed successfully");
+    }
+    @GetMapping("/show/{sessionId}")
+    public ResponseEntity<ChargingSessionResponse> getSessionById(@PathVariable String sessionId){
+        ChargingSessionEntity session = sessionService.getSessionById(sessionId);
+        ChargingSessionResponse sessionR = new ChargingSessionResponse(session.getChargingSessionId(), session.getExpectedEndTime()
+                ,session.getBooking().getBookingId(),session.getChargingPost().getIdChargingPost()
+                ,session.getStation().getIdChargingStation(),session.getUser().getUserID()
+                ,session.getUserManage().getUserID(), session.isDone(), session.getStartTime()
+                , session.getEndTime(),session.getKWh(), session.getTotalAmount() );
+        if(session == null)
+        {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(sessionR);
     }
 }

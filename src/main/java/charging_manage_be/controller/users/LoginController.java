@@ -22,17 +22,12 @@ public class LoginController {
         System.out.println("Received login request for email: " + loginRequest.getEmail()); // Debug line
 
         UserEntity user = userService.loginUser(loginRequest.getEmail(), loginRequest.getPassword());
-        System.out.println("User found: " + (user != null)); // Debug line
-
         if(user == null) {
-            System.out.println("Login failed - invalid credentials"); // Debug line
             return ResponseEntity.status(401).body("Sai email hoặc mật khẩu");
         }
 
-        System.out.println("Login successful - setting session"); // Debug line
         UserResponse userResponse = new UserResponse(user.getUserID(), user.getEmail(),user.getFirstName(),user.getLastName(),user.getRole());
         session.setAttribute("userSession", userResponse);
-
         return ResponseEntity.ok(userResponse);
     }
 }

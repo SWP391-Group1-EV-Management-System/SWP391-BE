@@ -59,6 +59,11 @@ public class CarController {
         }
         return ResponseEntity.notFound().build();
     }
+    @GetMapping ("/user/{userID}")
+    public ResponseEntity<List<CarEntity>> getCarByUserID(@PathVariable String userID) {
+        List<CarEntity> cars = carService.findAllCarByUserID(userID);
+        return ResponseEntity.ok(cars);
+    }
 
 
 
