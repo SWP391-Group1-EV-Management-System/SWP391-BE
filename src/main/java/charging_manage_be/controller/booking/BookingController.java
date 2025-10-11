@@ -54,7 +54,12 @@ public class BookingController {
         List<BookingResponseDTO> bookingResponseDTO = bookingService.getBookingByPostId(postId).stream().map(BookingEntity -> {
             BookingResponseDTO dto = new BookingResponseDTO();
             dto.setBookingId(BookingEntity.getBookingId());
-            dto.setWaitingListId(BookingEntity.getWaitingList().getWaitingListId());
+            // Kiểm tra null trước khi lấy waitingListId
+            if (BookingEntity.getWaitingList() == null) {
+                dto.setWaitingListId(null);
+            } else {
+                dto.setWaitingListId(BookingEntity.getWaitingList().getWaitingListId());
+            }
             dto.setUserId(BookingEntity.getUser().getUserID());
             dto.setChargingStationId(BookingEntity.getChargingStation().getIdChargingStation());
             dto.setChargingPostId(BookingEntity.getChargingPost().getIdChargingPost());
@@ -74,7 +79,11 @@ public class BookingController {
         List<BookingResponseDTO> bookingResponseDTO = bookingService.getBookingByStationId(stationId).stream().map(BookingEntity -> {
             BookingResponseDTO dto = new BookingResponseDTO();
             dto.setBookingId(BookingEntity.getBookingId());
-            dto.setWaitingListId(BookingEntity.getWaitingList().getWaitingListId());
+            if (BookingEntity.getWaitingList() == null) {
+                dto.setWaitingListId(null);
+            } else {
+                dto.setWaitingListId(BookingEntity.getWaitingList().getWaitingListId());
+            }
             dto.setUserId(BookingEntity.getUser().getUserID());
             dto.setChargingStationId(BookingEntity.getChargingStation().getIdChargingStation());
             dto.setChargingPostId(BookingEntity.getChargingPost().getIdChargingPost());
@@ -94,7 +103,11 @@ public class BookingController {
         List<BookingResponseDTO> bookingResponseDTO = bookingService.getBookingByUserId(userId).stream().map(BookingEntity -> {
             BookingResponseDTO dto = new BookingResponseDTO();
             dto.setBookingId(BookingEntity.getBookingId());
-            dto.setWaitingListId(BookingEntity.getWaitingList().getWaitingListId());
+            if (BookingEntity.getWaitingList() == null) {
+                dto.setWaitingListId(null);
+            } else {
+                dto.setWaitingListId(BookingEntity.getWaitingList().getWaitingListId());
+            }
             dto.setUserId(BookingEntity.getUser().getUserID());
             dto.setChargingStationId(BookingEntity.getChargingStation().getIdChargingStation());
             dto.setChargingPostId(BookingEntity.getChargingPost().getIdChargingPost());
@@ -116,7 +129,11 @@ public class BookingController {
         List<BookingResponseDTO> bookingResponseDTO = bookingService.getBookingByCreatedDate(startOfDay, endOfDay).stream().map(BookingEntity -> {
             BookingResponseDTO dto = new BookingResponseDTO();
             dto.setBookingId(BookingEntity.getBookingId());
-            dto.setWaitingListId(BookingEntity.getWaitingList().getWaitingListId());
+            if (BookingEntity.getWaitingList() == null) {
+                dto.setWaitingListId(null);
+            } else {
+                dto.setWaitingListId(BookingEntity.getWaitingList().getWaitingListId());
+            }
             dto.setUserId(BookingEntity.getUser().getUserID());
             dto.setChargingStationId(BookingEntity.getChargingStation().getIdChargingStation());
             dto.setChargingPostId(BookingEntity.getChargingPost().getIdChargingPost());
@@ -136,7 +153,11 @@ public class BookingController {
         List<BookingResponseDTO> bookingResponseDTO = bookingService.getBookingByWaitingListId(waitingListId).stream().map(BookingEntity -> {
             BookingResponseDTO dto = new BookingResponseDTO();
             dto.setBookingId(BookingEntity.getBookingId());
-            dto.setWaitingListId(BookingEntity.getWaitingList().getWaitingListId());
+            if (BookingEntity.getWaitingList() == null) {
+                dto.setWaitingListId(null);
+            } else {
+                dto.setWaitingListId(BookingEntity.getWaitingList().getWaitingListId());
+            }
             dto.setUserId(BookingEntity.getUser().getUserID());
             dto.setChargingStationId(BookingEntity.getChargingStation().getIdChargingStation());
             dto.setChargingPostId(BookingEntity.getChargingPost().getIdChargingPost());
