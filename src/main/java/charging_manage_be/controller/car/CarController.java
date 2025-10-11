@@ -1,5 +1,6 @@
 package charging_manage_be.controller.car;
 
+import charging_manage_be.model.dto.car.CarResponse;
 import charging_manage_be.model.entity.cars.CarEntity;
 import charging_manage_be.services.car.CarService;
 import charging_manage_be.services.users.UserService;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.swing.text.html.Option;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,9 +62,21 @@ public class CarController {
         return ResponseEntity.notFound().build();
     }
     @GetMapping ("/user/{userID}")
-    public ResponseEntity<List<CarEntity>> getCarByUserID(@PathVariable String userID) {
+    public ResponseEntity<List<CarResponse>> getCarByUserID(@PathVariable String userID) {
         List<CarEntity> cars = carService.findAllCarByUserID(userID);
-        return ResponseEntity.ok(cars);
+        List<CarResponse> carResponses = new ArrayList<>();
+        for (CarEntity car : cars) {
+            List<String> listWaiting = car.getWaitingList().stream()
+                    .map(waiting -> waiting.getWaitingListId())
+                    .toList();
+            List<String> listBooking = car.getBookingList().stream()
+                    .map(booking -> booking.getBookingId())
+                    .toList();
+            CarResponse carResponse = new CarResponse(car.getCarID(), car.getLicensePlate(), car.getUser().getUserID(), car.getTypeCar(), car.getChassisNumber(), car.getChargingType().getIdChargingType(),listWaiting, listBooking);
+            carResponses.add(carResponse);
+        }
+
+        return ResponseEntity.ok(carResponses);
     }
 
 

@@ -3,6 +3,7 @@ package charging_manage_be.services.payments;
 import charging_manage_be.model.entity.charging.ChargingSessionEntity;
 import charging_manage_be.model.entity.payments.PaymentEntity;
 import charging_manage_be.model.entity.payments.PaymentMethodEntity;
+import charging_manage_be.model.entity.users.UserEntity;
 import charging_manage_be.repository.charging_session.ChargingSessionRepository;
 import charging_manage_be.repository.payments.PaymentMethodRepository;
 import charging_manage_be.repository.payments.PaymentRepository;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static charging_manage_be.util.RandomId.generateRandomId;
 
@@ -96,20 +98,14 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public PaymentEntity getPaymentByUserID(String userID, String paymentId) {
-        if (!userRepository.existsById(userID) || paymentRepository.findById(paymentId).isEmpty()){
+    public List<PaymentEntity> getPaymentByUserID(String userID) {
+        if (!userRepository.existsById(userID)){
             throw  new RuntimeException("User or paymentId not found");
         }
         else{
-            PaymentEntity payment = paymentRepository.findById(paymentId).get();
-            if(payment.getUser().getUserID().equals(userID))
-            {
-                return payment;
-            }
-            else
-            {
-                throw  new RuntimeException("Payment does not belong to user");
-            }
+            UserEntity user = userRepository.findById(userID).get();
+            List<PaymentEntity> payments = paymentRepository.findByUser(user);
+            return payments;
         }
     }
     public boolean invoicePayment(String paymentId)
@@ -123,6 +119,11 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setPaidAt(LocalDateTime.now());
         paymentRepository.save(payment);
         return true;
+    }
+    @Override
+    public List<PaymentEntity> findAllPayment()
+    {
+        return paymentRepository.findAll();
     }
 
     /*
