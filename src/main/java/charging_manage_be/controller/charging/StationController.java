@@ -2,7 +2,8 @@ package charging_manage_be.controller.charging;
 
 import charging_manage_be.model.dto.charging.station.ChargingStationRequestDTO;
 import charging_manage_be.model.dto.charging.station.ChargingStationResponseDTO;
-import charging_manage_be.model.dto.charging.PostResponseDTO;
+import charging_manage_be.model.dto.charging.station.ChargingStationResponseDTO;
+import charging_manage_be.model.dto.charging.post.PostResponseDTO;
 import charging_manage_be.model.entity.booking.BookingEntity;
 import charging_manage_be.model.entity.booking.WaitingListEntity;
 import charging_manage_be.model.entity.charging.ChargingPostEntity;
