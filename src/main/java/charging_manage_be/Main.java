@@ -1,5 +1,6 @@
 package charging_manage_be;
 
+import charging_manage_be.model.entity.charging.ChargingStationEntity;
 import charging_manage_be.services.booking.BookingServiceImpl;
 import charging_manage_be.services.waiting_list.WaitingListServiceImpl;
 import org.springframework.boot.SpringApplication;
@@ -31,6 +32,5 @@ public class Main {
         //bookingService.handleBookingNavigation("DRV002", "POST001", "CAR002");
         //bookingService.handleBookingNavigation("DRV003", "POST001", "CAR003");
 //        bookingService.completeBooking("URGUI80727");
-
     }
 }

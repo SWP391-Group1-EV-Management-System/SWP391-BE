@@ -20,7 +20,9 @@ public class ChargingPostServiceImpl implements ChargingPostService {
     @Autowired // vì sử dụng bản spring boot khá cao nên không cần @Autowired vẫn chạy được
 
     private ChargingPostRepository ChargingPostRepository;
+    @Autowired
     private ChargingTypeRepository chargingTypeRepository;
+    @Autowired
     private ChargingStationService stationService;
    // ChargingPostServiceImpl postService = context.getBean(ChargingPostServiceImpl.class); gọi trong main
     private String generateUniqueId() {
@@ -53,8 +55,9 @@ public class ChargingPostServiceImpl implements ChargingPostService {
         List<ChargingTypeEntity> listChargingType =  new ArrayList<>();
         for(int i : listType)
         {
-            if(chargingTypeRepository.findById(i).isPresent()) {
-                listChargingType.add(chargingTypeRepository.findById(i).get());
+            ChargingTypeEntity type = chargingTypeRepository.findById(i).orElse(null);
+            if(type != null) {
+                listChargingType.add(type);
             }
         }
         post.setChargingType(listChargingType);

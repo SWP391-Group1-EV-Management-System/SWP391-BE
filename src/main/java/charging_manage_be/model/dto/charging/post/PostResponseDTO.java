@@ -1,4 +1,4 @@
-package charging_manage_be.model.dto.charging;
+package charging_manage_be.model.dto.charging.post;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

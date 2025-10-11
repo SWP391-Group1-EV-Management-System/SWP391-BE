@@ -1,8 +1,13 @@
 package charging_manage_be.controller.charging;
 
-import charging_manage_be.model.dto.charging.PostResponseDTO;
+import charging_manage_be.model.dto.charging.post.PostRequestDTO;
+import charging_manage_be.model.dto.charging.post.PostResponseDTO;
 import charging_manage_be.model.entity.charging.ChargingPostEntity;
+import charging_manage_be.model.entity.charging.ChargingStationEntity;
+import charging_manage_be.model.entity.charging.ChargingTypeEntity;
 import charging_manage_be.services.charging_post.ChargingPostService;
+import charging_manage_be.services.charging_station.ChargingStationService;
+import charging_manage_be.services.charging_type.ChargingTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,26 +21,44 @@ import java.util.stream.Collectors;
 public class PostController {
     @Autowired
     private ChargingPostService chargingPostService;
+    @Autowired
+    private ChargingStationService chargingStationService;
+    @Autowired
+    private ChargingTypeService chargingTypeService;
 
     @PostMapping("/create")
-    public ResponseEntity<String> createChargingPost(@RequestBody String stationId,
-                                                        boolean isActive,
-                                                        List<Integer> listType,
-                                                        BigDecimal maxPower,
-                                                        BigDecimal chargingFeePerKWh,
-                                                        String postId)
+    public ResponseEntity<String> createChargingPost(@RequestBody PostRequestDTO postRequestDTO)
     {
-        ChargingPostEntity post = new ChargingPostEntity();
-        post.setIdChargingPost(postId);
+        String stationId = postRequestDTO.getStationId();
+        boolean isActive = postRequestDTO.isActive();
+        List<Integer> listType = postRequestDTO.getListType();
+        BigDecimal maxPower = postRequestDTO.getMaxPower();
+        BigDecimal chargingFeePerKWh = postRequestDTO.getChargingFeePerKWh();
         chargingPostService.addPost(stationId, isActive, listType, maxPower, chargingFeePerKWh);
-
         return ResponseEntity.ok("Post create completed successfully");
     }
-    @PostMapping ("/update")
-    public ResponseEntity<String> updateChargingPost(@PathVariable String postId)
+    @PostMapping ("/update/{postId}")
+    public ResponseEntity<String> updateChargingPost(@PathVariable String postId, @RequestBody PostRequestDTO postRequestDTO)
     {
-        ChargingPostEntity ChargingPostEntity = chargingPostService.getChargingPostById(postId);
-        chargingPostService.updatePost(ChargingPostEntity);
+        ChargingPostEntity chargingPostEntity = chargingPostService.getChargingPostById(postId);
+        if (chargingPostEntity == null) {
+            return ResponseEntity.notFound().build();
+        }
+        String stationId = postRequestDTO.getStationId();
+        ChargingStationEntity station = chargingStationService.getStationById(stationId);
+        boolean isActive = postRequestDTO.isActive();
+        List<Integer> listType = postRequestDTO.getListType();
+        BigDecimal maxPower = postRequestDTO.getMaxPower();
+        BigDecimal chargingFeePerKWh = postRequestDTO.getChargingFeePerKWh();
+        chargingPostEntity.setActive(isActive);
+        chargingPostEntity.setMaxPower(maxPower);
+        chargingPostEntity.setChargingFeePerKWh(chargingFeePerKWh);
+        chargingPostEntity.setChargingStation(station);
+        List<ChargingTypeEntity> chargingTypeEntities = listType.stream()
+                .map(id -> chargingTypeService.getChargingTypeById(id))
+                .collect(Collectors.toList());
+        chargingPostEntity.setChargingType(chargingTypeEntities);
+        chargingPostService.updatePost(chargingPostEntity);
         return ResponseEntity.ok("Post update completed successfully");
     }
 

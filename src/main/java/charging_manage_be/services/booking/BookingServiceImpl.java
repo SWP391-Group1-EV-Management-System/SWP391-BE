@@ -161,13 +161,13 @@ public class BookingServiceImpl implements BookingService {
                 "Your Booking: " + booking.getBookingId() + " completed successfully");
         // tự động thay thế bằng một booking mới từ waiting chờ nếu có
         // phải set nếu end time bên session bằng với thời gian expected end bên session thì mới gọi hàm này
-        boolean isWaitingDriver = waitingListRepository
-                .findFirstByChargingPost_IdChargingPostAndStatusOrderByCreatedAtAsc(
-                        booking.getChargingPost().getIdChargingPost(), "WAITING")
-                .isPresent();
-        if (isWaitingDriver) {
-            processBooking(booking.getChargingPost().getIdChargingPost());
-        }
+//        boolean isWaitingDriver = waitingListRepository
+//                .findFirstByChargingPost_IdChargingPostAndStatusOrderByCreatedAtAsc(
+//                        booking.getChargingPost().getIdChargingPost(), "WAITING")
+//                .isPresent();
+//        if (isWaitingDriver) {
+//            processBooking(booking.getChargingPost().getIdChargingPost());
+//        }
         return bookingRepository.save(booking);
     }
 

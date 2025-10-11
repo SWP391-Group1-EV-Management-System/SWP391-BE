@@ -5,6 +5,8 @@ import charging_manage_be.repository.charging_type.ChargingTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ChargingTypeServiceImpl implements  ChargingTypeService {
     @Autowired
@@ -19,6 +21,17 @@ public class ChargingTypeServiceImpl implements  ChargingTypeService {
     }
     public ChargingTypeEntity updateChargingType(ChargingTypeEntity chargingTypeEntity) {
         return chargingTypeRepository.save(chargingTypeEntity);
+    }
+    public List<ChargingTypeEntity> getAllChargingType() {
+        return chargingTypeRepository.findAll();
+    }
+    public boolean deleteChargingTypeById(int typeId) {
+        if(!chargingTypeRepository.existsById(typeId))
+        {
+            return false;
+        }
+        chargingTypeRepository.deleteById(typeId);
+        return true;
     }
 
 }
