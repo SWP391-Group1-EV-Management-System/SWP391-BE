@@ -1,8 +1,11 @@
 package charging_manage_be.services.charging_station;
 
+import charging_manage_be.model.dto.charging.station.ChargingStationRequestDTO;
 import charging_manage_be.model.entity.charging.ChargingPostEntity;
 import charging_manage_be.model.entity.charging.ChargingStationEntity;
+import charging_manage_be.model.entity.users.UserEntity;
 import charging_manage_be.repository.charging_station.ChargingStationRepository;
+import charging_manage_be.repository.users.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +19,8 @@ public class ChargingStationServiceImpl implements  ChargingStationService {
     private final int numberLength = 2;
     @Autowired
     private ChargingStationRepository chargingStationRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
     public ChargingStationEntity updateNumberOfPosts(ChargingStationEntity station) {
@@ -39,15 +44,17 @@ public class ChargingStationServiceImpl implements  ChargingStationService {
     }
 
     @Override
-    public boolean addStation(ChargingStationEntity station)
+    public boolean addStation(ChargingStationRequestDTO station)
     {
-
-        if(station == null)
-        {
-            return false;
-        }
-        station.setIdChargingStation(generateUniqueId());
-        chargingStationRepository.save(station);
+        UserEntity manager = userRepository.findById(station.getUserManagerId()).orElse(null);
+        ChargingStationEntity newStation = new ChargingStationEntity();
+        newStation.setIdChargingStation(generateUniqueId());
+        newStation.setNameChargingStation(station.getNameChargingStation());
+        newStation.setAddress(station.getAddress());
+        newStation.setActive(station.isActive());
+        newStation.setUserManager(manager);
+        newStation.setNumberOfPosts(station.getNumberOfPosts());
+        chargingStationRepository.save(newStation);
         return true;
     }
 
@@ -58,15 +65,22 @@ public class ChargingStationServiceImpl implements  ChargingStationService {
     }
 
     @Override
-    public boolean updateFullStation(ChargingStationEntity station)
-    {
-        if(station == null || !isPaymentIdExists(station.getIdChargingStation()))
-        {
-            return false;
+    public boolean updateStation(String stationId, ChargingStationRequestDTO stationRequestDTO){
+        ChargingStationEntity chargingStation = chargingStationRepository.findByIdChargingStation(stationId);
+        if(chargingStation == null){
+            throw new RuntimeException("Station not found with id: " + stationId);
         }
-        chargingStationRepository.save(station);
+        UserEntity manager = userRepository.findById(stationRequestDTO.getUserManagerId()).orElse(null);
+        chargingStation.setUserManager(manager);
+        chargingStation.setAddress(stationRequestDTO.getAddress());
+        chargingStation.setActive(stationRequestDTO.isActive());
+        chargingStation.setNameChargingStation(stationRequestDTO.getNameChargingStation());
+        chargingStation.setNumberOfPosts(stationRequestDTO.getNumberOfPosts());
+
+        chargingStationRepository.save(chargingStation);
         return true;
     }
+
     @Override
     public List<ChargingStationEntity> getAllStations()
     {

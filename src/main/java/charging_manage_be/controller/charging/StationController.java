@@ -1,6 +1,7 @@
 package charging_manage_be.controller.charging;
 
-import charging_manage_be.model.dto.charging.ChargingStationResponseDTO;
+import charging_manage_be.model.dto.charging.station.ChargingStationRequestDTO;
+import charging_manage_be.model.dto.charging.station.ChargingStationResponseDTO;
 import charging_manage_be.model.dto.charging.PostResponseDTO;
 import charging_manage_be.model.entity.booking.BookingEntity;
 import charging_manage_be.model.entity.booking.WaitingListEntity;
@@ -8,6 +9,8 @@ import charging_manage_be.model.entity.charging.ChargingPostEntity;
 import charging_manage_be.model.entity.charging.ChargingSessionEntity;
 import charging_manage_be.model.entity.charging.ChargingStationEntity;
 import charging_manage_be.model.entity.charging.ChargingTypeEntity;
+import charging_manage_be.model.entity.users.UserEntity;
+import charging_manage_be.repository.users.UserRepository;
 import charging_manage_be.services.charging_station.ChargingStationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,22 +24,32 @@ public class StationController {
 
     @Autowired
     private ChargingStationService chargingStationService;
+    @Autowired
+    private UserRepository userRepository;
 
     @PostMapping("/create")
-    public ResponseEntity<String> createChargingStation(@RequestBody ChargingStationEntity chargingStationEntity) {
-        chargingStationService.addStation(chargingStationEntity);
-        return ResponseEntity.ok("Station create completed successfully");
+    public ResponseEntity<String> createChargingStation(@RequestBody ChargingStationRequestDTO chargingStationRequestDTO) {
+        if (chargingStationRequestDTO == null) {
+            return ResponseEntity.badRequest().body("Invalid station data");
+        }
+        chargingStationService.addStation(chargingStationRequestDTO);
+        return ResponseEntity.ok().body("success");
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<String> updateChargingStation(@PathVariable String stationId, @RequestBody ChargingStationEntity chargingStationEntity) {
-        try{
-            chargingStationEntity.setIdChargingStation(stationId);
-            chargingStationService.updateFullStation(chargingStationEntity);
-            return ResponseEntity.ok("Station update completed successfully");
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+    @PutMapping("/update/{stationId}")
+    public ResponseEntity<String> updateChargingStation(@PathVariable String stationId, @RequestBody ChargingStationRequestDTO chargingStationRequestDTO) {
+        ChargingStationEntity chargingStation = chargingStationService.getStationById(stationId);
+        if (chargingStation == null) {
+            return ResponseEntity.badRequest().body("Station not found with id: " + stationId);
         }
+        UserEntity manager = userRepository.findById(chargingStationRequestDTO.getUserManagerId()).orElse(null);
+        if (manager == null) {
+            return ResponseEntity.badRequest().body("Manager not found with id: " + chargingStationRequestDTO.getUserManagerId());
+        }
+        chargingStationService.updateStation(stationId, chargingStationRequestDTO);
+
+
+        return ResponseEntity.ok().body("success");
     }
 
     @GetMapping("/{stationId}")

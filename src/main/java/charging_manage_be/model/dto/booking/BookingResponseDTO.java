@@ -25,5 +25,4 @@ public class BookingResponseDTO {
     private int maxWaitingTime;
     private String status;
     private LocalDateTime arrivalTime;
-
 }

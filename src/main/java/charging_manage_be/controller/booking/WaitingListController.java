@@ -96,15 +96,14 @@ public class WaitingListController {
     }
 
     // Lấy theo ngày tháng năm
-    @GetMapping("/queue/date/{date}")
-    public ResponseEntity<List<WaitingListResponseDTO>> getWaitingListForDate(@PathVariable String date) {
+    @GetMapping("/queue/date")
+    public ResponseEntity<List<WaitingListResponseDTO>> getWaitingListForDate(@RequestParam LocalDate date) {
 
         //LocalDateTime dateTime = LocalDate.parse(date).atStartOfDay(); // startOfDay là lấy khoảng thời gian từ 00:00:00 đến 23:59:59 của ngày đó
         // Khi này, dateTime sẽ là 2023-10-10T00:00:00 và ta sẽ lấy tất cả các record có createdAt trong khoảng từ 2023-10-10T00:00:00 đến 2023-10-10T23:59:59
 
-        LocalDate localDate = LocalDate.parse(date);
-        LocalDateTime startOfDay = localDate.atStartOfDay();
-        LocalDateTime endOfDay = localDate.plusDays(1).atStartOfDay();
+        LocalDateTime startOfDay = date.atStartOfDay();
+        LocalDateTime endOfDay = date.plusDays(1).atStartOfDay();
 
         List<WaitingListResponseDTO> waitingList = waitingListService.getWaitingListForDate(startOfDay, endOfDay).stream().map(waitingListEntity -> {
             WaitingListResponseDTO dto = new WaitingListResponseDTO();

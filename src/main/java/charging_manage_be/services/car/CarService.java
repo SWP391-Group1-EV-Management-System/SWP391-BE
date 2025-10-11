@@ -1,5 +1,6 @@
 package charging_manage_be.services.car;
 
+import charging_manage_be.model.dto.car.CarRequestDTO;
 import charging_manage_be.model.entity.cars.CarEntity;
 
 import java.util.List;
@@ -7,10 +8,10 @@ import java.util.Optional;
 
 public interface CarService {
 
-    CarEntity insertCar(CarEntity carEntity);
-    CarEntity updateCar(CarEntity carEntity);
+    CarEntity insertCar(CarRequestDTO carEntity);
+    CarEntity updateCar(String carId, CarRequestDTO carEntity);
     boolean deleteCarByCarID(String carID);
-    Optional<CarEntity> getCarByCarID(String carID);
+    CarEntity getCarByCarID(String carID);
     List<CarEntity> findAllCar();
     List<CarEntity> findAllCarByUserID(String userID);
 }
