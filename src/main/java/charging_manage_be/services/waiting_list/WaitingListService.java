@@ -15,6 +15,9 @@ public interface WaitingListService{
     WaitingListEntity addToWaitingList(String userID, String chargingPostId,String carID);
    // Đây là hàm khi hủy chờ, tức là userID sẽ bị xóa khỏi danh sách chờ trong Redis và status của record trong DB sẽ được cập nhật thành "CANCELED"
     void cancelWaiting(String waitingListId);
-    List<String> getWaitingListForPost(String chargingPostID);
+    List<WaitingListEntity> getWaitingListForPost(String chargingPostID);
+    List<WaitingListEntity> getWaitingListForStation(String chargingStationID);
+    List<WaitingListEntity> getWaitingListForUser(String userID);
+    List<WaitingListEntity> getWaitingListForDate(LocalDateTime startOfDay, LocalDateTime endOfDay);
     boolean addExpectedWaitingTime(String postId, LocalDateTime expectedWaitingTime);
 }

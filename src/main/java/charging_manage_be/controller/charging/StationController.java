@@ -1,11 +1,16 @@
 package charging_manage_be.controller.charging;
 
+import charging_manage_be.model.dto.charging.ChargingStationResponseDTO;
+import charging_manage_be.model.dto.charging.PostResponseDTO;
+import charging_manage_be.model.entity.booking.BookingEntity;
+import charging_manage_be.model.entity.booking.WaitingListEntity;
 import charging_manage_be.model.entity.charging.ChargingPostEntity;
+import charging_manage_be.model.entity.charging.ChargingSessionEntity;
 import charging_manage_be.model.entity.charging.ChargingStationEntity;
+import charging_manage_be.model.entity.charging.ChargingTypeEntity;
 import charging_manage_be.services.charging_station.ChargingStationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,25 +40,68 @@ public class StationController {
     }
 
     @GetMapping("/{stationId}")
-    public ResponseEntity<ChargingStationEntity> getChargingStationById(@PathVariable String stationId) {
+    public ResponseEntity<ChargingStationResponseDTO> getChargingStationById(@PathVariable String stationId) {
         ChargingStationEntity station = chargingStationService.getStationById(stationId);
-        if (station != null) {
-            return ResponseEntity.ok(station);
-        } else {
-            return ResponseEntity.notFound().build();
+        if (station == null) {
+            throw new RuntimeException("Station not found with id: " + stationId);
+        }
+        else {
+            ChargingStationResponseDTO stationDTO = new ChargingStationResponseDTO();
+            stationDTO.setIdChargingStation(station.getIdChargingStation());
+            stationDTO.setNameChargingStation(station.getNameChargingStation());
+            stationDTO.setAddress(station.getAddress());
+            stationDTO.setActive(station.isActive());
+            stationDTO.setEstablishedTime(station.getEstablishedTime());
+            stationDTO.setNumberOfPosts(station.getNumberOfPosts());
+            stationDTO.setUserManagerName(station.getUserManager().getLastName());
+            stationDTO.setChargingPostIds(station.getChargingPosts().stream().map(ChargingPostEntity::getIdChargingPost).toList());
+            stationDTO.setChargingSessionIds(station.getChargingSession().stream().map(ChargingSessionEntity::getChargingSessionId).toList());
+            return ResponseEntity.ok(stationDTO);
         }
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<ChargingStationEntity>> getAllChargingStations() {
-        List<ChargingStationEntity> stations = chargingStationService.getAllStations();
+    public ResponseEntity<List<ChargingStationResponseDTO>> getAllChargingStations() {
+        List<ChargingStationResponseDTO> stations = chargingStationService.getAllStations().stream().map(chargingStationEntity -> {
+            ChargingStationResponseDTO stationDTO = new ChargingStationResponseDTO();
+            stationDTO.setIdChargingStation(chargingStationEntity.getIdChargingStation());
+            stationDTO.setNameChargingStation(chargingStationEntity.getNameChargingStation());
+            stationDTO.setAddress(chargingStationEntity.getAddress());
+            stationDTO.setActive(chargingStationEntity.isActive());
+            stationDTO.setEstablishedTime(chargingStationEntity.getEstablishedTime());
+            stationDTO.setNumberOfPosts(chargingStationEntity.getNumberOfPosts());
+            stationDTO.setUserManagerName(chargingStationEntity.getUserManager().getLastName());
+            stationDTO.setChargingPostIds(chargingStationEntity.getChargingPosts().stream().map(ChargingPostEntity::getIdChargingPost).toList());
+            stationDTO.setChargingSessionIds(chargingStationEntity.getChargingSession().stream().map(ChargingSessionEntity::getChargingSessionId).toList());
+            return stationDTO;
+        }).toList();
         return ResponseEntity.ok(stations);
     }
 
-    @GetMapping("/posts/{stationId}" )
-    public ResponseEntity<List<ChargingPostEntity>> getAllPostsInStation(@PathVariable String stationId) {
-        List<ChargingPostEntity> posts = chargingStationService.getAllPostsInStation(stationId);
-        return ResponseEntity.ok(posts);
+    @GetMapping("/amountPost/{stationId}")
+    public ResponseEntity<Integer> getAmountPostInStation(@PathVariable ChargingStationEntity stationId) {
+        ChargingStationEntity stationEntity = chargingStationService.updateNumberOfPosts(stationId);
+        if (stationEntity == null) {
+            throw new RuntimeException("Station not found with id: " + stationId.getIdChargingStation());
+        }
+        return ResponseEntity.ok(stationEntity.getNumberOfPosts());
     }
 
+    @GetMapping("/posts/{stationId}" )
+    public ResponseEntity<List<PostResponseDTO>> getAllPostsInStation(@PathVariable String stationId) {
+        List<PostResponseDTO> posts = chargingStationService.getAllPostsInStation(stationId).stream().map(chargingPostEntity -> {
+            PostResponseDTO postDTO = new PostResponseDTO();
+            postDTO.setIdChargingPost(chargingPostEntity.getIdChargingPost());
+            postDTO.setActive(chargingPostEntity.isActive());
+            postDTO.setMaxPower(chargingPostEntity.getMaxPower());
+            postDTO.setChargingFeePerKWh(chargingPostEntity.getChargingFeePerKWh());
+            postDTO.setChargingStation(chargingPostEntity.getChargingStation().getNameChargingStation());
+            postDTO.setChargingType(chargingPostEntity.getChargingType().stream().map(ChargingTypeEntity::getIdChargingType).toList());
+            postDTO.setWaitingList(chargingPostEntity.getWaitingList().stream().map(WaitingListEntity::getWaitingListId).toList());
+            postDTO.setBookings(chargingPostEntity.getBookings().stream().map(BookingEntity::getBookingId).toList());
+            postDTO.setChargingSessions(chargingPostEntity.getChargingSessions().stream().map(ChargingSessionEntity::getChargingSessionId).toList());
+            return postDTO;
+        }).toList();
+        return ResponseEntity.ok(posts);
+    }
 }

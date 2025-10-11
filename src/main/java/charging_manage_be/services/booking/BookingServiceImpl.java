@@ -265,6 +265,46 @@ public class BookingServiceImpl implements BookingService {
         bookingRepository.save(booking);
         return true;
     }
+
+    @Override
+    public List<BookingEntity> getBookingByPostId(String postId) {
+        ChargingPostEntity chargingPost = chargingPostRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+        return bookingRepository.findByChargingPost(chargingPost);
+    }
+
+    @Override
+    public List<BookingEntity> getBookingByStationId(String stationId) {
+        ChargingStationEntity chargingStation = chargingStationRepository.findById(stationId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+        return bookingRepository.findByChargingStation(chargingStation);
+    }
+
+    @Override
+    public List<BookingEntity> getBookingByUserId(String userId) {
+        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        return bookingRepository.findByUser(user);
+    }
+
+    @Override
+    public List<BookingEntity> getBookingByCreatedDate(LocalDateTime startOfDay, LocalDateTime endOfDay) {
+        return bookingRepository.findByCreatedAtBetween(startOfDay, endOfDay);
+
+    }
+
+    @Override
+    public List<BookingEntity> getBookingByWaitingListId(String waitingListId) {
+        WaitingListEntity waitingList = waitingListRepository.findById(waitingListId)
+                .orElseThrow(() -> new RuntimeException("Waiting list not found"));
+        return bookingRepository.findByWaitingList(waitingList);
+    }
+
+    @Override
+    public List<BookingEntity> getBookingByStatus(String status) {
+        return bookingRepository.findByStatusIn(List.of(status));
+    }
+
+
 }
 /*
 @Transactional

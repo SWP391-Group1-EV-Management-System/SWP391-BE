@@ -18,11 +18,12 @@ public class ChargingStationServiceImpl implements  ChargingStationService {
     private ChargingStationRepository chargingStationRepository;
 
     @Override
-    public void updateNumberOfPosts(ChargingStationEntity station) {
+    public ChargingStationEntity updateNumberOfPosts(ChargingStationEntity station) {
         // cập nhật số lượng trụ theo kích thước của list trụ sạc
         // gọi hàm này sau khi thêm hoặc xóa trụ sạc
          station.setNumberOfPosts(station.getChargingPosts().size());
         chargingStationRepository.save(station);
+        return station;
     }
     private String generateUniqueId() {
         String newId;

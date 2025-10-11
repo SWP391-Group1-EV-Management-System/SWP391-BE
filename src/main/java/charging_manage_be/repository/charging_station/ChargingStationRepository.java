@@ -1,11 +1,13 @@
 package charging_manage_be.repository.charging_station;
 
+import charging_manage_be.model.entity.booking.WaitingListEntity;
 import charging_manage_be.model.entity.charging.ChargingStationEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository

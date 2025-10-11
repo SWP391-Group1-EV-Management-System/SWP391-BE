@@ -22,7 +22,7 @@ public ResponseEntity<UserEntity> createUser(@RequestBody UserEntity user) {
     return ResponseEntity.ok(savedUser);
 }
 
-@PutMapping("/{userID}")
+@PutMapping("/update/{userID}")
 public ResponseEntity<UserEntity> updateUser(@PathVariable String userID, @RequestBody UserEntity userDetails) {
     try {
         // Lấy user hiện tại để giữ createdAt
@@ -39,7 +39,7 @@ public ResponseEntity<UserEntity> updateUser(@PathVariable String userID, @Reque
     }
 }
 
-@DeleteMapping("/{userID}")
+@DeleteMapping("/delete/{userID}")
 public ResponseEntity<String> deleteUser(@PathVariable String userID) { // @PathVariable để lấy userID từ URL
     boolean deleted = userService.softDeleteUser(userID);
     if (deleted) {
@@ -48,7 +48,7 @@ public ResponseEntity<String> deleteUser(@PathVariable String userID) { // @Path
     return ResponseEntity.badRequest().body("Failed to delete user");
 }
 
-@GetMapping("/{userID}")
+@GetMapping("/getUser/{userID}")
 public ResponseEntity<UserEntity> getUser(@PathVariable String userID) {
     Optional<UserEntity> user = userService.getUserByID(userID);
     if (user.isPresent()) {
@@ -57,7 +57,7 @@ public ResponseEntity<UserEntity> getUser(@PathVariable String userID) {
     return ResponseEntity.notFound().build();
 }
 
-@GetMapping
+@GetMapping("/getAllUsers")
 public ResponseEntity<List<UserEntity>> getAllUsers() {
     List<UserEntity> users = userService.getAllUsers();
     return ResponseEntity.ok(users);

@@ -1,5 +1,7 @@
 package charging_manage_be.repository.users;
 
+import charging_manage_be.model.entity.booking.WaitingListEntity;
+import charging_manage_be.model.entity.charging.ChargingStationEntity;
 import charging_manage_be.model.entity.users.UserEntity;
 import jakarta.transaction.Transactional;
 import org.apache.catalina.User;

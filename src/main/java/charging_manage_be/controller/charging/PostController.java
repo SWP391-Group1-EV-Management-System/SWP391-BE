@@ -1,6 +1,6 @@
 package charging_manage_be.controller.charging;
 
-import charging_manage_be.model.dto.charging.postResponse;
+import charging_manage_be.model.dto.charging.PostResponseDTO;
 import charging_manage_be.model.entity.charging.ChargingPostEntity;
 import charging_manage_be.services.charging_post.ChargingPostService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +40,7 @@ public class PostController {
     }
 
     @GetMapping("/{postId}")
-    public ResponseEntity<postResponse> getChargingPostById(@PathVariable String postId) {
+    public ResponseEntity<PostResponseDTO> getChargingPostById(@PathVariable String postId) {
         ChargingPostEntity post = chargingPostService.getChargingPostById(postId);
         List<Integer> listType = post.getChargingType().stream()
                 .map(type -> type.getIdChargingType())
@@ -54,7 +54,7 @@ public class PostController {
         List<String> listWaiting = post.getWaitingList().stream()
                 .map(waiting -> waiting.getWaitingListId())
                 .collect(Collectors.toList());
-        postResponse postR = new postResponse(post.getIdChargingPost(), post.isActive(), post.getMaxPower(), post.getChargingFeePerKWh(), post.getChargingStation().getIdChargingStation(), listType, listWaiting, listBooking, listSession);
+        PostResponseDTO postR = new PostResponseDTO(post.getIdChargingPost(), post.isActive(), post.getMaxPower(), post.getChargingFeePerKWh(), post.getChargingStation().getIdChargingStation(), listType, listWaiting, listBooking, listSession);
         if (post != null) {
             return ResponseEntity.ok(postR);
         } else {

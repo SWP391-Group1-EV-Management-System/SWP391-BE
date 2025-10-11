@@ -2,12 +2,11 @@ package charging_manage_be.services.charging_station;
 
 import charging_manage_be.model.entity.charging.ChargingPostEntity;
 import charging_manage_be.model.entity.charging.ChargingStationEntity;
-import charging_manage_be.model.entity.users.UserEntity;
 
 import java.util.List;
 
 public interface ChargingStationService {
-    public void updateNumberOfPosts(ChargingStationEntity station);
+    public ChargingStationEntity updateNumberOfPosts(ChargingStationEntity station);
     public boolean isPaymentIdExists(String id);
     public boolean addStation(ChargingStationEntity station);
     public ChargingStationEntity getStationById(String stationId);

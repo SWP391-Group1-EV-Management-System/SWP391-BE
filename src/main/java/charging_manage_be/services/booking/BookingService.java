@@ -4,6 +4,7 @@ import charging_manage_be.model.entity.booking.BookingEntity;
 import charging_manage_be.model.entity.booking.WaitingListEntity;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface BookingService {
 
@@ -13,5 +14,12 @@ public interface BookingService {
      BookingEntity cancelBooking(String bookingId);
      BookingEntity processBooking(String chargingPostId);
      boolean updateChargingBookingStatus(String bookingId);
+    List<BookingEntity> getBookingByPostId(String postId);
+    List<BookingEntity> getBookingByStationId(String stationId);
+    List<BookingEntity> getBookingByUserId(String userId);
+    List<BookingEntity> getBookingByCreatedDate(LocalDateTime startOfDay, LocalDateTime endOfDay);
+    List<BookingEntity> getBookingByWaitingListId(String waitingListId);
+    List<BookingEntity> getBookingByStatus(String status);
+
 
 }

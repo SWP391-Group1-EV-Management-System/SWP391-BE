@@ -138,11 +138,38 @@ public class WaitingListServiceImpl implements WaitingListService{
     }
 
     @Override
-    public List<String> getWaitingListForPost(String chargingPostID) {
-        return redisTemplate.opsForList().range(redisKey(chargingPostID), 0, -1);
+    public List<WaitingListEntity> getWaitingListForPost(String chargingPostID) {
+//        return redisTemplate.opsForList().range(redisKey(chargingPostID), 0, -1);
         // range là hàm để lấy tất cả các phần tử trong danh sách từ vị trí 0 đến -1 (tức là lấy tất cả)
         // Tức là sau thao tác này, ta sẽ có được danh sách tất cả userID đang chờ theo trạm sạc tương ứng trong Redis
+
+        // Khi lấy thông tin waitingList theo trạm sạc thì phải lấy trong DB chứ không lấy trong Redis
+        ChargingPostEntity post = chargingPostRepository.findById(chargingPostID)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+        return waitingListRepository.findByChargingPost(post);
+
+
     }
+
+    @Override
+    public List<WaitingListEntity> getWaitingListForStation(String chargingStationID) {
+        ChargingStationEntity station = chargingStationRepository.findById(chargingStationID)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+        return waitingListRepository.findByChargingStation(station);
+    }
+
+    @Override
+    public List<WaitingListEntity> getWaitingListForUser(String userID) {
+        UserEntity user = userRepository.findById(userID)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return waitingListRepository.findByUser(user);
+    }
+
+    @Override
+    public List<WaitingListEntity> getWaitingListForDate(LocalDateTime startOfDay, LocalDateTime endOfDay) {
+        return waitingListRepository.findByCreatedAtBetween(startOfDay, endOfDay);
+    }
+
     public void getPositionAllDriver(String queueName) {
         String key = "queue:" + queueName;
         List<String> queue = redisTemplate.opsForList().range(key, 0, -1);
