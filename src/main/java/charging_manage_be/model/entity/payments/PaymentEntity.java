@@ -22,8 +22,6 @@ public class PaymentEntity {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;// khóa ngoại bảng user (người dùng thanh toán)
-    @Column(name = "charging_session_id", nullable = false)
-    private String chargingSessionId; // khóa ngoại bảng phiên sạc
     @Column (name = "is_paid", nullable = false)
     private boolean isPaid;
     @Column (name = "created_at", nullable = false)

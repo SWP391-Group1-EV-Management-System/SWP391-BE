@@ -160,27 +160,26 @@ public class BookingController {
     }
 
     @GetMapping("/getByWaitingListId/{waitingListId}")
-    public   ResponseEntity<List<BookingResponseDTO>> getByWaitingListId(@PathVariable String waitingListId) {
+    public   ResponseEntity<BookingResponseDTO> getByWaitingListId(@PathVariable String waitingListId) {
 
-        List<BookingResponseDTO> bookingResponseDTO = bookingService.getBookingByWaitingListId(waitingListId).stream().map(BookingEntity -> {
+        BookingEntity bookingEntity = bookingService.getBookingByWaitingListId(waitingListId);
             BookingResponseDTO dto = new BookingResponseDTO();
-            dto.setBookingId(BookingEntity.getBookingId());
-            if (BookingEntity.getWaitingList() == null) {
+
+            dto.setBookingId(bookingEntity.getBookingId());
+            if (bookingEntity.getWaitingList() == null) {
                 dto.setWaitingListId(null);
             } else {
-                dto.setWaitingListId(BookingEntity.getWaitingList().getWaitingListId());
+                dto.setWaitingListId(bookingEntity.getWaitingList().getWaitingListId());
             }
-            dto.setUserId(BookingEntity.getUser().getUserID());
-            dto.setChargingStationId(BookingEntity.getChargingStation().getIdChargingStation());
-            dto.setChargingPostId(BookingEntity.getChargingPost().getIdChargingPost());
-            dto.setCarId(BookingEntity.getCar().getCarID());
-            dto.setCreatedAt(BookingEntity.getCreatedAt());
-            dto.setMaxWaitingTime(BookingEntity.getMaxWaitingTime());
-            dto.setStatus(BookingEntity.getStatus());
-            dto.setArrivalTime(BookingEntity.getArrivalTime());
-            return dto;
-        }).toList();
-        return ResponseEntity.ok(bookingResponseDTO);
+            dto.setUserId(bookingEntity.getUser().getUserID());
+            dto.setChargingStationId(bookingEntity.getChargingStation().getIdChargingStation());
+            dto.setChargingPostId(bookingEntity.getChargingPost().getIdChargingPost());
+            dto.setCarId(bookingEntity.getCar().getCarID());
+            dto.setCreatedAt(bookingEntity.getCreatedAt());
+            dto.setMaxWaitingTime(bookingEntity.getMaxWaitingTime());
+            dto.setStatus(bookingEntity.getStatus());
+            dto.setArrivalTime(bookingEntity.getArrivalTime());
+        return ResponseEntity.ok(dto);
     }
 
     @GetMapping("/getByBookingId/{bookingId}")

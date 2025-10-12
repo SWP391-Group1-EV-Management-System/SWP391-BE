@@ -54,7 +54,6 @@ public class PaymentServiceImpl implements PaymentService {
         ChargingSessionEntity session = chargingSessionRepository.findById(sessionId).orElseThrow(() -> new RuntimeException("Session not found"));
         paymentEntity.setSession(session);
         paymentEntity.setUser(session.getUser());
-        paymentEntity.setChargingSessionId(sessionId);
         //paymentEntity.setPaymentMethod(paymentMethod);
         // tạo hàm riêng chọn phương thức thanh toán
         paymentEntity.setPrice(session.getTotalAmount());
