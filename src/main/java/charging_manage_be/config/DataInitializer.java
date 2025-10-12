@@ -153,6 +153,7 @@ public class DataInitializer implements CommandLineRunner {
                 else if (i < 10) userRep.setReputationLevel(mediumRep);
                 else userRep.setReputationLevel(badRep);
                 userRep.setNotes("Reputation for user " + (i + 1));
+                userRep.setCurrentScore(100); // Set current_score to 100
                 userReputationRepository.save(userRep);
             }
         }
@@ -272,9 +273,9 @@ public class DataInitializer implements CommandLineRunner {
                 waitingList.setUser(user);
                 waitingList.setChargingPost(chargingPosts[i % chargingPosts.length]);
                 waitingList.setBooking(booking);
+                waitingList.setCar(userCar);
                 waitingList.setExpectedWaitingTime(now.plusHours(i).plusMinutes(15));
                 waitingListRepository.save(waitingList);
-
                 // Update booking with waiting list reference
                 booking.setWaitingList(waitingList);
                 bookingRepository.save(booking);
