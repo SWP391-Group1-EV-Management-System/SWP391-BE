@@ -65,7 +65,4 @@ public class ChargingStationEntity {
 //            //this.numberOfPosts = numberOfPosts; đếm số post tự động
 //            UserManager = userManager;
 //        }
-
-
-
 }

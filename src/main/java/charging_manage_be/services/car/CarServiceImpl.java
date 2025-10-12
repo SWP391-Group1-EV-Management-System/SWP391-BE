@@ -1,9 +1,16 @@
 package charging_manage_be.services.car;
 
+import charging_manage_be.model.dto.car.CarRequestDTO;
+import charging_manage_be.model.dto.car.CarResponseDTO;
+import charging_manage_be.model.entity.booking.BookingEntity;
+import charging_manage_be.model.entity.booking.WaitingListEntity;
 import charging_manage_be.model.entity.cars.CarEntity;
+import charging_manage_be.model.entity.charging.ChargingTypeEntity;
 import charging_manage_be.model.entity.users.UserEntity;
 import charging_manage_be.repository.cars.CarRepository;
+import charging_manage_be.repository.charging_type.ChargingTypeRepository;
 import charging_manage_be.repository.payments.PaymentMethodRepository;
+import charging_manage_be.repository.users.UserRepository;
 import charging_manage_be.services.users.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +27,10 @@ public class CarServiceImpl implements CarService {
     private CarRepository carRepository;
     @Autowired
     private UserService userService;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private ChargingTypeRepository chargingTypeRepository;
 
     private int characterLength = 5;
     private int numberLength = 5;
@@ -34,62 +45,60 @@ public class CarServiceImpl implements CarService {
 
 
     @Override
-    public CarEntity insertCar(CarEntity carEntity) {
-        if (carEntity == null) {
-            throw new NullPointerException("carEntity is null");
-        }
+    public boolean insertCar(CarRequestDTO carRequestDTO) {
+        UserEntity user = userRepository.findById(carRequestDTO.getUser()).orElse(null);
+        ChargingTypeEntity chargingType = chargingTypeRepository.findById(carRequestDTO.getChargingType()).orElse(null);
 
-        else if (carEntity.getCarID() == null) {
-            carEntity.setCarID(generateUniqueId());
-        }
+        CarEntity newCar = new CarEntity();
+        newCar.setCarID(generateUniqueId());
+        newCar.setLicensePlate(carRequestDTO.getLicensePlate());
+        newCar.setUser(user);
+        newCar.setTypeCar(carRequestDTO.getTypeCar());
+        newCar.setChassisNumber(carRequestDTO.getChassisNumber());
+        newCar.setChargingType(chargingType);
+        carRepository.save(newCar);
 
-        else if (carRepository.existsById(carEntity.getCarID())){
-            throw new IllegalStateException("carEntity already exists");
-        }
-        return carRepository.save(carEntity); // Lúc này chỉ cần truyền những tham số cần thiết chứ không cần truyền id
+        return true;
     }
 
     @Override
-    public CarEntity updateCar(CarEntity carEntity) {
-        if (carEntity == null) {
-            throw new NullPointerException("carEntity is null");
+    public boolean updateCar(String carId, CarRequestDTO carEntity) {
+        CarEntity updatedCar = carRepository.findById(carId).orElse(null);
+        if (updatedCar != null) {
+            UserEntity user = userRepository.findById(carEntity.getUser()).orElse(null);
+            ChargingTypeEntity chargingType = chargingTypeRepository.findById(carEntity.getChargingType()).orElse(null);
+            updatedCar.setLicensePlate(carEntity.getLicensePlate());
+            updatedCar.setUser(user);
+            updatedCar.setTypeCar(carEntity.getTypeCar());
+            updatedCar.setChassisNumber(carEntity.getChassisNumber());
+            updatedCar.setChargingType(chargingType);
+            carRepository.save(updatedCar);
+            return true;
+        } else {
+            return false;
         }
-        else if (!carRepository.existsById(carEntity.getCarID())){
-            throw new IllegalStateException("carEntity is not exists");
-        }
-        return carRepository.save(carEntity);
     }
 
     @Override
     public boolean deleteCarByCarID(String carID) {
-        if (carID == null) {
-            throw new NullPointerException("carID is null");
-        }
-        else if (!carRepository.existsById(carID)){
-            throw new IllegalStateException("carEntity is not exists");
-        }
-        else {
+        if (carRepository.findById(carID).isPresent()) {
             carRepository.deleteById(carID);
-            return true;
         }
+        else{
+            return false;
+        }
+        return true;
     }
 
     @Override
-    public Optional<CarEntity> getCarByCarID(String carID) {
-        if (carID == null) {
-            throw new NullPointerException("carID is null");
-        }
-        return carRepository.findById(carID);
+    public CarEntity getCarByCarID(String carID) {
+        return carRepository.findById(carID).orElse(null);
     }
 
-    @Override
-    public List<CarEntity> findAllCar() {
-        return carRepository.findAll();
-    }
 
     @Override
     public List<CarEntity> findAllCarByUserID(String userID) {
-        UserEntity user  = userService.getUserByID(userID).orElse(null);
+        UserEntity user = userService.getUserByID(userID).orElse(null);
         return carRepository.findByUser(user);
     }
 }

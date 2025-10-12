@@ -300,6 +300,13 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    public List<BookingEntity> getBookingByBookingId(String bookingId) {
+        BookingEntity booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+        return List.of(booking);
+    }
+
+    @Override
     public List<BookingEntity> getBookingByStatus(String status) {
         return bookingRepository.findByStatusIn(List.of(status));
     }

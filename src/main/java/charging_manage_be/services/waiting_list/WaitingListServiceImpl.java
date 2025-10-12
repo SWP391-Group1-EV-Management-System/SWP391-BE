@@ -166,6 +166,13 @@ public class WaitingListServiceImpl implements WaitingListService{
     }
 
     @Override
+    public List<WaitingListEntity> getWaitingListForWaitingListId(String waitingListId) {
+        WaitingListEntity waitingListEntity = waitingListRepository.findById(waitingListId)
+                .orElseThrow(() -> new RuntimeException("WaitingList not found"));
+        return List.of(waitingListEntity);
+    }
+
+    @Override
     public List<WaitingListEntity> getWaitingListForDate(LocalDateTime startOfDay, LocalDateTime endOfDay) {
         return waitingListRepository.findByCreatedAtBetween(startOfDay, endOfDay);
     }

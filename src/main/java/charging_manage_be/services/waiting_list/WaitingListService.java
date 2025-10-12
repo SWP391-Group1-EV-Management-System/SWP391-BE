@@ -18,6 +18,7 @@ public interface WaitingListService{
     List<WaitingListEntity> getWaitingListForPost(String chargingPostID);
     List<WaitingListEntity> getWaitingListForStation(String chargingStationID);
     List<WaitingListEntity> getWaitingListForUser(String userID);
+    List<WaitingListEntity> getWaitingListForWaitingListId(String waitingListId);
     List<WaitingListEntity> getWaitingListForDate(LocalDateTime startOfDay, LocalDateTime endOfDay);
     boolean addExpectedWaitingTime(String postId, LocalDateTime expectedWaitingTime);
 }
