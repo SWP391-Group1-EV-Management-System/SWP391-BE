@@ -153,6 +153,7 @@ public class DataInitializer implements CommandLineRunner {
                 else if (i < 10) userRep.setReputationLevel(mediumRep);
                 else userRep.setReputationLevel(badRep);
                 userRep.setNotes("Reputation for user " + (i + 1));
+                userRep.setCurrentScore(100);
                 userReputationRepository.save(userRep);
             }
         }
@@ -256,7 +257,6 @@ public class DataInitializer implements CommandLineRunner {
                     PaymentEntity payment = new PaymentEntity();
                     payment.setPaymentId("PAY" + String.format("%03d", i + 1));
                     payment.setUser(user);
-                    payment.setChargingSessionId(session.getChargingSessionId());
                     payment.setSession(session);
                     payment.setPrice(new BigDecimal("500000")); // 500,000 VND
                     payment.setPaymentMethod(paymentMethod.get());
@@ -273,6 +273,7 @@ public class DataInitializer implements CommandLineRunner {
                 waitingList.setChargingPost(chargingPosts[i % chargingPosts.length]);
                 waitingList.setBooking(booking);
                 waitingList.setExpectedWaitingTime(now.plusHours(i).plusMinutes(15));
+                waitingList.setCar(userCar);
                 waitingListRepository.save(waitingList);
 
                 // Update booking with waiting list reference
