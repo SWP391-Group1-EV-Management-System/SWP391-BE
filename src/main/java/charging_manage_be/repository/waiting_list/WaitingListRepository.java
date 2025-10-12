@@ -1,6 +1,4 @@
 package charging_manage_be.repository.waiting_list;
-
-
 import charging_manage_be.model.entity.booking.BookingEntity;
 import charging_manage_be.model.entity.booking.WaitingListEntity;
 import charging_manage_be.model.entity.cars.CarEntity;
@@ -14,7 +12,6 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-
 @Repository
 public interface WaitingListRepository extends JpaRepository<WaitingListEntity, String> {
     Optional<WaitingListEntity> findFirstByChargingPost_IdChargingPostAndStatusOrderByCreatedAtAsc(String chargingPostID, String status);
