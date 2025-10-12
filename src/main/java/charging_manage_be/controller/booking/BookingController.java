@@ -1,5 +1,6 @@
 package charging_manage_be.controller.booking;
 
+import charging_manage_be.model.dto.booking.BookingRequestDTO;
 import charging_manage_be.model.dto.booking.BookingResponseDTO;
 import charging_manage_be.model.entity.booking.BookingEntity;
 import charging_manage_be.model.entity.booking.WaitingListEntity;
@@ -21,8 +22,8 @@ public class BookingController {
     private BookingService bookingService;
 
     @PostMapping("/create")
-    public ResponseEntity<?> processBooking(@RequestBody BookingEntity booking) { // ? có nghĩa là có thể là Booking hoặc WaitingList
-        int result = bookingService.handleBookingNavigation(booking.getUser().getUserID(), booking.getChargingPost().getIdChargingPost(), booking.getCar().getCarID()); // Trả về một result có thể là Booking hoặc WaitingList
+    public ResponseEntity<?> processBooking(@RequestBody BookingRequestDTO booking) { // ? có nghĩa là có thể là Booking hoặc WaitingList
+        int result = bookingService.handleBookingNavigation(booking.getUser(), booking.getChargingPost(), booking.getCar()); // Trả về một result có thể là Booking hoặc WaitingList
         return ResponseEntity.ok(result);
     }
 
