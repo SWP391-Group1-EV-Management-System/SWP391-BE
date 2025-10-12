@@ -26,7 +26,7 @@ public class BookingController {
         return ResponseEntity.ok(result);
     }
 
-   @PostMapping("/complete/{bookingId}")
+    @PostMapping("/complete/{bookingId}")
     public ResponseEntity<String> completeBooking(@PathVariable String bookingID) {
         BookingEntity completedBooking = bookingService.completeBooking(bookingID);
         if (completedBooking != null) {
