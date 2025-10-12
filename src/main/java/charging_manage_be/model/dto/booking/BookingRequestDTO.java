@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BookingRequestDTO {
+    private String bookingId;
     private String user;
     private String chargingPost;
     private String car;

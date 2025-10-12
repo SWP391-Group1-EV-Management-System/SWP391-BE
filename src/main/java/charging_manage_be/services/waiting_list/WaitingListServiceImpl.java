@@ -166,10 +166,8 @@ public class WaitingListServiceImpl implements WaitingListService{
     }
 
     @Override
-    public List<WaitingListEntity> getWaitingListForWaitingListId(String waitingListId) {
-        WaitingListEntity waitingListEntity = waitingListRepository.findById(waitingListId)
-                .orElseThrow(() -> new RuntimeException("WaitingList not found"));
-        return List.of(waitingListEntity);
+    public WaitingListEntity getWaitingListForWaitingListId(String waitingListId) {
+        return waitingListRepository.findById(waitingListId).orElse(null);
     }
 
     @Override

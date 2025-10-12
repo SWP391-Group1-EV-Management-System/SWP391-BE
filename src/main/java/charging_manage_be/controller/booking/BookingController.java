@@ -5,6 +5,7 @@ import charging_manage_be.model.dto.booking.BookingResponseDTO;
 import charging_manage_be.model.entity.booking.BookingEntity;
 import charging_manage_be.model.entity.booking.WaitingListEntity;
 import charging_manage_be.services.booking.BookingService;
+import charging_manage_be.services.status_service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,10 +21,18 @@ public class BookingController {
 
     @Autowired
     private BookingService bookingService;
-
+    @Autowired
+    private UserStatusService userStatusService;
+    private final String STATUS_BOOKING = "booking";
+    private final String STATUS_WAITING = "waiting";
     @PostMapping("/create")
     public ResponseEntity<?> processBooking(@RequestBody BookingRequestDTO booking) { // ? có nghĩa là có thể là Booking hoặc WaitingList
         int result = bookingService.handleBookingNavigation(booking.getUser(), booking.getChargingPost(), booking.getCar()); // Trả về một result có thể là Booking hoặc WaitingList
+        if (result != -1) {
+            userStatusService.setUserStatus(booking.getUser(), STATUS_WAITING);
+        }else {
+            userStatusService.setUserStatus(booking.getUser(), STATUS_BOOKING);
+        }
         return ResponseEntity.ok(result);
     }
 
@@ -35,18 +44,20 @@ public class BookingController {
         }
        else {
             return ResponseEntity.notFound().build();
-        }
+       }
     }
 
     @PostMapping("/cancel/{bookingId}")
     public ResponseEntity<String> cancelBooking(@PathVariable String bookingID) {
         BookingEntity booking =  bookingService.cancelBooking(bookingID);
         if (booking != null) {
+            userStatusService.idleUserStatus(booking.getUser().getUserID());
             return ResponseEntity.ok("Booking cancelled successfully");
         }
         else {
             return ResponseEntity.notFound().build();
         }
+
     }
 
     @GetMapping("/getByPost/{postId}")
@@ -173,8 +184,8 @@ public class BookingController {
     }
 
     @GetMapping("/getByBookingId/{bookingId}")
-    public   ResponseEntity<List<BookingResponseDTO>> getByBookingId(@PathVariable String bookingId) {
-        List<BookingResponseDTO> bookingResponseDTO = bookingService.getBookingByBookingId(bookingId).stream().map(BookingEntity -> {
+    public   ResponseEntity<BookingResponseDTO> getByBookingId(@PathVariable String bookingId) {
+            BookingEntity BookingEntity = bookingService.getBookingByBookingId(bookingId);
             BookingResponseDTO dto = new BookingResponseDTO();
             dto.setBookingId(BookingEntity.getBookingId());
             if (BookingEntity.getWaitingList() == null) {
@@ -190,9 +201,8 @@ public class BookingController {
             dto.setMaxWaitingTime(BookingEntity.getMaxWaitingTime());
             dto.setStatus(BookingEntity.getStatus());
             dto.setArrivalTime(BookingEntity.getArrivalTime());
-            return dto;
-        }).toList();
-        return ResponseEntity.ok(bookingResponseDTO);
+
+        return ResponseEntity.ok(dto);
     }
 
     @GetMapping("/getByStatus/{statusList}")

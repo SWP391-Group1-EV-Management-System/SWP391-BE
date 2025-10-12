@@ -12,6 +12,7 @@ import charging_manage_be.repository.charging_post.ChargingPostRepository;
 import charging_manage_be.repository.charging_station.ChargingStationRepository;
 import charging_manage_be.repository.users.UserRepository;
 import charging_manage_be.repository.waiting_list.WaitingListRepository;
+import charging_manage_be.services.status_service.UserStatusService;
 import charging_manage_be.services.waiting_list.WaitingListService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,8 @@ public class BookingServiceImpl implements BookingService {
     private final RedisTemplate<String, String> redisTemplate;
     private final SimpMessagingTemplate simpMessagingTemplate;
     private static final String KEY_QUEUE_POST = "queue:post:";
+    private final String STATUS_BOOKING = "booking";
+    private final UserStatusService userStatusService;
     private final int characterLength = 5;
     private final int numberLength = 5;
 
@@ -242,7 +245,7 @@ public class BookingServiceImpl implements BookingService {
         waitingListRepository.save(waitingList);
 
         redisTemplate.opsForList().leftPop(redisKey(chargingPostId));
-
+        userStatusService.setUserStatus(booking.getUser().getUserID(), STATUS_BOOKING);
         simpMessagingTemplate.convertAndSendToUser(
                 waitingList.getUser().getUserID(),
                 "/queue/notifications",
@@ -300,10 +303,8 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingEntity> getBookingByBookingId(String bookingId) {
-        BookingEntity booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new RuntimeException("Booking not found"));
-        return List.of(booking);
+    public BookingEntity getBookingByBookingId(String bookingId) {
+        return bookingRepository.findById(bookingId).orElse(null);
     }
 
     @Override

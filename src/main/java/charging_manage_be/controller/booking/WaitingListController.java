@@ -126,20 +126,18 @@ public class WaitingListController {
 
     // Lấy hàng chờ theo WaitingListId
     @GetMapping("/queue/{waitingListId}")
-    public ResponseEntity<List<WaitingListResponseDTO>> getWaitingListById(@PathVariable String waitingListId) {
-        List<WaitingListResponseDTO> waitingLists = waitingListService.getWaitingListForWaitingListId(waitingListId).stream().map(waitingListEntity -> {
-            WaitingListResponseDTO dto = new WaitingListResponseDTO();
-            dto.setWaitingListId(waitingListEntity.getWaitingListId());
-            dto.setExpectedWaitingTime(waitingListEntity.getExpectedWaitingTime());
-            dto.setUserId(waitingListEntity.getUser().getUserID());
-            dto.setChargingStationId(waitingListEntity.getChargingStation().getIdChargingStation());
-            dto.setChargingPostId(waitingListEntity.getChargingPost().getIdChargingPost());
-            dto.setCarId(waitingListEntity.getCar().getCarID());
-            dto.setOutedAt(waitingListEntity.getOutedAt());
-            dto.setCreatedAt(waitingListEntity.getCreatedAt());
-            dto.setStatus(waitingListEntity.getStatus());
-            return dto;
-        }).toList();
-        return ResponseEntity.ok(waitingLists);
+    public ResponseEntity<WaitingListResponseDTO> getWaitingListById(@PathVariable String waitingListId) {
+        WaitingListEntity waitingListEntity = waitingListService.getWaitingListForWaitingListId(waitingListId);
+        WaitingListResponseDTO dto = new WaitingListResponseDTO();
+        dto.setWaitingListId(waitingListEntity.getWaitingListId());
+        dto.setExpectedWaitingTime(waitingListEntity.getExpectedWaitingTime());
+        dto.setUserId(waitingListEntity.getUser().getUserID());
+        dto.setChargingStationId(waitingListEntity.getChargingStation().getIdChargingStation());
+        dto.setChargingPostId(waitingListEntity.getChargingPost().getIdChargingPost());
+        dto.setCarId(waitingListEntity.getCar().getCarID());
+        dto.setOutedAt(waitingListEntity.getOutedAt());
+        dto.setCreatedAt(waitingListEntity.getCreatedAt());
+        dto.setStatus(waitingListEntity.getStatus());
+        return ResponseEntity.ok(dto);
     }
 }

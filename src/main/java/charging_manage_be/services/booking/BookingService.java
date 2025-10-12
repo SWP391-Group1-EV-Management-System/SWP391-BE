@@ -19,7 +19,7 @@ public interface BookingService {
     List<BookingEntity> getBookingByUserId(String userId);
     List<BookingEntity> getBookingByCreatedDate(LocalDateTime startOfDay, LocalDateTime endOfDay);
     List<BookingEntity> getBookingByWaitingListId(String waitingListId);
-    List<BookingEntity> getBookingByBookingId(String bookingId);
+    BookingEntity getBookingByBookingId(String bookingId);
     List<BookingEntity> getBookingByStatus(String status);
 
 

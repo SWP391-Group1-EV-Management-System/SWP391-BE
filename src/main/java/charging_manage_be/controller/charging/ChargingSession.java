@@ -7,6 +7,7 @@ import charging_manage_be.model.entity.booking.BookingEntity;
 import charging_manage_be.model.entity.charging.ChargingSessionEntity;
 import charging_manage_be.services.booking.BookingService;
 import charging_manage_be.services.charging_session.ChargingSessionService;
+import charging_manage_be.services.status_service.UserStatusService;
 import charging_manage_be.services.user_reputations.UserReputationService;
 import charging_manage_be.services.waiting_list.WaitingListService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,15 +28,19 @@ public class ChargingSession {
     private BookingService bookingService;
     @Autowired
     private UserReputationService userReputationService;
-
+    @Autowired
+    private UserStatusService userStatusService;
+    private final String STATUS_SESSION = "session";
+    private final String STATUS_PAYMENT = "payment";
     @PostMapping("/create")
     public ResponseEntity<String> createChargingSession(@RequestBody ChargingSessionRequest createSession) { // gồm có đối tượng booking và expectedEndTime
-        BookingEntity booking = createSession.getBooking();
+        BookingEntity booking = bookingService.getBookingByBookingId(createSession.getBooking().getBookingId());
         LocalDateTime expectedEndTime = createSession.getExpectedEndTime();
         // gọi thằng waiting ở sau lưng nếu có để cập nhật addExpectedWaitingTime
         waitingService.addExpectedWaitingTime(booking.getChargingPost().getIdChargingPost(), expectedEndTime);
         if (booking.getBookingId() == null) {
             sessionService.addSessionWithoutBooking(booking.getUser().getUserID(), booking.getChargingPost().getIdChargingPost(),expectedEndTime);
+
         } else {
             sessionService.addSessionWithBooking(booking.getBookingId(), expectedEndTime);
             //cập nhật trạng thái bên booking thành charging ngay khi tạo session thành công
@@ -44,6 +49,7 @@ public class ChargingSession {
            // sau đó gọi lại hàm completeBooking ở dưới khi kết thúc session
         }
         // yêu cầu FE xử lý khi realtime đạt tới expectedEndTime thì gọi API finish ở dưới
+        userStatusService.setUserStatus(booking.getUser().getUserID(), STATUS_SESSION);
         return ResponseEntity.ok("Charging Session create completed successfully");
     }
     @PostMapping("/finish/{sessionId}")
@@ -64,8 +70,10 @@ public class ChargingSession {
         boolean isOnTime = session.getExpectedEndTime().isEqual(session.getEndTime());
         if(!isOnTime){
             bookingService.processBooking(session.getChargingPost().getIdChargingPost());
+            //đã set status thành booking cho thằng tiếp theo ở trong này rồi
         }
         // không thì phải request cho người trong hàng đợi sau có muốn vào luôn hay không
+        userStatusService.setUserStatus(session.getUser().getUserID(), STATUS_PAYMENT);
         return ResponseEntity.ok("Charging Session finish completed successfully");
     }
     @GetMapping("/show/{sessionId}")
