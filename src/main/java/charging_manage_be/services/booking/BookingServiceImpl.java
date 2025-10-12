@@ -296,7 +296,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingEntity> getBookingByWaitingListId(String waitingListId) {
+    public BookingEntity getBookingByWaitingListId(String waitingListId) {
         WaitingListEntity waitingList = waitingListRepository.findById(waitingListId)
                 .orElseThrow(() -> new RuntimeException("Waiting list not found"));
         return bookingRepository.findByWaitingList(waitingList);

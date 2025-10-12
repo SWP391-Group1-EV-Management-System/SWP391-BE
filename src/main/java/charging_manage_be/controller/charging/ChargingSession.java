@@ -55,6 +55,9 @@ public class ChargingSession {
     @PostMapping("/finish/{sessionId}")
     public ResponseEntity<String> endChargingSession(@PathVariable String sessionId){
         ChargingSessionEntity session = sessionService.getSessionById(sessionId);
+        if (session == null) {
+            throw new RuntimeException("Session not found");
+        }
         sessionService.endSession(sessionId);
         // nếu có booking thì gọi thằng completeBooking để hoàn thành booking
         if (session.getBooking() == null) {

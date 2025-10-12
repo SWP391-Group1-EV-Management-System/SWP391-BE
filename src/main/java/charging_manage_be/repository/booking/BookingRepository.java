@@ -28,7 +28,7 @@ public interface BookingRepository extends JpaRepository<BookingEntity, String> 
     List<BookingEntity> findByChargingStation(ChargingStationEntity chargingStationEntity);
     List<BookingEntity> findByUser(UserEntity userEntity);
     List<BookingEntity> findByCreatedAtBetween(LocalDateTime startOfDay, LocalDateTime endOfDay);
-    List<BookingEntity> findByWaitingList(WaitingListEntity waitingListEntity);
+    BookingEntity findByWaitingList(WaitingListEntity waitingListEntity);
     List<BookingEntity> findByStatusIn(List<String> statusList);
 
 
