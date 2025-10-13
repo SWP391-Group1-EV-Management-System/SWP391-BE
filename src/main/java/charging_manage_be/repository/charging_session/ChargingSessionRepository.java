@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -18,4 +19,6 @@ public interface ChargingSessionRepository extends JpaRepository<ChargingSession
             @Param("chargingPost") ChargingPostEntity chargingPost,
             @Param("isDone") boolean isDone
     );
+    List<ChargingSessionEntity> findByExpectedEndTimeLessThanEqualAndEndTimeIsNull(LocalDateTime currentTime);
+    // hàm này để tìm ra các session có expectedTime <= currentTime và endTime là Null
 }
