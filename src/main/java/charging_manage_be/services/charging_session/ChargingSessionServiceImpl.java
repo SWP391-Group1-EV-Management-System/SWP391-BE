@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static charging_manage_be.util.RandomId.generateRandomId;
@@ -163,6 +164,11 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
     public LocalDateTime getExpectedEndTime(String chargingPost) {
         ChargingPostEntity post = ChargingPostService.getChargingPostById(chargingPost);
         return chargingSession.findExpectedEndTimeByChargingPostAndIsDone(post, false).orElse(null);
+    }
+
+    @Override
+    public List<ChargingSessionEntity> findSessionsToEnd(LocalDateTime currentTime) {
+        return chargingSession.findByExpectedEndTimeLessThanEqualAndEndTimeIsNull(currentTime);
     }
 //    @Override
 //    @Transactional

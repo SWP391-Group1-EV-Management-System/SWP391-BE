@@ -204,12 +204,14 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     public BookingEntity processBooking(String chargingPostId) {
         BookingEntity saved = new BookingEntity();
+        // Tìm người đầu tiên trong danh sách chờ theo trụ sạc và trạng thái "WAITING"
         boolean isWaitingDriver = waitingListRepository
                 .findFirstByChargingPost_IdChargingPostAndStatusOrderByCreatedAtAsc(
                         chargingPostId, "WAITING")
                 .isPresent();
         if (isWaitingDriver){
 
+        // Kiểm tra trạng thái hiện tại của trạm sạc, để nếu trụ có trạng thái "CONFIRMED" hoặc "CHARGING" thì trả về ngoại lệ và không tạo booking mới
         boolean busy = bookingRepository
                 .findFirstByChargingPost_IdChargingPostAndStatusInOrderByCreatedAtAsc(
                         chargingPostId, List.of("CONFIRMED", "CHARGING"))
@@ -218,12 +220,14 @@ public class BookingServiceImpl implements BookingService {
             throw new IllegalStateException("Charging post " + chargingPostId + " is still busy");
         }
 
+        // Nếu trạm sạc không bận, thì tạo booking mới từ người đầu tiên trong danh sách chờ theo trụ sạc và có trạng thái "WAITING"
         WaitingListEntity waitingList = waitingListRepository
                 .findFirstByChargingPost_IdChargingPostAndStatusOrderByCreatedAtAsc(
                         chargingPostId, "WAITING")
                 .orElseThrow(() -> new RuntimeException("No WAITING record for post " + chargingPostId));
 
 
+        // Tạo booking mới cho người từ danh sách chờ vừa lấy được
         BookingEntity booking = new BookingEntity();
         booking.setBookingId(generateUniqueId());
         booking.setWaitingList(waitingList);

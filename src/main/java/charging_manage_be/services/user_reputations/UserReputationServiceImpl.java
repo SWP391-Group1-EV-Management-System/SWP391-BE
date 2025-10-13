@@ -7,6 +7,7 @@ import charging_manage_be.model.entity.users.UserEntity;
 import charging_manage_be.repository.reputations.ReputationLevelRepository;
 import charging_manage_be.repository.user_reputations.UserReputationRepository;
 import charging_manage_be.repository.users.UserRepository;
+import jakarta.transaction.Transactional;
 import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.core.Local;
@@ -69,6 +70,7 @@ public class UserReputationServiceImpl implements UserReputationService{
 
 
     @Override
+    @Transactional
     public List<UserReputationEntity> getUserReputationById(String userID) {
         if (!userRepository.existsById(userID)) {
             throw new IllegalArgumentException("User not found with ID: " + userID);
@@ -77,6 +79,7 @@ public class UserReputationServiceImpl implements UserReputationService{
     }
 
     @Override
+    @Transactional
     public Optional<UserReputationEntity> getCurrentUserReputationById(String userID) {
         if (!userRepository.existsById(userID)) {
             throw new IllegalArgumentException("User not found with ID: " + userID);
@@ -85,6 +88,7 @@ public class UserReputationServiceImpl implements UserReputationService{
     }
 
     @Override
+    @Transactional
     public int calculateReputationPoints(LocalDateTime startTime, LocalDateTime expectedEndTime, LocalDateTime actualEndTime) {
         if (startTime == null || expectedEndTime == null || actualEndTime == null) {
             throw new IllegalArgumentException("Invalid time values provided.");
@@ -119,6 +123,7 @@ public class UserReputationServiceImpl implements UserReputationService{
     }
 
     @Override
+    @Transactional
     public boolean updatePointsUserReputation(String userID, int pointsChange, String notes) {
         //  Lấy thông tin uy tín hiện tại của user
         UserReputationEntity currentUser = getCurrentUserReputationById(userID)
@@ -146,6 +151,7 @@ public class UserReputationServiceImpl implements UserReputationService{
     }
 
     @Override
+    @Transactional
     public void handleEarlyUnplugPenalty(ChargingSessionEntity chargingSession) {
         if (chargingSession == null ||
                 chargingSession.getUser() == null ||

@@ -10,11 +10,14 @@ import charging_manage_be.services.charging_session.ChargingSessionService;
 import charging_manage_be.services.status_service.UserStatusService;
 import charging_manage_be.services.user_reputations.UserReputationService;
 import charging_manage_be.services.waiting_list.WaitingListService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/charging/session")
@@ -70,11 +73,12 @@ public class ChargingSession {
         // khi đã đủ giờ tự động driver trong hàng đợi sẽ được lấy ra
         // so sánh giờ dự kiến kết thúc với giờ hiện tại
         // nếu đủ thì lấy driver trong waiting list ra luôn
-        boolean isOnTime = session.getExpectedEndTime().isEqual(session.getEndTime());
-        if(!isOnTime){
+//        boolean isOnTime = session.getExpectedEndTime().isEqual(session.getEndTime());
+//        if(!isOnTime){ --> Không cần check isOnTime nữa vì dù đúng giờ hay không đúng giờ thì cũng phải hỏi người trong hàng đợi và khi người trong hàng đợi đồng ý
+//        thì gọi API này thủ công nên không cần check isOnTime nữa còn nếu không đồng ý thì đã có hàm xử lý việc tự động lấy người trong hàng đợi ra khi đủ giờ rồi
             bookingService.processBooking(session.getChargingPost().getIdChargingPost());
             //đã set status thành booking cho thằng tiếp theo ở trong này rồi
-        }
+//        }
         // không thì phải request cho người trong hàng đợi sau có muốn vào luôn hay không
         userStatusService.setUserStatus(session.getUser().getUserID(), STATUS_PAYMENT);
         return ResponseEntity.ok("Charging Session finish completed successfully");
@@ -93,4 +97,23 @@ public class ChargingSession {
         }
         return ResponseEntity.ok(sessionR);
     }
+
+    @Scheduled(fixedRate = 60000) // Chạy mỗi phút
+    @Transactional
+    public void checkAndEndSessions() {
+        // idea là ngoài việc tự bấm nút kết thúc session trước khi đủ giờ sạc
+        // Thì mỗi phút hệ thống sẽ kiểm trả các session nào đã tới expectedEndTime mà chưa kết thúc thì tự động kết thúc
+        List<ChargingSessionEntity> session = sessionService.findSessionsToEnd(LocalDateTime.now()); // Tìm các session có thời gian kết thúc dự kiến <= thời gian hiện tại và chưa có tgian kết thúc kết thúc
+        for (ChargingSessionEntity chargingSession : session) {
+            sessionService.endSession(chargingSession.getChargingSessionId());
+            // nếu có booking thì gọi thằng completeBooking để hoàn thành booking
+            if (chargingSession.getBooking() != null) {
+                bookingService.completeBooking(chargingSession.getBooking().getBookingId());
+                bookingService.processBooking(chargingSession.getChargingPost().getIdChargingPost());
+                userReputationService.handleEarlyUnplugPenalty(chargingSession);
+            }
+            userStatusService.setUserStatus(chargingSession.getUser().getUserID(), STATUS_PAYMENT);
+        }
+    }
+
 }
