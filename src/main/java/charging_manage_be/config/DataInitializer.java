@@ -1,41 +1,32 @@
 package charging_manage_be.config;
 
-import charging_manage_be.model.entity.booking.BookingEntity;
-import charging_manage_be.model.entity.booking.WaitingListEntity;
 import charging_manage_be.model.entity.cars.CarEntity;
 import charging_manage_be.model.entity.charging.ChargingPostEntity;
-import charging_manage_be.model.entity.charging.ChargingSessionEntity;
 import charging_manage_be.model.entity.charging.ChargingStationEntity;
 import charging_manage_be.model.entity.charging.ChargingTypeEntity;
-import charging_manage_be.model.entity.payments.PaymentEntity;
-import charging_manage_be.model.entity.payments.PaymentMethodEntity;
 import charging_manage_be.model.entity.reputations.ReputationLevelEntity;
 import charging_manage_be.model.entity.reputations.UserReputationEntity;
 import charging_manage_be.model.entity.users.UserEntity;
-import charging_manage_be.repository.booking.BookingRepository;
 import charging_manage_be.repository.cars.CarRepository;
 import charging_manage_be.repository.charging_post.ChargingPostRepository;
-import charging_manage_be.repository.charging_session.ChargingSessionRepository;
 import charging_manage_be.repository.charging_station.ChargingStationRepository;
 import charging_manage_be.repository.charging_type.ChargingTypeRepository;
-import charging_manage_be.repository.payments.PaymentMethodRepository;
-import charging_manage_be.repository.payments.PaymentRepository;
 import charging_manage_be.repository.reputations.ReputationLevelRepository;
 import charging_manage_be.repository.user_reputations.UserReputationRepository;
 import charging_manage_be.repository.users.UserRepository;
-import charging_manage_be.repository.waiting_list.WaitingListRepository;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Optional;
 
 @Component
-public class DataInitializer implements CommandLineRunner {
+public class DataInitializer  implements CommandLineRunner {
     @Autowired
     private ReputationLevelRepository reputationLevelRepository;
     @Autowired
@@ -50,25 +41,109 @@ public class DataInitializer implements CommandLineRunner {
     private ChargingStationRepository chargingStationRepository;
     @Autowired
     private ChargingPostRepository chargingPostRepository;
-    @Autowired
-    private PaymentMethodRepository paymentMethodRepository;
-    @Autowired
-    private PaymentRepository paymentRepository;
-    @Autowired
-    private BookingRepository bookingRepository;
-    @Autowired
-    private ChargingSessionRepository chargingSessionRepository;
-    @Autowired
-    private WaitingListRepository waitingListRepository;
-
     @Override
-    public void run(String... args) {
+    public void run(String... args) throws Exception {
         // Initialize Reputation Levels
         if(reputationLevelRepository.count() > 0) {
             return; // Dữ liệu đã được khởi tạo, không cần thêm nữa
         }
+        ReputationLevelEntity good = new ReputationLevelEntity();
+        good.setLevelID(1);
+        good.setLevelName("Tốt");
+        good.setMaxWaitMinutes(30);
+        good.setMinScore(71);
+        good.setMaxScore(100);
+        good.setDescription("Người dùng có uy tín tốt");
+        reputationLevelRepository.save(good);
 
-        // Initialize Charging Types first
+        ReputationLevelEntity medium = new ReputationLevelEntity();
+        medium.setLevelID(2);
+        medium.setLevelName("Khá");
+        medium.setMaxWaitMinutes(20);
+        medium.setMinScore(31);
+        medium.setMaxScore(70);
+        medium.setDescription("Người dùng có uy tín khá");
+        reputationLevelRepository.save(medium);
+
+        ReputationLevelEntity bad = new ReputationLevelEntity();
+        bad.setLevelID(3);
+        bad.setLevelName("Xấu");
+        bad.setMaxWaitMinutes(10);
+        bad.setMinScore(0);
+        good.setMaxScore(30);
+        bad.setDescription("Người dùng có uy tín xấu");
+        reputationLevelRepository.save(bad);
+
+        // Initialize Users
+        UserEntity driverA = new UserEntity();
+        driverA.setUserID("DRV001");
+        driverA.setFirstName("Driver");
+        driverA.setLastName("A");
+        driverA.setBirthDate(new Date());
+        driverA.setGender(true);
+        driverA.setRole("DRIVER");
+        driverA.setEmail("drivera@test.com");
+        driverA.setPassword("password");
+        driverA.setPhoneNumber("0123456789");
+        driverA.setStatus(true);
+        userRepository.save(driverA);
+        UserEntity driverB = new UserEntity();
+        driverB.setUserID("DRV002");
+        driverB.setFirstName("Driver");
+        driverB.setLastName("B");
+        driverB.setBirthDate(new Date());
+        driverB.setGender(true);
+        driverB.setRole("DRIVER");
+        driverB.setEmail("driverb@test.com");
+        driverB.setPassword("password");
+        driverB.setPhoneNumber("0123456780");
+        driverB.setStatus(true);
+        userRepository.save(driverB);
+
+        UserEntity manager = new UserEntity();
+        manager.setUserID("MGR001");
+        manager.setFirstName("Manager");
+        manager.setLastName("Test");
+        manager.setBirthDate(new Date());
+        manager.setGender(true);
+        manager.setRole("MANAGER");
+        manager.setEmail("manager@test.com");
+        manager.setPassword("password");
+        manager.setPhoneNumber("0987654321");
+        manager.setStatus(true);
+        userRepository.save(manager);
+
+        UserEntity staff = new UserEntity();
+        staff.setUserID("STF001");
+        staff.setFirstName("Staff");
+        staff.setLastName("Test");
+        staff.setBirthDate(new Date());
+        staff.setGender(true);
+        staff.setRole("STAFF");
+        staff.setEmail("staff@test.com");
+        staff.setPassword("password");
+        staff.setPhoneNumber("0123498765");
+        staff.setStatus(true);
+        userRepository.save(staff);
+
+        // Initialize User Reputation
+        UserReputationEntity driverARep = new UserReputationEntity();
+        driverARep.setUserReputationID("REP001");
+        driverARep.setUser(driverA);
+        driverARep.setReputationLevel(good);
+        driverARep.setCurrentScore(100);
+        driverARep.setNotes("Initial reputation");
+        userReputationRepository.save(driverARep);
+
+        UserReputationEntity driverBRep = new UserReputationEntity();
+        driverBRep.setUserReputationID("REP002");
+        driverBRep.setUser(driverB);
+        driverBRep.setReputationLevel(bad);
+        driverBRep.setCurrentScore(10);
+        driverBRep.setNotes("Initial reputation");
+        userReputationRepository.save(driverBRep);
+
+        // Initialize Charging Types
         ChargingTypeEntity ccs = new ChargingTypeEntity();
         ccs.setIdChargingType(1);
         ccs.setNameChargingType("CCS");
@@ -78,208 +153,69 @@ public class DataInitializer implements CommandLineRunner {
         chademo.setIdChargingType(2);
         chademo.setNameChargingType("CHAdeMO");
         chargingTypeRepository.save(chademo);
-
         ChargingTypeEntity ac = new ChargingTypeEntity();
         ac.setIdChargingType(3);
         ac.setNameChargingType("AC");
         chargingTypeRepository.save(ac);
 
-        // Initialize reputation levels
-        ReputationLevelEntity goodLevel = new ReputationLevelEntity();
-        goodLevel.setLevelID(1);
-        goodLevel.setLevelName("Tốt");
-        goodLevel.setMaxWaitMinutes(15);
-        goodLevel.setDescription("Người dùng có uy tín tốt");
-        goodLevel.setMaxScore(100);
-        goodLevel.setMinScore(60);
-        reputationLevelRepository.save(goodLevel);
+        // Initialize Car
+        CarEntity car = new CarEntity();
+        car.setCarID("CAR001");
+        car.setLicensePlate("29A-12345");
+        car.setUser(driverA);
+        car.setTypeCar("Sedan");
+        car.setChassisNumber("CHASSIS001");
+        car.setChargingType(ccs);
+        carRepository.save(car);
+        CarEntity car1 = new CarEntity();
+        car1.setCarID("CAR002");
+        car1.setLicensePlate("59A-12345");
+        car1.setUser(driverB);
+        car1.setTypeCar("Sedan");
+        car1.setChassisNumber("CHASSIS123");
+        car1.setChargingType(ccs);
+        carRepository.save(car1);
 
-        ReputationLevelEntity mediumLevel = new ReputationLevelEntity();
-        mediumLevel.setLevelID(2);
-        mediumLevel.setLevelName("Khá");
-        mediumLevel.setMaxWaitMinutes(10);
-        mediumLevel.setDescription("Người dùng có uy tín khá");
-        mediumLevel.setMaxScore(59);
-        mediumLevel.setMinScore(20);
-        reputationLevelRepository.save(mediumLevel);
+        // Initialize Charging Station
+        ChargingStationEntity stationA1 = new ChargingStationEntity();
+        stationA1.setIdChargingStation("STA001");
+        stationA1.setNameChargingStation("Trạm A1");
+        stationA1.setAddress("123 Test Street");
+        stationA1.setUserManager(manager);
+        stationA1.setNumberOfPosts(3);
+        chargingStationRepository.save(stationA1);
 
-        ReputationLevelEntity badLevel = new ReputationLevelEntity();
-        badLevel.setLevelID(3);
-        badLevel.setLevelName("Xấu");
-        badLevel.setMaxWaitMinutes(5);
-        badLevel.setDescription("Người dùng có uy tín xấu");
-        badLevel.setMaxScore(19);
-        badLevel.setMinScore(0);
-        reputationLevelRepository.save(badLevel);
+        // Initialize Charging Posts
 
-        // Initialize Users (adding more users to reach 15, including more managers)
-        UserEntity[] users = new UserEntity[15];
-        String[] roles = {
-            "DRIVER", "DRIVER", "DRIVER", "DRIVER", "DRIVER",  // 5 drivers
-            "MANAGER", "MANAGER", "MANAGER", "MANAGER", "MANAGER", // 5 managers for stations 1-5
-            "MANAGER", "MANAGER", "MANAGER", "MANAGER", "MANAGER"  // 5 managers for stations 6-10
-        };
+        // Lấy các ChargingTypeEntity từ DB
+        ChargingTypeEntity type1 = chargingTypeRepository.findById(1).get();
+        ChargingTypeEntity type2 = chargingTypeRepository.findById(2).get();
+        ChargingTypeEntity type3 = chargingTypeRepository.findById(3).get();
+        ChargingPostEntity post1 = new ChargingPostEntity();
+        post1.setIdChargingPost("POST001");
+        post1.setChargingStation(stationA1);
+        post1.setChargingType(Arrays.asList(type1, type2,type3));
+        post1.setChargingFeePerKWh(new BigDecimal("100"));
+        post1.setMaxPower(new BigDecimal("10000"));
+        post1.setActive(true);
+        chargingPostRepository.save(post1);
 
-        for (int i = 0; i < 15; i++) {
-            users[i] = new UserEntity();
-            users[i].setUserID(String.format("USR%03d", i + 1));
-            users[i].setFirstName("User");
-            users[i].setLastName("" + (i + 1));
-            users[i].setBirthDate(new Date());
-            users[i].setGender(i % 2 == 0);
-            users[i].setRole(roles[i]);
-            users[i].setEmail("user" + (i + 1) + "@test.com");
-            users[i].setPassword("password");
-            users[i].setPhoneNumber("0123456" + String.format("%03d", i));
-            users[i].setStatus(true);
-            userRepository.save(users[i]);
-        }
+        ChargingPostEntity post2 = new ChargingPostEntity();
+        post2.setIdChargingPost("POST002");
+        post2.setChargingStation(stationA1);
+        post2.setChargingType(Arrays.asList(type1, type2,type3));
+        post2.setChargingFeePerKWh(new BigDecimal("100"));
+        post2.setMaxPower(new BigDecimal("10000"));
+        post2.setActive(true);
+        chargingPostRepository.save(post2);
 
-        // Initialize User Reputation (15 entries)
-        Optional<ReputationLevelEntity> goodOpt = reputationLevelRepository.findById(1);
-        Optional<ReputationLevelEntity> mediumOpt = reputationLevelRepository.findById(2);
-        Optional<ReputationLevelEntity> badOpt = reputationLevelRepository.findById(3);
-
-        if (goodOpt.isPresent() && mediumOpt.isPresent() && badOpt.isPresent()) {
-            ReputationLevelEntity goodRep = goodOpt.get();
-            ReputationLevelEntity mediumRep = mediumOpt.get();
-            ReputationLevelEntity badRep = badOpt.get();
-
-            for (int i = 0; i < 15; i++) {
-                UserReputationEntity userRep = new UserReputationEntity();
-                userRep.setUserReputationID("REP" + String.format("%03d", i + 1));
-                userRep.setUser(users[i]);
-                if (i < 6) userRep.setReputationLevel(goodRep);
-                else if (i < 10) userRep.setReputationLevel(mediumRep);
-                else userRep.setReputationLevel(badRep);
-                userRep.setNotes("Reputation for user " + (i + 1));
-                userRep.setCurrentScore(100);
-                userReputationRepository.save(userRep);
-            }
-        }
-
-        // Initialize Cars (10 entries, only for drivers)
-        String[] carTypes = {"Sedan", "SUV", "Hatchback", "Crossover", "MPV"};
-
-        for (int i = 0; i < 10; i++) {
-            CarEntity car = new CarEntity();
-            car.setCarID("CAR" + String.format("%03d", i + 1));
-            car.setLicensePlate(String.format("%02dA-%05d", 30 + i, 12345 + i));
-            car.setUser(users[i % 5]); // Assign only to the first 5 users (DRIVERS)
-            car.setTypeCar(carTypes[i % carTypes.length]);
-            car.setChassisNumber("CHASSIS" + String.format("%03d", i + 1));
-            car.setChargingType(i % 3 == 0 ? ccs : (i % 3 == 1 ? chademo : ac));
-            carRepository.save(car);
-        }
-
-        // Initialize Charging Stations (10 entries)
-        for (int i = 0; i < 10; i++) {
-            ChargingStationEntity station = new ChargingStationEntity();
-            station.setIdChargingStation("STA" + String.format("%03d", i + 1));
-            station.setNameChargingStation("Trạm " + (char)('A' + i));
-            station.setAddress((i + 1) * 100 + " Test Street, District " + (i + 1));
-            station.setUserManager(users[i + 5]); // Assign to managers (users[5] through users[14])
-            station.setNumberOfPosts(3 + i % 3);
-            station.setActive(true);
-            chargingStationRepository.save(station);
-        }
-
-        // Initialize Charging Posts (10 entries)
-        ChargingStationEntity[] stations = chargingStationRepository.findAll().toArray(new ChargingStationEntity[0]);
-
-        // Store charging posts array for later use
-        ChargingPostEntity[] chargingPosts = new ChargingPostEntity[10];
-        for (int i = 0; i < 10; i++) {
-            ChargingPostEntity post = new ChargingPostEntity();
-            post.setIdChargingPost("POST" + String.format("%03d", i + 1));
-            post.setChargingStation(stations[i % stations.length]);
-            post.setChargingType(Arrays.asList(ccs, chademo, ac));
-            post.setChargingFeePerKWh(new BigDecimal("100").add(BigDecimal.valueOf(i * 10)));
-            post.setMaxPower(new BigDecimal("10000").add(BigDecimal.valueOf(i * 1000)));
-            post.setActive(true);
-            chargingPosts[i] = chargingPostRepository.save(post);
-        }
-
-        // Initialize Payment Methods
-        String[] paymentMethods = {"CASH", "BANK_TRANSFER", "MOMO", "VNPAY"};
-        for (int i = 0; i < paymentMethods.length; i++) {
-            PaymentMethodEntity method = new PaymentMethodEntity();
-            method.setIdPaymentMethod("PM" + String.format("%03d", i + 1));
-            method.setNamePaymentMethod(paymentMethods[i]);
-            paymentMethodRepository.save(method);
-        }
-
-        // Initialize Bookings and related entities
-        LocalDateTime now = LocalDateTime.of(2025, 10, 12, 8, 0); // Current context date
-
-        // Create some bookings
-        for (int i = 0; i < 10; i++) {
-            UserEntity user = users[i % 5]; // Only drivers can book
-            CarEntity userCar = null;
-            // Find the user's car
-            for (CarEntity car : carRepository.findAll()) {
-                if (car.getUser().getUserID().equals(user.getUserID())) {
-                    userCar = car;
-                    break;
-                }
-            }
-            if (userCar == null) continue;
-
-            // Create booking
-            BookingEntity booking = new BookingEntity();
-            booking.setBookingId("BOK" + String.format("%03d", i + 1));
-            booking.setUser(user);
-            booking.setCar(userCar);
-            booking.setChargingStation(stations[i % stations.length]);
-            booking.setChargingPost(chargingPosts[i % chargingPosts.length]);
-            booking.setMaxWaitingTime(15); // Default to 15 minutes
-            booking.setCreatedAt(now.plusHours(i));
-            booking.setStatus(i < 5 ? "COMPLETED" : "CANCEL"); // Set status based on whether it's completed or pending
-            bookingRepository.save(booking);
-
-            // Create charging session for completed bookings (first 5)
-            if (i < 5) {
-                ChargingSessionEntity session = new ChargingSessionEntity();
-                session.setChargingSessionId("SES" + String.format("%03d", i + 1));
-                session.setBooking(booking);
-                session.setChargingPost(chargingPosts[i % chargingPosts.length]);
-                session.setStation(stations[i % stations.length]);
-                session.setUser(user);
-                session.setUserManage(stations[i % stations.length].getUserManager());
-                session.setStartTime(booking.getCreatedAt().plusMinutes(15));
-                session.setExpectedEndTime(now.plusHours(i).plusHours(2));
-                session.setDone(true);
-                chargingSessionRepository.save(session);
-
-                // Create payment for completed sessions
-                Optional<PaymentMethodEntity> paymentMethod = paymentMethodRepository.findById("PM" + String.format("%03d", i % paymentMethods.length + 1));
-                if (paymentMethod.isPresent()) {
-                    PaymentEntity payment = new PaymentEntity();
-                    payment.setPaymentId("PAY" + String.format("%03d", i + 1));
-                    payment.setUser(user);
-                    payment.setSession(session);
-                    payment.setPrice(new BigDecimal("500000")); // 500,000 VND
-                    payment.setPaymentMethod(paymentMethod.get());
-                    payment.setPaid(true);
-                    payment.setPaidAt(now.plusHours(i).plusHours(2).plusMinutes(5));
-                    paymentRepository.save(payment);
-                }
-            } else {
-                // Create waiting list entries for pending bookings
-                WaitingListEntity waitingList = new WaitingListEntity();
-                waitingList.setWaitingListId("WAIT" + String.format("%03d", i + 1));
-                waitingList.setChargingStation(stations[i % stations.length]);
-                waitingList.setUser(user);
-                waitingList.setChargingPost(chargingPosts[i % chargingPosts.length]);
-                waitingList.setBooking(booking);
-                waitingList.setExpectedWaitingTime(now.plusHours(i).plusMinutes(15));
-                waitingList.setCar(userCar);
-                waitingListRepository.save(waitingList);
-
-                // Update booking with waiting list reference
-                booking.setWaitingList(waitingList);
-                bookingRepository.save(booking);
-            }
-        }
+        ChargingPostEntity post3 = new ChargingPostEntity();
+        post3.setIdChargingPost("POST003");
+        post3.setChargingStation(stationA1);
+        post3.setChargingType(Arrays.asList(type1, type2,type3));
+        post3.setChargingFeePerKWh(new BigDecimal("100"));
+        post3.setMaxPower(new BigDecimal("10000"));
+        post3.setActive(true);
+        chargingPostRepository.save(post3);
     }
 }

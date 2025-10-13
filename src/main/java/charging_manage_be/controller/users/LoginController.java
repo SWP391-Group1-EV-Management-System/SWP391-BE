@@ -31,7 +31,7 @@ public class LoginController {
         if(!user.isStatus()) {
             return ResponseEntity.status(401).body("Tài Khoản Đã Bị Chặn");
         }
-        UserResponse userResponse = new UserResponse(user.getUserID(), user.getEmail(),user.getFirstName(),user.getLastName(),user.getRole());
+        UserResponse userResponse = new UserResponse(user.getUserID(), user.getEmail(),user.getFirstName(),user.getLastName(),user.getRole(), user.getCreatedAt());
         session.setAttribute("userSession", userResponse);
         String userStatus = userStatusService.getUserStatus(user.getUserID());
         if(userStatus == null ) {

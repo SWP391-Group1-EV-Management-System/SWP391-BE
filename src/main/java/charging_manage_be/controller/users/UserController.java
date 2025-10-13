@@ -1,5 +1,6 @@
 package charging_manage_be.controller.users;
 
+import charging_manage_be.model.dto.user.UserResponse;
 import charging_manage_be.model.entity.users.UserEntity;
 import charging_manage_be.services.users.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,8 +59,16 @@ public ResponseEntity<UserEntity> getUser(@PathVariable String userID) {
 }
 
 @GetMapping("/getAllUsers")
-public ResponseEntity<List<UserEntity>> getAllUsers() {
-    List<UserEntity> users = userService.getAllUsers();
+public ResponseEntity<List<UserResponse>> getAllUsers() {
+    List<UserResponse> users = userService.getAllUsers().stream()
+            .map(user -> new UserResponse(
+                    user.getUserID(),
+                    user.getEmail(),
+                    user.getFirstName(),
+                    user.getLastName(),
+                    user.getRole(),
+                    user.getCreatedAt()
+            )).toList();
     return ResponseEntity.ok(users);
 }
 }

@@ -71,6 +71,8 @@ public class ChargingSession {
         // so sánh giờ dự kiến kết thúc với giờ hiện tại
         // nếu đủ thì lấy driver trong waiting list ra luôn
         boolean isOnTime = session.getExpectedEndTime().isEqual(session.getEndTime());
+        // 15 = 15
+        // 14 != 15
         if(!isOnTime){
             bookingService.processBooking(session.getChargingPost().getIdChargingPost());
             //đã set status thành booking cho thằng tiếp theo ở trong này rồi
