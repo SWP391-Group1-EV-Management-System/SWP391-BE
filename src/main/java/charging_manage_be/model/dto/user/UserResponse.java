@@ -4,6 +4,8 @@ package charging_manage_be.model.dto.user;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor
 public class UserResponse {
@@ -12,4 +14,5 @@ public class UserResponse {
     private String firstName;
     private String lastName;
     private String role;
+    private LocalDateTime createdAt;
 }
