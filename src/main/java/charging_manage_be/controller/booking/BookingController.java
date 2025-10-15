@@ -4,11 +4,16 @@ import charging_manage_be.model.dto.booking.BookingRequestDTO;
 import charging_manage_be.model.dto.booking.BookingResponseDTO;
 import charging_manage_be.model.entity.booking.BookingEntity;
 import charging_manage_be.model.entity.booking.WaitingListEntity;
+import charging_manage_be.model.entity.reputations.UserReputationEntity;
+import charging_manage_be.model.entity.users.UserEntity;
 import charging_manage_be.services.booking.BookingService;
 import charging_manage_be.services.status_service.UserStatusService;
+import charging_manage_be.services.user_reputations.UserReputationService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -23,6 +28,8 @@ public class BookingController {
     private BookingService bookingService;
     @Autowired
     private UserStatusService userStatusService;
+    @Autowired
+    private UserReputationService userReputationService;
     private final String STATUS_BOOKING = "booking";
     private final String STATUS_WAITING = "waiting";
     @PostMapping("/create")
@@ -225,6 +232,18 @@ public class BookingController {
             return dto;
         }).toList();
         return ResponseEntity.ok(bookingResponseDTO);
+    }
+
+
+    @Scheduled(fixedRate = 60000)
+    @Transactional
+    public void autoProcessBoookingWhenExpire() {
+        List<BookingEntity> bookingEntityList = bookingService.getExpiredBookings(LocalDateTime.now());
+        for (BookingEntity bookingEntity : bookingEntityList) {
+            bookingService.cancelBooking(bookingEntity.getBookingId());
+            bookingService.processBooking(bookingEntity.getChargingPost().getIdChargingPost());
+            userReputationService.handlerExpiredPenalty(bookingEntity);
+        }
     }
 
 

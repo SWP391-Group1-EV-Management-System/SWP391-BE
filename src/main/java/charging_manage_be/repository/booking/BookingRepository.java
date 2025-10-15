@@ -6,6 +6,8 @@ import charging_manage_be.model.entity.charging.ChargingPostEntity;
 import charging_manage_be.model.entity.charging.ChargingStationEntity;
 import charging_manage_be.model.entity.users.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -30,6 +32,9 @@ public interface BookingRepository extends JpaRepository<BookingEntity, String> 
     List<BookingEntity> findByCreatedAtBetween(LocalDateTime startOfDay, LocalDateTime endOfDay);
     BookingEntity findByWaitingList(WaitingListEntity waitingListEntity);
     List<BookingEntity> findByStatusIn(List<String> statusList);
+
+    @Query("SELECT b FROM BookingEntity b WHERE b.arrivalTime IS NULL ")
+    List<BookingEntity> findExpiredBookings();
 
 
 }

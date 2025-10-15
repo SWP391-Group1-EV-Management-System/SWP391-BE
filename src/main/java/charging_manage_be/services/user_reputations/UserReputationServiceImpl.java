@@ -1,5 +1,6 @@
 package charging_manage_be.services.user_reputations;
 
+import charging_manage_be.model.entity.booking.BookingEntity;
 import charging_manage_be.model.entity.charging.ChargingSessionEntity;
 import charging_manage_be.model.entity.reputations.ReputationLevelEntity;
 import charging_manage_be.model.entity.reputations.UserReputationEntity;
@@ -183,6 +184,25 @@ public class UserReputationServiceImpl implements UserReputationService{
 
         updatePointsUserReputation(chargingSession.getUser().getUserID(), pointChange, notes);
 
+    }
+
+    @Override
+    @Transactional
+    public void handlerExpiredPenalty(BookingEntity bookingEntity) {
+        if (bookingEntity == null) {
+            throw new IllegalArgumentException("No booking entity found.");
+        }
+        LocalDateTime createdAt = bookingEntity.getCreatedAt();
+        int maxWaitingTime = bookingEntity.getMaxWaitingTime();
+        LocalDateTime expiredTime = createdAt.plusMinutes(maxWaitingTime);
+
+        if (LocalDateTime.now().isAfter(expiredTime)) {
+            String userId = bookingEntity.getUser().getUserID();
+            int penaltyPoint = -30;
+            String notes = "User did not arrive within the allowed waiting time, " + Math.abs(penaltyPoint) + " reputation points deducted.";
+            updatePointsUserReputation(userId, penaltyPoint, notes);
+
+        }
     }
 
 

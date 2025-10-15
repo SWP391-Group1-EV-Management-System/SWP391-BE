@@ -1,5 +1,6 @@
 package charging_manage_be.services.user_reputations;
 
+import charging_manage_be.model.entity.booking.BookingEntity;
 import charging_manage_be.model.entity.charging.ChargingSessionEntity;
 import charging_manage_be.model.entity.reputations.UserReputationEntity;
 
@@ -31,5 +32,8 @@ public interface UserReputationService {
 
     // Tạo một hàm để trừ điểm theo số điểm bị trừ của user và lưu vào bảng user_reputations
     void handleEarlyUnplugPenalty(ChargingSessionEntity chargingSession);
+
+    // Tạo một hàm để trừ điểm theo việc đến trễ booking
+    void handlerExpiredPenalty(BookingEntity bookingEntity);
 
 }

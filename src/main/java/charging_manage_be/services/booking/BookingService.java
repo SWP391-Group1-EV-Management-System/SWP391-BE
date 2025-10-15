@@ -21,6 +21,6 @@ public interface BookingService {
     BookingEntity getBookingByWaitingListId(String waitingListId);
     BookingEntity getBookingByBookingId(String bookingId);
     List<BookingEntity> getBookingByStatus(String status);
-
+    List<BookingEntity> getExpiredBookings(LocalDateTime currentTime);
 
 }

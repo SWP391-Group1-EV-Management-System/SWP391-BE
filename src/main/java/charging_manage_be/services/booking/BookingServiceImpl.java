@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static charging_manage_be.util.RandomId.generateRandomId;
 
@@ -180,7 +181,6 @@ public class BookingServiceImpl implements BookingService {
         BookingEntity booking = bookingRepository.findById(bookingID).orElseThrow();
 
         booking.setStatus("CANCELLED");
-        booking.setArrivalTime(LocalDateTime.now());
 
         // Gửi thông báo đến user rằng booking đã bị hủy
         simpMessagingTemplate.convertAndSendToUser(booking.getUser().getUserID(), "/queue/notifications",
@@ -314,6 +314,13 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingEntity> getBookingByStatus(String status) {
         return bookingRepository.findByStatusIn(List.of(status));
+    }
+
+    @Override
+    public List<BookingEntity> getExpiredBookings(LocalDateTime currentTime) {
+        return bookingRepository.findExpiredBookings().stream()
+                .filter(booking -> booking.getCreatedAt().plusMinutes(booking.getMaxWaitingTime()).isBefore(currentTime) ||
+                         booking.getCreatedAt().plusMinutes(booking.getMaxWaitingTime()).isEqual(currentTime)).collect(Collectors.toList());
     }
 
 
