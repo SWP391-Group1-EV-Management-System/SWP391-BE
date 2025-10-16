@@ -125,6 +125,18 @@ public class PaymentServiceImpl implements PaymentService {
         return paymentRepository.findAll();
     }
 
+    @Override
+    public List<PaymentEntity> findUnpaidPaymentsUser(String userId) {
+        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        return paymentRepository.findByUserAndIsPaid(user, false);
+    }
+
+    @Override
+    public List<PaymentEntity> findPaidPaymentsUser(String userId) {
+        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        return paymentRepository.findByUserAndIsPaid(user, true);
+    }
+
     /*
     public PaymentEntity createPayment(UserEntity userId, String chargingSessionId, BigDecimal price) {
         PaymentEntity payment = new PaymentEntity();

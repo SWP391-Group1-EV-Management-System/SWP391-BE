@@ -23,4 +23,5 @@ public interface UserService {
     public void saveUserTemp(UserEntity userEntity);
     UserEntity getTempUserByEmail(String email);
     List<UserEntity> getUserByRole(String role);
+    UserEntity getUserEmail(String email);
 }

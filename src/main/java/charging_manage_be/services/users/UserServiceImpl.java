@@ -162,7 +162,10 @@ public class UserServiceImpl implements UserService {
     public List<UserEntity> getUserByRole(String role) {
         return userRepository.findAllByRole(role);
     }
-
+    @Override
+    public UserEntity getUserEmail(String email) {
+          return userRepository.findByEmail(email).orElse(null);
+    }
 
 
 }
