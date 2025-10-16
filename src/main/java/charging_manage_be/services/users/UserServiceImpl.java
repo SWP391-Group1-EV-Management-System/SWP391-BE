@@ -158,5 +158,11 @@ public class UserServiceImpl implements UserService {
         return null;  // Trả về null nếu không tìm thấy hoặc có lỗi khi chuyển đổi
     }
 
+    @Override
+    public List<UserEntity> getUserByRole(String role) {
+        return userRepository.findAllByRole(role);
+    }
+
+
 
 }
