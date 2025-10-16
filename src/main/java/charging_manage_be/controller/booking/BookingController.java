@@ -44,8 +44,8 @@ public class BookingController {
     }
 
     @PostMapping("/complete/{bookingId}")
-    public ResponseEntity<String> completeBooking(@PathVariable String bookingID) {
-        BookingEntity completedBooking = bookingService.completeBooking(bookingID);
+    public ResponseEntity<String> completeBooking(@PathVariable String bookingId) {
+        BookingEntity completedBooking = bookingService.completeBooking(bookingId);
         if (completedBooking != null) {
             return ResponseEntity.ok("Booking completed successfully" );
         }
@@ -55,8 +55,9 @@ public class BookingController {
     }
 
     @PostMapping("/cancel/{bookingId}")
-    public ResponseEntity<String> cancelBooking(@PathVariable String bookingID) {
-        BookingEntity booking =  bookingService.cancelBooking(bookingID);
+    public ResponseEntity<String> cancelBooking(@PathVariable String bookingId) {
+        BookingEntity booking =  bookingService.cancelBooking(bookingId);
+        bookingService.processBooking(booking.getChargingPost().getIdChargingPost());
         if (booking != null) {
             userStatusService.idleUserStatus(booking.getUser().getUserID());
             return ResponseEntity.ok("Booking cancelled successfully");
@@ -245,15 +246,4 @@ public class BookingController {
             userReputationService.handlerExpiredPenalty(bookingEntity);
         }
     }
-
-
-//    @PostMapping("/process/{chargingPostID}") // này không cần thiết vì sẽ tự động xử lý khi hoàn thành hoặc hủy booking
-//    public ResponseEntity<String> processNextBooking(@PathVariable String chargingPostID) {
-//        BookingEntity processedBooking = bookingService.processBooking(chargingPostID);
-//        if (processedBooking != null) {
-//            return ResponseEntity.ok("Processed next booking successfully");
-//        } else {
-//            return ResponseEntity.ok("No pending bookings to process");
-//        }
-//    }
 }

@@ -70,7 +70,7 @@ public class DataInitializer  implements CommandLineRunner {
         bad.setLevelName("Xấu");
         bad.setMaxWaitMinutes(10);
         bad.setMinScore(0);
-        good.setMaxScore(30);
+        bad.setMaxScore(30);
         bad.setDescription("Người dùng có uy tín xấu");
         reputationLevelRepository.save(bad);
 
