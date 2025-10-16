@@ -9,9 +9,7 @@ import charging_manage_be.services.status_service.UserStatusService;
 import charging_manage_be.services.users.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.RequestEntity;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -46,8 +44,16 @@ public class LoginController {
 
         final UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
         final String jwt = jwtUtil.generateToken(userDetails);
+        ResponseCookie cookie = ResponseCookie.from("jwt", jwt)
+                .httpOnly(true) // không cho JS đọc tránh XXS
+                .secure(true) // chỉ gửi qua HTTPS
+                .path("/")
+                .maxAge(24 * 60 * 60) // 1 ngày
+                .build();
 
-        return ResponseEntity.ok(Map.of("token", jwt));
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body("Đăng nhập thành công!");
     }
 
     @GetMapping("/admin/test")
