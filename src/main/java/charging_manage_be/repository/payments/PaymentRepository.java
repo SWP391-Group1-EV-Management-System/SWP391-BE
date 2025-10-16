@@ -14,4 +14,5 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, String> 
     public List<PaymentEntity> findAll();
 
     List<PaymentEntity> findByUser(UserEntity user);
+    List<PaymentEntity> findByUserAndIsPaid(UserEntity user, boolean isPaid);
 }

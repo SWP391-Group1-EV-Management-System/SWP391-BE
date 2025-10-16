@@ -142,6 +142,46 @@ public class PaymentController {
 
         return ResponseEntity.ok(paymentResponses);
     }
+    @GetMapping("/paymentByUser/UnPaid/{userId}")
+    public ResponseEntity<List<PaymentResponse>> getPaymentByUserIdUnPaid(@PathVariable String userId) {
+        List<PaymentEntity> payments = paymentService.findUnpaidPaymentsUser(userId);
+        List<PaymentResponse> paymentResponses = payments.stream().map(payment -> new PaymentResponse(
+                payment.getPaymentId(),
+                payment.getUser().getUserID(),
+                payment.getSession().getChargingSessionId(),
+                payment.isPaid(),
+                payment.getCreatedAt(),
+                payment.getPaidAt(),
+                payment.getPaymentMethod() != null ? payment.getPaymentMethod().getIdPaymentMethod() : null,
+                payment.getPrice(),
+                payment.getSession().getChargingSessionId()
+        )).toList();
+        if (paymentResponses != null) {
+            return ResponseEntity.ok(paymentResponses);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+    @GetMapping("/paymentByUser/Paid/{userId}")
+    public ResponseEntity<List<PaymentResponse>> getPaymentByUserIdPaid(@PathVariable String userId) {
+        List<PaymentEntity> payments = paymentService.findPaidPaymentsUser(userId);
+        List<PaymentResponse> paymentResponses = payments.stream().map(payment -> new PaymentResponse(
+                payment.getPaymentId(),
+                payment.getUser().getUserID(),
+                payment.getSession().getChargingSessionId(),
+                payment.isPaid(),
+                payment.getCreatedAt(),
+                payment.getPaidAt(),
+                payment.getPaymentMethod() != null ? payment.getPaymentMethod().getIdPaymentMethod() : null,
+                payment.getPrice(),
+                payment.getSession().getChargingSessionId()
+        )).toList();
+        if (paymentResponses != null) {
+            return ResponseEntity.ok(paymentResponses);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
 
 

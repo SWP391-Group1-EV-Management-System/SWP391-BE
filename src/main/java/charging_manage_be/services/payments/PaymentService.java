@@ -14,5 +14,8 @@ public interface PaymentService {
     boolean processPayment(String paymentId,String paymentMethodId);
     boolean invoicePayment (String paymentId);
     List<PaymentEntity> findAllPayment();
+    List<PaymentEntity> findUnpaidPaymentsUser(String userId);
+    List<PaymentEntity> findPaidPaymentsUser(String userId);
+
 }
 
