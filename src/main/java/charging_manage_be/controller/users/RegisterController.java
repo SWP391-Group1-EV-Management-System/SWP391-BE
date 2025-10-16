@@ -103,7 +103,7 @@ public class RegisterController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid OTP code.");
             }
             else {
-                UserEntity newUser = userService.getUserByEmail(email);
+                UserEntity newUser = userService.getTempUserByEmail(email);
                 userService.registerUser(newUser);
                 return ResponseEntity.ok("OTP has been verified and user registered successfully.");
             }
@@ -122,7 +122,7 @@ public class RegisterController {
             }
 
             // Kiểm tra xem user tạm thời có tồn tại trong Redis không
-            if (userService.getUserByEmail(email) == null) {
+            if (userService.getTempUserByEmail(email) == null) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not found or registration expired. Please register again.");
             }
 

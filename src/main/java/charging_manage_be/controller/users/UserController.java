@@ -30,7 +30,7 @@ public class UserController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName();
 
-        UserEntity savedUser = userService.getUserByEmail(email);
+        UserEntity savedUser = userService.getTempUserByEmail(email);
         UserResponse userResponse = new UserResponse(
                 savedUser.getUserID(),
                 savedUser.getEmail(),

@@ -21,6 +21,6 @@ public interface UserService {
     UserEntity registerUser(UserEntity userEntity);
     Optional<UserEntity> findByEmail(String email);
     public void saveUserTemp(UserEntity userEntity);
-    UserEntity getUserByEmail(String email);
+    UserEntity getTempUserByEmail(String email);
     List<UserEntity> getUserByRole(String role);
 }

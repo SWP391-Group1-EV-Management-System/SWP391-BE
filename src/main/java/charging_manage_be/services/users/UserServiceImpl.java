@@ -143,7 +143,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserEntity getUserByEmail(String email) {
+    public UserEntity getTempUserByEmail(String email) {
         String userJson = redisTemplate.opsForValue().get("user:" + email); // Lấy dữ liệu từ Redis
         try {
             if (userJson != null) {
