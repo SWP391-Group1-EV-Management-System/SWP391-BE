@@ -90,4 +90,57 @@ public class UserController {
                 )).toList();
         return ResponseEntity.ok(users);
     }
+    @GetMapping("/getUserByRole/Admin")
+    public ResponseEntity<List<UserResponse>> getUserRoleAdmin() {
+        List<UserResponse> admins = userService.getUserByRole("ADMIN").stream()
+                .map(user -> new UserResponse(
+                        user.getUserID(),
+                        user.getEmail(),
+                        user.getFirstName(),
+                        user.getLastName(),
+                        user.getRole(),
+                        user.getCreatedAt()
+                )).toList();
+        return ResponseEntity.ok(admins);
+    }
+    @GetMapping("/getUserByRole/Manager")
+    public ResponseEntity<List<UserResponse>> getUserRoleManager() {
+        List<UserResponse> admins = userService.getUserByRole("MANAGER").stream()
+                .map(user -> new UserResponse(
+                        user.getUserID(),
+                        user.getEmail(),
+                        user.getFirstName(),
+                        user.getLastName(),
+                        user.getRole(),
+                        user.getCreatedAt()
+                )).toList();
+        return ResponseEntity.ok(admins);
+    }
+    @GetMapping("/getUserByRole/Staff")
+    public ResponseEntity<List<UserResponse>> getUserRoleStaff() {
+        List<UserResponse> admins = userService.getUserByRole("STAFF").stream()
+                .map(user -> new UserResponse(
+                        user.getUserID(),
+                        user.getEmail(),
+                        user.getFirstName(),
+                        user.getLastName(),
+                        user.getRole(),
+                        user.getCreatedAt()
+                )).toList();
+        return ResponseEntity.ok(admins);
+    }
+    @GetMapping("/getUserByRole/Driver")
+    public ResponseEntity<List<UserResponse>> getUserRoleDriver() {
+        List<UserResponse> admins = userService.getUserByRole("DRIVER").stream()
+                .map(user -> new UserResponse(
+                        user.getUserID(),
+                        user.getEmail(),
+                        user.getFirstName(),
+                        user.getLastName(),
+                        user.getRole(),
+                        user.getCreatedAt()
+                )).toList();
+        return ResponseEntity.ok(admins);
+    }
+
 }

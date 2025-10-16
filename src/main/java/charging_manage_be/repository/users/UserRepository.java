@@ -19,11 +19,6 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<UserEntity, String> {
     // Tìm user theo email đã đăng kí hay chưa
     Optional<UserEntity> findByEmail(String email);
-//    // Bởi vì softDeleteUser không có sẵn trong JpaRepository nên ta phải tự modi
-//    // Câu lệnh SQL này sẽ được thực thi khi ta gọi phương thức softDeleteUser
-//
-//    @Modifying // Modifying được sử dụng để đánh dấu rằng truy vấn này sẽ thay đổi dữ liệu (INSERT, UPDATE, DELETE)
-//    @Transactional // Đảm bảo rằng thao tác này được thực hiện trong một giao dịch
-//    @Query("UPDATE UserEntity u SET u.status = false WHERE u.userID = :userID")
-//    int softDeleteUser(@Param("userID") String userID); // Param dùng để ánh xạ tham số trong truy vấn với tham số trong phương thức và sẽ thay thế :userID trong truy vấn bằng giá trị của tham số userID khi phương thức được gọi
+
+    List<UserEntity> findAllByRole(String role);
 }
