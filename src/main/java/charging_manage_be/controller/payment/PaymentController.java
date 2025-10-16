@@ -7,6 +7,10 @@ import charging_manage_be.model.entity.payments.PaymentEntity;
 import charging_manage_be.services.momo.MomoService;
 import charging_manage_be.services.payments.PaymentMethodService;
 import charging_manage_be.services.payments.PaymentService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -45,7 +49,7 @@ public class PaymentController {
         }
     }
 
-    @PostMapping("creatPayment")
+    @PostMapping("/creatPayment")
     public ResponseEntity<CreateMomoResponseDTO> createPayment(@RequestBody CreateMomoRequestDTO requestData) {
         try {
             // Tức là mình sẽ lấy ra payment từ orderId của requestData(là cái mình nhập trong body của postman) rồi nó sẽ so sánh với paymentId trong bảng payment xem có tồn tại không
@@ -67,6 +71,34 @@ public class PaymentController {
                     .message("Error: " + e.getMessage())
                     .build();
             return ResponseEntity.badRequest().body(errorResponse);
+        }
+    }
+
+    @PostMapping("/ipn-handler")
+    public ResponseEntity<String> handleIPN(@RequestBody String ipnData) {
+        try{
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode root = objectMapper.readTree(ipnData);
+            String orderId = root.get("orderId").asText();
+            int resultCode = root.path("resultCode").asInt();
+
+            if (resultCode == 0) {
+                boolean isPaid = paymentService.invoicePayment(orderId);
+                if (isPaid) {
+                    return ResponseEntity.ok("Payment successfully");
+                }
+                else{
+                    return ResponseEntity.status(500).body("Failed to process payment");
+                }
+            }
+            else{
+                return ResponseEntity.status(500).body("Failed to process payment");
+            }
+
+        } catch (JsonMappingException e) {
+            throw new RuntimeException(e);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
     }
 

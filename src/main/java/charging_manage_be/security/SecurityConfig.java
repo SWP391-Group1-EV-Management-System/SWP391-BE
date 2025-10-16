@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -26,6 +27,8 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        // Cho phép MoMo gửi request
+                        .requestMatchers("/api/payment/ipn-handler").permitAll()
                         .requestMatchers("/users/login", "/users/register").permitAll() // các end ponit auth không cần token ( login, register)
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/manager/**").hasRole("MANAGER")
@@ -33,6 +36,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/driver/**").hasRole("DRIVER")
                         .anyRequest().authenticated() // các end ponit khác cần token ( tức phải đăng nhập, nhưng không quan trọng role)
                 )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
@@ -45,6 +49,7 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
     /*
     BCrypt là thuật toán mã hóa một chiều giúp mật khẩu người dùng không bị lưu dạng rõ (plain text).
     Dùng khi đăng ký hoặc đăng nhập (so sánh mật khẩu)
