@@ -16,4 +16,7 @@ public interface ChargingSessionService {
     ChargingSessionEntity getSessionById(String sessionId);
     LocalDateTime getExpectedEndTime(String post);
     List<ChargingSessionEntity> findSessionsToEnd(LocalDateTime currentTime);
+    List<ChargingSessionEntity> getAllSessionByUserStatusDone(String userId);
+    List<ChargingSessionEntity> getAllSessionInStationWithStatus(String stationId, boolean isDone);
+    List<ChargingSessionEntity> getAllSessions();
 }

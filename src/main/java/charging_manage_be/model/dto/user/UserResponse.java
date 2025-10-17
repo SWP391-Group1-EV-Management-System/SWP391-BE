@@ -15,4 +15,7 @@ public class UserResponse {
     private String lastName;
     private String role;
     private LocalDateTime createdAt;
+    private boolean isActive;
+    private boolean gender;
+    private String phone;
 }

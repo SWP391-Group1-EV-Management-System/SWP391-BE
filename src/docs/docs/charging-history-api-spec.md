@@ -1,6 +1,6 @@
 # ĐẶC TẢ API LỊCH SỬ PHIÊN SẠC - FE <-> BE
 
-## 1. Lấy lịch sử phiên sạc của user
+## 1. Lấy lịch sử phiên sạc của user OK
 ### GET /api/payment/paymentByUser/{userId}
 - **Trả về:** Danh sách payment của user, mỗi payment gồm:
   - paymentId
@@ -11,7 +11,7 @@
 
 ---
 
-## 2. Lấy chi tiết từng phiên sạc từ payment
+## 2. Lấy chi tiết từng phiên sạc từ payment OK
 ### GET /api/charging/session/show/{sessionId}
 - **Trả về:** Thông tin chi tiết phiên sạc:
   - chargingSessionId
@@ -26,7 +26,7 @@
 
 ---
 
-## 3. Lấy thông tin trạm sạc (để hiển thị tên trạm)
+## 3. Lấy thông tin trạm sạc (để hiển thị tên trạm) OK
 ### GET /api/charging/station/all
 - **Trả về:** Danh sách trạm sạc, mỗi trạm gồm:
   - idChargingStation, nameChargingStation, address, ...
@@ -34,7 +34,7 @@
 
 ---
 
-## 4. Lấy thông tin trụ sạc (để hiển thị tên trụ)
+## 4. Lấy thông tin trụ sạc (để hiển thị tên trụ) OK
 ### GET /api/charging/station/posts/{stationId}
 - **Trả về:** Danh sách trụ sạc của trạm, mỗi trụ gồm:
   - idChargingPost, nameChargingPost, maxPower, ...
@@ -61,6 +61,6 @@
 
 ---
 
-## 7. Lưu ý cho BE:
+## 7. Lưu ý cho BE: OK
 - Trả về dữ liệu đã format đúng cho UI, FE chỉ cần gọi API và xử lý giao diện.
 - Xử lý nghiệp vụ, kiểm tra hợp lệ, tính toán tổng tiền, trạng thái ở BE.
