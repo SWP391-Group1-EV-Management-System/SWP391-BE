@@ -4,12 +4,14 @@ import charging_manage_be.controller.charging.ChargingSession;
 import charging_manage_be.model.entity.booking.BookingEntity;
 import charging_manage_be.model.entity.charging.ChargingPostEntity;
 import charging_manage_be.model.entity.charging.ChargingSessionEntity;
+import charging_manage_be.model.entity.charging.ChargingStationEntity;
 import charging_manage_be.model.entity.users.UserEntity;
 import charging_manage_be.repository.booking.BookingRepository;
 import charging_manage_be.repository.charging_post.ChargingPostRepository;
 import charging_manage_be.repository.charging_session.ChargingSessionRepository;
 import charging_manage_be.repository.users.UserRepository;
 import charging_manage_be.services.charging_post.ChargingPostService;
+import charging_manage_be.services.charging_station.ChargingStationService;
 import charging_manage_be.services.payments.PaymentService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +37,7 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
     private final UserRepository userRepository;
     private final ChargingPostRepository chargingPostRepository;
     private final ChargingPostService ChargingPostService;
+    private final ChargingStationService stationService;
 
     public boolean isExistById(String sessionId) {
         return chargingSession.existsById(sessionId);
@@ -175,6 +178,17 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
     public List<ChargingSessionEntity> getAllSessionByUserStatusDone(String userId) {
         UserEntity user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         return chargingSession.findByUserAndIsDone(user, true);
+    }
+
+    @Override
+    public List<ChargingSessionEntity> getAllSessionInStationWithStatus(String stationId, boolean isDone) {
+        ChargingStationEntity station = stationService.getStationById(stationId);
+        return chargingSession.findByStationAndIsDone(station ,isDone);
+    }
+
+    @Override
+    public List<ChargingSessionEntity> getAllSessions() {
+        return chargingSession.findAll();
     }
 //    @Override
 //    @Transactional

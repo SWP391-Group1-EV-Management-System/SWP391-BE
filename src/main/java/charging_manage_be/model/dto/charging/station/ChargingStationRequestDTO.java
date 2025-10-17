@@ -13,4 +13,5 @@ public class ChargingStationRequestDTO {
     private boolean isActive;
     private int numberOfPosts;
     private String userManagerId;
+    private String coordinate;
 }

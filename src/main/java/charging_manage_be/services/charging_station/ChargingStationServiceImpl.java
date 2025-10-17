@@ -54,6 +54,7 @@ public class ChargingStationServiceImpl implements  ChargingStationService {
         newStation.setActive(station.isActive());
         newStation.setUserManager(manager);
         newStation.setNumberOfPosts(station.getNumberOfPosts());
+        newStation.setCoordinate(station.getCoordinate());
         chargingStationRepository.save(newStation);
         return true;
     }
@@ -76,7 +77,7 @@ public class ChargingStationServiceImpl implements  ChargingStationService {
         chargingStation.setActive(stationRequestDTO.isActive());
         chargingStation.setNameChargingStation(stationRequestDTO.getNameChargingStation());
         chargingStation.setNumberOfPosts(stationRequestDTO.getNumberOfPosts());
-
+        chargingStation.setCoordinate(stationRequestDTO.getCoordinate());
         chargingStationRepository.save(chargingStation);
         return true;
     }

@@ -132,6 +132,79 @@ public class ChargingSession {
                 session.getTotalAmount()
         )).toList();
         return ResponseEntity.ok(sessionResponses);
-        }
+    }
+    // lấy tất cả session đang hoạt động theo trạm
+    @GetMapping("showChargingSession/{stationId}/undone")
+    public ResponseEntity<List<ChargingSessionResponse>> getAllActiveSessionsUndone(@PathVariable String stationId){
+        List<ChargingSessionEntity> sessions = sessionService.getAllSessionInStationWithStatus(stationId, false);
+        List<ChargingSessionResponse> sessionResponses = sessions.stream().map(session -> new ChargingSessionResponse(
+                session.getChargingSessionId(), session.getExpectedEndTime(),
+                session.getBooking() != null ? session.getBooking().getBookingId() : null,
+                session.getChargingPost().getIdChargingPost(),
+                session.getStation().getIdChargingStation(),
+                session.getUser().getUserID(),
+                session.getUserManage().getUserID(),
+                session.isDone(),
+                session.getStartTime(),
+                session.getEndTime(),
+                session.getKWh(),
+                session.getTotalAmount()
+        )).toList();
+        return ResponseEntity.ok(sessionResponses);
+    }
+    // lấy tất cả các session đã hoàn thành theo trạm
+    @GetMapping("showChargingSession/{stationId}/done")
+    public ResponseEntity<List<ChargingSessionResponse>> getAllActiveSessionsDone(@PathVariable String stationId){
+        List<ChargingSessionEntity> sessions = sessionService.getAllSessionInStationWithStatus(stationId, true);
+        List<ChargingSessionResponse> sessionResponses = sessions.stream().map(session -> new ChargingSessionResponse(
+                session.getChargingSessionId(), session.getExpectedEndTime(),
+                session.getBooking() != null ? session.getBooking().getBookingId() : null,
+                session.getChargingPost().getIdChargingPost(),
+                session.getStation().getIdChargingStation(),
+                session.getUser().getUserID(),
+                session.getUserManage().getUserID(),
+                session.isDone(),
+                session.getStartTime(),
+                session.getEndTime(),
+                session.getKWh(),
+                session.getTotalAmount()
+        )).toList();
+        return ResponseEntity.ok(sessionResponses);
+    }
+    // lấy tất cả session
+    @GetMapping("showChargingSession/all")
+    public ResponseEntity<List<ChargingSessionResponse>> getAllSessions(){
+        List<ChargingSessionEntity> sessions = sessionService.getAllSessions();
+        List<ChargingSessionResponse> sessionResponses = sessions.stream().map(session -> new ChargingSessionResponse(
+                session.getChargingSessionId(), session.getExpectedEndTime(),
+                session.getBooking() != null ? session.getBooking().getBookingId() : null,
+                session.getChargingPost().getIdChargingPost(),
+                session.getStation().getIdChargingStation(),
+                session.getUser().getUserID(),
+                session.getUserManage().getUserID(),
+                session.isDone(),
+                session.getStartTime(),
+                session.getEndTime(),
+                session.getKWh(),
+                session.getTotalAmount()
+        )).toList();
+        return ResponseEntity.ok(sessionResponses);
+    }
+
+    /*
+    ## 5. Thống kê phiên sạc/trụ/hàng chờ (Statistics)
+    ### GET /api/charging/session/statistics
+    - **Trả về:** Tổng số phiên sạc, số phiên đang sạc, số phiên hoàn thành, tổng doanh thu, ...
+    - **Logic BE:** Tính toán số liệu tổng hợp cho dashboard staff.
+
+    ### GET /api/charging/station/statistics
+    - **Trả về:** Tổng số trụ online, offline, đang sạc, trống, ...
+    - **Logic BE:** Tính toán số liệu tổng hợp cho dashboard staff.
+
+    ---
+     */
+    // giả lập trụ ảo
+
+
 
 }

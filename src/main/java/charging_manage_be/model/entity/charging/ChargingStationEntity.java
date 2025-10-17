@@ -31,6 +31,10 @@ public class ChargingStationEntity {
     private  LocalDateTime establishedTime;
     @Column (name = "number_of_posts", nullable = false)
     private  int numberOfPosts;
+    // tọa độ trạm sạc
+    @Column (name = "coordinate", nullable = true)
+    private  String coordinate;
+
     @OneToMany(mappedBy = "chargingStation")
     private List<ChargingPostEntity> chargingPosts;
 

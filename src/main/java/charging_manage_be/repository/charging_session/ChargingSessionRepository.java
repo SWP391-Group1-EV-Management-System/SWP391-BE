@@ -2,6 +2,7 @@ package charging_manage_be.repository.charging_session;
 
 import charging_manage_be.model.entity.charging.ChargingPostEntity;
 import charging_manage_be.model.entity.charging.ChargingSessionEntity;
+import charging_manage_be.model.entity.charging.ChargingStationEntity;
 import charging_manage_be.model.entity.users.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -23,4 +24,6 @@ public interface ChargingSessionRepository extends JpaRepository<ChargingSession
     List<ChargingSessionEntity> findByExpectedEndTimeLessThanEqualAndEndTimeIsNull(LocalDateTime currentTime);
 
     List<ChargingSessionEntity> findByUserAndIsDone(UserEntity user, boolean isDone);
+
+    List<ChargingSessionEntity> findByStationAndIsDone(ChargingStationEntity station, boolean isDone);
 }
