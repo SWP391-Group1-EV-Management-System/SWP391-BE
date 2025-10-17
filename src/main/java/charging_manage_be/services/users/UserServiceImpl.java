@@ -1,5 +1,6 @@
 package charging_manage_be.services.users;
 
+import charging_manage_be.model.dto.user.UserRequest;
 import charging_manage_be.model.entity.users.UserEntity;
 import charging_manage_be.repository.users.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -52,14 +53,27 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserEntity updateUser(UserEntity user) {
+    public boolean updateUser(String userId, UserRequest userRequest) {
+        UserEntity user = userRepository.findById(userId).orElse(null);
         if (user == null) {
-            throw new IllegalArgumentException("User cannot be null");
+            return false;
         }
-        if (!userRepository.existsById(user.getUserID())) {
-            throw new IllegalArgumentException("User does not exist");
+        else{
+            user.setUserID(userId);
+            user.setFirstName(userRequest.getFirstName());
+            user.setLastName(userRequest.getLastName());
+            user.setBirthDate(userRequest.getBirthDate());
+            user.setGender(userRequest.isGender());
+            user.setEmail(userRequest.getEmail());
+            user.setPassword(userRequest.getPassword());
+            user.setPhoneNumber(userRequest.getPhoneNumber());
+            user.setRole(userRequest.getRole());
+            user.setStatus(userRequest.isStatus());
+            user.setCreatedAt(user.getCreatedAt());
+
+            userRepository.save(user);
         }
-        return userRepository.save(user);
+        return true;
     }
 
     @Override

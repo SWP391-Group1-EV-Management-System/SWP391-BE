@@ -1,5 +1,6 @@
 package charging_manage_be.controller.users;
 
+import charging_manage_be.model.dto.user.UserRequest;
 import charging_manage_be.model.dto.user.UserResponse;
 import charging_manage_be.model.entity.users.UserEntity;
 import charging_manage_be.services.users.UserService;
@@ -43,19 +44,14 @@ public class UserController {
     }
 
     @PutMapping("/update/{userID}")
-    public ResponseEntity<UserEntity> updateUser(@PathVariable String userID, @RequestBody UserEntity userDetails) {
-        try {
-            // Lấy user hiện tại để giữ createdAt
-            Optional<UserEntity> existingUser = userService.getUserByID(userID);
-            if (existingUser.isPresent()) {
-                userDetails.setUserID(userID);
-                userDetails.setCreatedAt(existingUser.get().getCreatedAt());
-            }
-
-            UserEntity updatedUser = userService.updateUser(userDetails);
-            return ResponseEntity.ok(updatedUser);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<String> updateUser(@PathVariable String userID, @RequestBody UserRequest userDetails) {
+        Optional<UserEntity> findUser = userService.getUserByID(userID);
+        if (findUser.isEmpty()) {
+            throw new RuntimeException("User not found");
+        }
+        else{
+            userService.updateUser(userID, userDetails);
+            return ResponseEntity.ok("User updated successfully");
         }
     }
 
