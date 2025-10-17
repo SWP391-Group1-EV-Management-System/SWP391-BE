@@ -2,6 +2,7 @@ package charging_manage_be.repository.charging_session;
 
 import charging_manage_be.model.entity.charging.ChargingPostEntity;
 import charging_manage_be.model.entity.charging.ChargingSessionEntity;
+import charging_manage_be.model.entity.users.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,5 +21,6 @@ public interface ChargingSessionRepository extends JpaRepository<ChargingSession
             @Param("isDone") boolean isDone
     );
     List<ChargingSessionEntity> findByExpectedEndTimeLessThanEqualAndEndTimeIsNull(LocalDateTime currentTime);
-    // hàm này để tìm ra các session có expectedTime <= currentTime và endTime là Null
+
+    List<ChargingSessionEntity> findByUserAndIsDone(UserEntity user, boolean isDone);
 }

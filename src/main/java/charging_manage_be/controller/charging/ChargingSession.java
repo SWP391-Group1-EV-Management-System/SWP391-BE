@@ -115,5 +115,23 @@ public class ChargingSession {
             userStatusService.setUserStatus(chargingSession.getUser().getUserID(), STATUS_PAYMENT);
         }
     }
+    @GetMapping("showAll/{userId}")
+    public ResponseEntity<List<ChargingSessionResponse>> getAllSessionsByUserId(@PathVariable String userId){
+        List<ChargingSessionEntity> sessions = sessionService.getAllSessionByUserStatusDone(userId);
+        List<ChargingSessionResponse> sessionResponses = sessions.stream().map(session -> new ChargingSessionResponse(
+                session.getChargingSessionId(), session.getExpectedEndTime(),
+                session.getBooking() != null ? session.getBooking().getBookingId() : null,
+                session.getChargingPost().getIdChargingPost(),
+                session.getStation().getIdChargingStation(),
+                session.getUser().getUserID(),
+                session.getUserManage().getUserID(),
+                session.isDone(),
+                session.getStartTime(),
+                session.getEndTime(),
+                session.getKWh(),
+                session.getTotalAmount()
+        )).toList();
+        return ResponseEntity.ok(sessionResponses);
+        }
 
 }

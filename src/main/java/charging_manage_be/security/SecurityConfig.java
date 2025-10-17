@@ -29,7 +29,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Cho phép MoMo gửi request
                         .requestMatchers("/api/payment/ipn-handler").permitAll()
-                        .requestMatchers("/users/login", "/users/register").permitAll() // các end ponit auth không cần token ( login, register)
+                        .requestMatchers("/users/login", "/users/register/**", "/users/re-login").permitAll() // các end ponit auth không cần token ( login, register)
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/manager/**").hasRole("MANAGER")
                         .requestMatchers("/api/staff/**").hasRole("STAFF")

@@ -170,6 +170,12 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
     public List<ChargingSessionEntity> findSessionsToEnd(LocalDateTime currentTime) {
         return chargingSession.findByExpectedEndTimeLessThanEqualAndEndTimeIsNull(currentTime);
     }
+
+    @Override
+    public List<ChargingSessionEntity> getAllSessionByUserStatusDone(String userId) {
+        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        return chargingSession.findByUserAndIsDone(user, true);
+    }
 //    @Override
 //    @Transactional
 //    public boolean addExpectedEndTime(String bookingID, LocalDateTime expectedEndTime) {
