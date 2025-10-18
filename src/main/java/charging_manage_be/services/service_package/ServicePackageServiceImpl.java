@@ -89,6 +89,7 @@ public class ServicePackageServiceImpl implements ServicePackageService {
         else{
             ServicePackageResponseDTO servicePackageResponseDTO = new ServicePackageResponseDTO();
 
+            servicePackageResponseDTO.setPackageId(packageId);
             servicePackageResponseDTO.setPackageName(servicePackageEntity.getPackageName());
             servicePackageResponseDTO.setDescription(servicePackageEntity.getDescription());
             servicePackageResponseDTO.setBillingCycle(servicePackageEntity.getBillingCycle());

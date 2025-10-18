@@ -30,6 +30,8 @@ public class ServicePackageEntity {
     @Column(name = "quota", nullable = false)
     private double quota;
 
-//    @OneToMany(mappedBy = "servicePackage")
-//    private List<PackageTransactionEntity> packageTransactions;
+    @OneToMany(mappedBy = "servicePackage")
+    private List<PackageTransactionEntity> packageTransactions;
+    @OneToMany(mappedBy = "servicePackage")
+    private List<PaymentServicePackageEntity> paymentServicePackages;
 }

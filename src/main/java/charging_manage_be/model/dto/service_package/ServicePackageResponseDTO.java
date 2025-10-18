@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ServicePackageResponseDTO {
+    private String packageId;
     private String packageName;
     private String description;
     private int billingCycle; // month

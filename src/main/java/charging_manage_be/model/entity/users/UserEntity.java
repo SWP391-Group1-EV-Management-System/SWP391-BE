@@ -7,7 +7,8 @@ import charging_manage_be.model.entity.cars.CarEntity;
 import charging_manage_be.model.entity.charging.ChargingStationEntity;
 import charging_manage_be.model.entity.payments.PaymentEntity;
 import charging_manage_be.model.entity.reputations.UserReputationEntity;
-//import charging_manage_be.model.entity.service_package.PackageTransactionEntity;
+import charging_manage_be.model.entity.service_package.PackageTransactionEntity;
+import charging_manage_be.model.entity.service_package.PaymentServicePackageEntity;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -84,6 +85,8 @@ public class UserEntity {
     private List<ChargingSessionEntity> userSession;
     @OneToMany(mappedBy = "userManage")
     private List<ChargingSessionEntity> userManagerSession;
-//    @OneToMany(mappedBy = "user")
-//    private List<PackageTransactionEntity>  packageTransactions;
+    @OneToMany(mappedBy = "user")
+    private List<PackageTransactionEntity>  packageTransactions;
+    @OneToMany(mappedBy = "user")
+    private List<PaymentServicePackageEntity> paymentServicePackages;
 }

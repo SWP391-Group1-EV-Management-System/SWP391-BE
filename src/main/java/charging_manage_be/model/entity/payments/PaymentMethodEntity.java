@@ -1,6 +1,8 @@
 package charging_manage_be.model.entity.payments;
 
 import charging_manage_be.model.entity.reputations.UserReputationEntity;
+import charging_manage_be.model.entity.service_package.PackageTransactionEntity;
+import charging_manage_be.model.entity.service_package.PaymentServicePackageEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,4 +24,6 @@ public class PaymentMethodEntity {
 
     @OneToMany(mappedBy = "paymentMethod")
     private List<PaymentEntity> paymentEntities;
+    @OneToMany(mappedBy = "paymentMethod")
+    private List<PaymentServicePackageEntity> paymentServicePackages;
 }
