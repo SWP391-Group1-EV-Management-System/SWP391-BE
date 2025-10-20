@@ -54,7 +54,6 @@ public class PaymentServicePackageServiceImpl implements PaymentServicePackageSe
         paymentServicePackageEntity.setServicePackage(findPackage);
         paymentServicePackageEntity.setPaymentMethod(paymentMethod);
         paymentServicePackageEntity.setUser(user);
-        paymentServicePackageEntity.setCreatedAt(LocalDateTime.now());
         paymentServicePackageEntity.setPaid(false);
         paymentServicePackageEntity.setPrice(findPackage.getPrice());
         paymentServicePackageRepository.save(paymentServicePackageEntity);
@@ -83,7 +82,7 @@ public class PaymentServicePackageServiceImpl implements PaymentServicePackageSe
 
     }
 
-    @Override
+
     public List<PaymentServicePackageEntity> getPaymentServicePackageByUserId(String userId) {
         UserEntity user = userRepository.findById(userId).orElse(null);
         if (user == null) {
@@ -92,7 +91,7 @@ public class PaymentServicePackageServiceImpl implements PaymentServicePackageSe
         return paymentServicePackageRepository.findByUser(user);
     }
 
-    @Override
+
     public boolean invoicePaymentServicePackage(String paymentServicePackageId) {
         PaymentServicePackageEntity payment = paymentServicePackageRepository.findById(paymentServicePackageId).orElse(null);
         if (payment == null || payment.isPaid()) {

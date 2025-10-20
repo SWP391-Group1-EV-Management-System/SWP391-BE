@@ -29,8 +29,6 @@ public class PaymentServicePackageEntity  {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
     @Column(name = "paid_at")
     private LocalDateTime paidAt;
     @Column(name = "is_paid", nullable = false)

@@ -16,7 +16,6 @@ public class PaymentServicePackageResponseDTO {
     private String servicePackageId;
     private String paymentMethodId;
     private String userId;
-    private LocalDateTime createdAt;
     private LocalDateTime paidAt;
     private boolean isPaid;
     private BigDecimal price;

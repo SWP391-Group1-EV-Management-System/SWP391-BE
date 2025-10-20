@@ -58,7 +58,7 @@ public class PaymentController {
         }
     }
 
-    @PostMapping("/creatPayment")
+    @PostMapping("/createPayment")
     public ResponseEntity<CreateMomoResponseDTO> createPayment(@RequestBody CreateMomoRequestDTO requestData) {
         try {
             // Tức là mình sẽ lấy ra payment từ orderId của requestData(là cái mình nhập trong body của postman) rồi nó sẽ so sánh với paymentId trong bảng payment xem có tồn tại không
