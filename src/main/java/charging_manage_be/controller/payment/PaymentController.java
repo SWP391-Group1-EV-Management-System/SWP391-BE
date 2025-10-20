@@ -4,14 +4,19 @@ import charging_manage_be.model.dto.momo_payment.CreateMomoRequestDTO;
 import charging_manage_be.model.dto.momo_payment.CreateMomoResponseDTO;
 import charging_manage_be.model.dto.payment.PaymentResponse;
 import charging_manage_be.model.entity.payments.PaymentEntity;
+import charging_manage_be.model.entity.service_package.PaymentServicePackageEntity;
 import charging_manage_be.services.momo.MomoService;
 import charging_manage_be.services.payments.PaymentMethodService;
 import charging_manage_be.services.payments.PaymentService;
+import charging_manage_be.services.service_package.PaymentServicePackageService;
+import charging_manage_be.services.service_package.PaymentServicePackageServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +33,10 @@ public class PaymentController {
     private PaymentMethodService paymentMethodService;
     @Autowired
     private MomoService momoService;
+    @Autowired
+    private PaymentServicePackageService paymentPackageService;
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 // hàm end session tự động tạo
 //    @PostMapping
 //    public ResponseEntity<PaymentEntity> createPayment(@RequestBody PaymentEntity payment) {
@@ -55,7 +64,13 @@ public class PaymentController {
             // Tức là mình sẽ lấy ra payment từ orderId của requestData(là cái mình nhập trong body của postman) rồi nó sẽ so sánh với paymentId trong bảng payment xem có tồn tại không
             PaymentEntity payment = paymentService.getPaymentByPaymentId(requestData.getOrderId());
             if(payment == null) {
-                throw new RuntimeException("Payment not found for orderId: " + requestData.getOrderId());
+                //throw new RuntimeException("Payment not found for orderId: " + requestData.getOrderId());
+                PaymentServicePackageEntity paymentPackage = paymentPackageService.getPaymentServicePackageById(requestData.getOrderId());
+                if(paymentPackage == null) {
+                    throw new RuntimeException("Payment Service Package not found for orderId: " + requestData.getOrderId());
+                } else {
+                    redisTemplate.opsForHash().put("userPackage:" + paymentPackage.getUser().getUserID(), "paymentPackageService", "YES");
+                }
             }
             // Nếu có thì gán các giá trị cần thiết cho requestData
             requestData.setOrderId(payment.getPaymentId());
@@ -77,12 +92,24 @@ public class PaymentController {
     @PostMapping("/ipn-handler")
     public ResponseEntity<String> handleIPN(@RequestBody String ipnData) {
         try{
+            String packagePayment = null;
+
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode root = objectMapper.readTree(ipnData);
             String orderId = root.get("orderId").asText();
             int resultCode = root.path("resultCode").asInt();
+            PaymentEntity payment = paymentService.getPaymentByPaymentId(orderId);
+            PaymentServicePackageEntity paymentPackage = paymentPackageService.getPaymentServicePackageById(orderId);
+            if(payment == null && paymentPackage != null) {
+                packagePayment =(String) redisTemplate.opsForHash().get("userPackage:" + paymentPackage.getUser().getUserID(), "paymentPackageService");
+            }
 
             if (resultCode == 0) {
+                if(packagePayment != null && packagePayment.equals("YES")) {
+                    redisTemplate.opsForHash().delete("userPackage:" + paymentPackage.getUser().getUserID(), "paymentPackageService");
+                    paymentPackageService.invoicePaymentServicePackage(orderId);
+                    return ResponseEntity.ok("Payment Service Package activated successfully");
+                }
                 boolean isPaid = paymentService.invoicePayment(orderId);
                 if (isPaid) {
                     return ResponseEntity.ok("Payment successfully");

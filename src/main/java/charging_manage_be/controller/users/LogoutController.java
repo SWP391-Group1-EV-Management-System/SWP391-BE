@@ -18,9 +18,15 @@ public class LogoutController {
                 .path("/")
                 .maxAge(0)
                 .build();
-
+        ResponseCookie cookie1 = ResponseCookie.from("refresh", "") //xóa token refresh
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(0)
+                .build();
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .header(HttpHeaders.SET_COOKIE, cookie1.toString())
                 .body("Đăng xuất thành công!");
     }
 }
