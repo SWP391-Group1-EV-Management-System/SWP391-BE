@@ -18,8 +18,6 @@ public class PaymentServicePackageController {
     @Autowired
     private PaymentServicePackageService paymentServicePackageService;
     @Autowired
-    private PaymentMethodService paymentMethodService;
-    @Autowired
     private StringRedisTemplate redisTemplate;
 
     @PostMapping("/CreatePaymentPacket")

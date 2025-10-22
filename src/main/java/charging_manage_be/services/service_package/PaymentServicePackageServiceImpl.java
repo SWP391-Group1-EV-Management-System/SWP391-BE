@@ -54,7 +54,8 @@ public class PaymentServicePackageServiceImpl implements PaymentServicePackageSe
         paymentServicePackageEntity.setServicePackage(findPackage);
         paymentServicePackageEntity.setPaymentMethod(paymentMethod);
         paymentServicePackageEntity.setUser(user);
-        paymentServicePackageEntity.setPaid(false);
+        paymentServicePackageEntity.setPaid(true);
+        paymentServicePackageEntity.setPaidAt(LocalDateTime.now());
         paymentServicePackageEntity.setPrice(findPackage.getPrice());
         paymentServicePackageRepository.save(paymentServicePackageEntity);
         return true;

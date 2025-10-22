@@ -44,7 +44,7 @@ public class PaymentController {
     private ServicePackageService servicePackageService;
     @Autowired
     private UserService  userService;
-    private final String  PAYMENTMOMO = "abc";
+    private final String  PAYMENTMOMO = "VHEXT91804";
 // hàm end session tự động tạo
 //    @PostMapping
 //    public ResponseEntity<PaymentEntity> createPayment(@RequestBody PaymentEntity payment) {
@@ -124,14 +124,13 @@ public class PaymentController {
                     //paymentPackageService.invoicePaymentServicePackage(orderId);
                     PaymentServicePackageEntity paymentPackage = new PaymentServicePackageEntity();
                     paymentPackage.setPaymentServicePackageId(orderId);
-                    paymentPackage.setPrice(servicePackageService.getPriceByPackegeId(orderId));
+                    paymentPackage.setPrice(servicePackageService.getPriceByPackegeId((String) redisTemplate.opsForHash().get("userPackage:" + orderId, "packetId")));
                     paymentPackage.setPaymentMethod(paymentMethodService.getPaymentMethodById(PAYMENTMOMO).orElse(null));
                     paymentPackage.setServicePackage(servicePackageService.getServicePackageByPackageId((String) redisTemplate.opsForHash().get("userPackage:" + orderId, "packetId")));
-                    paymentPackage.setPaidAt(LocalDateTime.now());
-                    paymentPackage.setPaid(true);
                     paymentPackage.setUser(userService.getUserByID((String) redisTemplate.opsForHash().get("userPackage:" + orderId, "userId")).orElse(null));
+                    redisTemplate.opsForHash().delete("userPackage:" + orderId, "userId", "packetId", "paymentPackageService");
 
-                    redisTemplate.opsForHash().delete("userPackage:" + orderId);
+                    paymentPackageService.insertPaymentServicePackage(paymentPackage.getServicePackage().getPackageId(), paymentPackage.getUser().getUserID(), paymentPackage.getPaymentMethod().getIdPaymentMethod());
                     return ResponseEntity.ok("Payment Service Package activated successfully");
                 }
                 boolean isPaid = paymentService.invoicePayment(orderId);
