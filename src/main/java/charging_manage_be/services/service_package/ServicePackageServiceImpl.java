@@ -7,6 +7,7 @@ import charging_manage_be.repository.service_package.ServicePackageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static charging_manage_be.util.RandomId.generateRandomId;
@@ -98,5 +99,19 @@ public class ServicePackageServiceImpl implements ServicePackageService {
             servicePackageResponseDTO.setQuota(servicePackageEntity.getQuota());
             return servicePackageResponseDTO;
         }
+    }
+
+    @Override
+    public BigDecimal getPriceByPackegeId(String packageId) {
+        ServicePackageEntity ser =  servicePackageRepository.findById(packageId).orElse(null);
+        if(ser == null){
+            throw new RuntimeException("Service package with id " + packageId + " not found");
+        }
+        return  ser.getPrice();
+    }
+
+    @Override
+    public ServicePackageEntity getServicePackageByPackageId(String packageId) {
+        return servicePackageRepository.findById(packageId).orElse(null);
     }
 }

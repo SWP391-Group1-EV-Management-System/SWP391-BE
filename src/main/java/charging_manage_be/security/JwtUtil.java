@@ -38,7 +38,7 @@ public class JwtUtil {
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 // sau 1h sẽ phải login lại và tạo một token mới, token này sẽ có payload khác token cũ
                 // tức là khác thời gian tạo token và hêts hạn dẫn đến chuỗi token khác nhau
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60)) // 1h
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 *60)) // 1h
                 .signWith(SECRET_KEY)
                 .compact();
     }

@@ -72,7 +72,7 @@ public class LoginController {
                 .body("Đăng nhập thành công!");
     }
 
-    @GetMapping("/admin/test")
+    @GetMapping("/test")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> adminOnly() {
         return ResponseEntity.ok("Chào ADMIN 👑");

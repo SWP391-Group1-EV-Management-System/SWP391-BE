@@ -4,6 +4,8 @@ import charging_manage_be.model.entity.service_package.ServicePackageEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
+
 @Repository
 public interface ServicePackageRepository extends JpaRepository<ServicePackageEntity, String> {
 

@@ -10,6 +10,8 @@ import charging_manage_be.services.payments.PaymentMethodService;
 import charging_manage_be.services.payments.PaymentService;
 import charging_manage_be.services.service_package.PaymentServicePackageService;
 import charging_manage_be.services.service_package.PaymentServicePackageServiceImpl;
+import charging_manage_be.services.service_package.ServicePackageService;
+import charging_manage_be.services.users.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -21,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -37,6 +40,11 @@ public class PaymentController {
     private PaymentServicePackageService paymentPackageService;
     @Autowired
     private StringRedisTemplate redisTemplate;
+    @Autowired
+    private ServicePackageService servicePackageService;
+    @Autowired
+    private UserService  userService;
+    private final String  PAYMENTMOMO = "abc";
 // hàm end session tự động tạo
 //    @PostMapping
 //    public ResponseEntity<PaymentEntity> createPayment(@RequestBody PaymentEntity payment) {
@@ -65,17 +73,23 @@ public class PaymentController {
             PaymentEntity payment = paymentService.getPaymentByPaymentId(requestData.getOrderId());
             if(payment == null) {
                 //throw new RuntimeException("Payment not found for orderId: " + requestData.getOrderId());
-                PaymentServicePackageEntity paymentPackage = paymentPackageService.getPaymentServicePackageById(requestData.getOrderId());
-                if(paymentPackage == null) {
+                String userId = (String) redisTemplate.opsForHash().get("userPackage:" + requestData.getOrderId(), "userId");
+                String packageId = (String) redisTemplate.opsForHash().get("userPackage:" + requestData.getOrderId(), "packetId");
+                //PaymentServicePackageEntity paymentPackage = paymentPackageService.getPaymentServicePackageById(requestData.getOrderId());
+                if(userId == null || packageId == null) {
                     throw new RuntimeException("Payment Service Package not found for orderId: " + requestData.getOrderId());
                 } else {
-                    redisTemplate.opsForHash().put("userPackage:" + paymentPackage.getUser().getUserID(), "paymentPackageService", "YES");
+                    //redisTemplate.opsForHash().put("userPackage:" + paymentPackage.getUser().getUserID(), "paymentPackageService", "YES");
+                    requestData.setOrderId(requestData.getOrderId());
+                    requestData.setAmount(servicePackageService.getPriceByPackegeId(packageId).longValue());
+                    requestData.setOrderInfo(requestData.getOrderInfo());
                 }
             }
-            // Nếu có thì gán các giá trị cần thiết cho requestData
-            requestData.setOrderId(payment.getPaymentId());
-            requestData.setAmount(payment.getPrice().longValue());
-            requestData.setOrderInfo(requestData.getOrderInfo());
+            else{
+                requestData.setOrderId(payment.getPaymentId());
+                requestData.setAmount(payment.getPrice().longValue());
+                requestData.setOrderInfo(requestData.getOrderInfo());
+            }
 
             CreateMomoResponseDTO response = momoService.createPayment(requestData);
             return ResponseEntity.ok(response);
@@ -99,15 +113,25 @@ public class PaymentController {
             String orderId = root.get("orderId").asText();
             int resultCode = root.path("resultCode").asInt();
             PaymentEntity payment = paymentService.getPaymentByPaymentId(orderId);
-            PaymentServicePackageEntity paymentPackage = paymentPackageService.getPaymentServicePackageById(orderId);
-            if(payment == null && paymentPackage != null) {
-                packagePayment =(String) redisTemplate.opsForHash().get("userPackage:" + paymentPackage.getUser().getUserID(), "paymentPackageService");
+            //PaymentServicePackageEntity paymentPackage = paymentPackageService.getPaymentServicePackageById(orderId);
+            if(payment == null) {
+                packagePayment =(String) redisTemplate.opsForHash().get("userPackage:" + orderId, "paymentPackageService");
             }
 
             if (resultCode == 0) {
                 if(packagePayment != null && packagePayment.equals("YES")) {
-                    redisTemplate.opsForHash().delete("userPackage:" + paymentPackage.getUser().getUserID(), "paymentPackageService");
-                    paymentPackageService.invoicePaymentServicePackage(orderId);
+
+                    //paymentPackageService.invoicePaymentServicePackage(orderId);
+                    PaymentServicePackageEntity paymentPackage = new PaymentServicePackageEntity();
+                    paymentPackage.setPaymentServicePackageId(orderId);
+                    paymentPackage.setPrice(servicePackageService.getPriceByPackegeId(orderId));
+                    paymentPackage.setPaymentMethod(paymentMethodService.getPaymentMethodById(PAYMENTMOMO).orElse(null));
+                    paymentPackage.setServicePackage(servicePackageService.getServicePackageByPackageId((String) redisTemplate.opsForHash().get("userPackage:" + orderId, "packetId")));
+                    paymentPackage.setPaidAt(LocalDateTime.now());
+                    paymentPackage.setPaid(true);
+                    paymentPackage.setUser(userService.getUserByID((String) redisTemplate.opsForHash().get("userPackage:" + orderId, "userId")).orElse(null));
+
+                    redisTemplate.opsForHash().delete("userPackage:" + orderId);
                     return ResponseEntity.ok("Payment Service Package activated successfully");
                 }
                 boolean isPaid = paymentService.invoicePayment(orderId);

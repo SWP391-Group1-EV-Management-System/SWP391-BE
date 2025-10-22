@@ -6,6 +6,7 @@ import charging_manage_be.model.entity.service_package.PaymentServicePackageEnti
 import java.util.List;
 
 public interface PaymentServicePackageService {
+    String generateUniquePaymentId();
     boolean insertPaymentServicePackage(String packageId, String userId, String paymentMethodId);
     PaymentServicePackageEntity getPaymentServicePackageById(String paymentServicePackageId);
     List<PaymentServicePackageEntity> getPaymentServicePackageByPackageId(String packageId);

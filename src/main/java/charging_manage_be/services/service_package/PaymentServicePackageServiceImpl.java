@@ -33,7 +33,7 @@ public class PaymentServicePackageServiceImpl implements PaymentServicePackageSe
     private final int characterLength = 4;
     private final int numberLength = 4;
 
-    private String generateUniquePaymentId() {
+    public String generateUniquePaymentId() {
         String newId;
         do {
             newId = generateRandomId(characterLength, numberLength);
