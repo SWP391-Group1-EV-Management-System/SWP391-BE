@@ -5,6 +5,7 @@ import charging_manage_be.model.dto.service_package.ServicePackageResponseDTO;
 import charging_manage_be.services.service_package.ServicePackageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -13,7 +14,7 @@ public class ServicePackageController {
 
     @Autowired
     private ServicePackageService servicePackageService;
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create")
     ResponseEntity<String> createServicePackage(@RequestBody ServicePackageRequestDTO servicePackageRequestDTO) {
         if (servicePackageRequestDTO == null) {
@@ -24,7 +25,7 @@ public class ServicePackageController {
             return ResponseEntity.ok().build();
         }
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/update/{servicePackageId}")
     ResponseEntity<String> updateServicePackage(@PathVariable String servicePackageId, @RequestBody ServicePackageRequestDTO servicePackageRequestDTO) {
         ServicePackageResponseDTO findPackage = servicePackageService.getServicePackageById(servicePackageId);
@@ -36,7 +37,7 @@ public class ServicePackageController {
             return ResponseEntity.ok().build();
         }
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete/{servicePackageId}")
     ResponseEntity<String> deleteServicePackage(@PathVariable String servicePackageId) {
         if (servicePackageService.getServicePackageById(servicePackageId) == null) {

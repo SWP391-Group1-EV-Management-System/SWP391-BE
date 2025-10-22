@@ -33,7 +33,7 @@ public class PaymentServicePackageServiceImpl implements PaymentServicePackageSe
     private final int characterLength = 4;
     private final int numberLength = 4;
 
-    private String generateUniquePaymentId() {
+    public String generateUniquePaymentId() {
         String newId;
         do {
             newId = generateRandomId(characterLength, numberLength);
@@ -54,7 +54,8 @@ public class PaymentServicePackageServiceImpl implements PaymentServicePackageSe
         paymentServicePackageEntity.setServicePackage(findPackage);
         paymentServicePackageEntity.setPaymentMethod(paymentMethod);
         paymentServicePackageEntity.setUser(user);
-        paymentServicePackageEntity.setPaid(false);
+        paymentServicePackageEntity.setPaid(true);
+        paymentServicePackageEntity.setPaidAt(LocalDateTime.now());
         paymentServicePackageEntity.setPrice(findPackage.getPrice());
         paymentServicePackageRepository.save(paymentServicePackageEntity);
         return true;

@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.naming.Name;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -31,9 +32,19 @@ public class ChargingStationEntity {
     private  LocalDateTime establishedTime;
     @Column (name = "number_of_posts", nullable = false)
     private  int numberOfPosts;
+
+
     // tọa độ trạm sạc
     @Column (name = "coordinate", nullable = true)
     private  String coordinate;
+    @Column(name = "latitude", nullable = true)
+    private double latitude;
+    @Column(name = "longitude",  nullable = true)
+    private double longitude;
+
+
+
+
 
     @OneToMany(mappedBy = "chargingStation")
     private List<ChargingPostEntity> chargingPosts;

@@ -4,6 +4,7 @@ import charging_manage_be.model.dto.service_package.ServicePackageRequestDTO;
 import charging_manage_be.model.dto.service_package.ServicePackageResponseDTO;
 import charging_manage_be.model.entity.service_package.ServicePackageEntity;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface ServicePackageService{
@@ -12,5 +13,7 @@ public interface ServicePackageService{
     boolean deleteServicePackage(String packageId);
     List<ServicePackageEntity> getServicePackages();
     ServicePackageResponseDTO getServicePackageById(String packageId);
+    BigDecimal getPriceByPackegeId(String packageId);
+    ServicePackageEntity getServicePackageByPackageId(String packageId);
 
 }
