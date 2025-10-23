@@ -43,7 +43,6 @@ public class ChargingSession {
         waitingService.addExpectedWaitingTime(createSession.getBooking().getChargingPost(), expectedEndTime);
         if (createSession.getBooking().getBookingId().isEmpty()) {
             sessionService.addSessionWithoutBooking(createSession.getBooking().getUser(), createSession.getBooking().getChargingPost(),expectedEndTime);
-
         }
         else {
             sessionService.addSessionWithBooking(booking.getBookingId(), expectedEndTime);
