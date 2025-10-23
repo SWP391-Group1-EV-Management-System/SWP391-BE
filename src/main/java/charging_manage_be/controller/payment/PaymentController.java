@@ -44,7 +44,7 @@ public class PaymentController {
     private ServicePackageService servicePackageService;
     @Autowired
     private UserService  userService;
-    private final String  PAYMENTMOMO = "VHEXT91804";
+    private final String  PAYMENTMOMO = "WDNDS27795";
 // hàm end session tự động tạo
 //    @PostMapping
 //    public ResponseEntity<PaymentEntity> createPayment(@RequestBody PaymentEntity payment) {

@@ -18,7 +18,6 @@ public class ChargingStationResponseDTO {
     private LocalDateTime establishedTime;
     private int numberOfPosts;
     private String userManagerName;
-    private String coordinate;
     private double latitude;
     private double longitude;
     private List<String> chargingPostIds;

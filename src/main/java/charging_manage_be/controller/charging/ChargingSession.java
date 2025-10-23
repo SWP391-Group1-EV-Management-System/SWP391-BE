@@ -40,11 +40,12 @@ public class ChargingSession {
         BookingEntity booking = bookingService.getBookingByBookingId(createSession.getBooking().getBookingId());
         LocalDateTime expectedEndTime = createSession.getExpectedEndTime();
         // gọi thằng waiting ở sau lưng nếu có để cập nhật addExpectedWaitingTime
-        waitingService.addExpectedWaitingTime(booking.getChargingPost().getIdChargingPost(), expectedEndTime);
-        if (booking.getBookingId() == null) {
-            sessionService.addSessionWithoutBooking(booking.getUser().getUserID(), booking.getChargingPost().getIdChargingPost(),expectedEndTime);
+        waitingService.addExpectedWaitingTime(createSession.getBooking().getChargingPost(), expectedEndTime);
+        if (createSession.getBooking().getBookingId().isEmpty()) {
+            sessionService.addSessionWithoutBooking(createSession.getBooking().getUser(), createSession.getBooking().getChargingPost(),expectedEndTime);
 
-        } else {
+        }
+        else {
             sessionService.addSessionWithBooking(booking.getBookingId(), expectedEndTime);
             //cập nhật trạng thái bên booking thành charging ngay khi tạo session thành công
             bookingService.updateChargingBookingStatus(booking.getBookingId());
@@ -52,7 +53,7 @@ public class ChargingSession {
            // sau đó gọi lại hàm completeBooking ở dưới khi kết thúc session
         }
         // yêu cầu FE xử lý khi realtime đạt tới expectedEndTime thì gọi API finish ở dưới
-        userStatusService.setUserStatus(booking.getUser().getUserID(), STATUS_SESSION);
+        userStatusService.setUserStatus(createSession.getBooking().getUser(), STATUS_SESSION);
         return ResponseEntity.ok("Charging Session create completed successfully");
     }
     @PostMapping("/finish/{sessionId}")
