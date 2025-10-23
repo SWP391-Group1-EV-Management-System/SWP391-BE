@@ -43,7 +43,7 @@ import java.util.Date;
 import java.util.UUID;
 
 @Component
-public class DataInitializer  implements CommandLineRunner {
+public class  DataInitializer  implements CommandLineRunner {
     @Autowired
     private ReputationLevelRepository reputationLevelRepository;
     @Autowired
