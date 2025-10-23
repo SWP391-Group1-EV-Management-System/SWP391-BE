@@ -16,6 +16,6 @@ public interface PaymentService {
     List<PaymentEntity> findAllPayment();
     List<PaymentEntity> findUnpaidPaymentsUser(String userId);
     List<PaymentEntity> findPaidPaymentsUser(String userId);
-
+    PaymentEntity getPaymentBySessionId(String sessionId);
 }
 

@@ -19,4 +19,5 @@ public interface ChargingSessionService {
     List<ChargingSessionEntity> getAllSessionByUserStatusDone(String userId);
     List<ChargingSessionEntity> getAllSessionInStationWithStatus(String stationId, boolean isDone);
     List<ChargingSessionEntity> getAllSessions();
+    List<ChargingSessionEntity> getAllSessionsByUserId(String userId);
 }

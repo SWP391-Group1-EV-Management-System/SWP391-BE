@@ -13,6 +13,7 @@ import charging_manage_be.repository.users.UserRepository;
 import charging_manage_be.services.charging_post.ChargingPostService;
 import charging_manage_be.services.charging_station.ChargingStationService;
 import charging_manage_be.services.payments.PaymentService;
+import charging_manage_be.services.users.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -38,6 +39,7 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
     private final ChargingPostRepository chargingPostRepository;
     private final ChargingPostService ChargingPostService;
     private final ChargingStationService stationService;
+    private final UserService userService;
 
     public boolean isExistById(String sessionId) {
         return chargingSession.existsById(sessionId);
@@ -189,6 +191,12 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
     @Override
     public List<ChargingSessionEntity> getAllSessions() {
         return chargingSession.findAll();
+    }
+
+    @Override
+    public List<ChargingSessionEntity> getAllSessionsByUserId(String userId) {
+        UserEntity user = userService.getUserByID(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        return chargingSession.findByUser(user);
     }
 //    @Override
 //    @Transactional

@@ -1,5 +1,6 @@
 package charging_manage_be.repository.payments;
 
+import charging_manage_be.model.entity.charging.ChargingSessionEntity;
 import charging_manage_be.model.entity.payments.PaymentEntity;
 import charging_manage_be.model.entity.users.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,4 +16,6 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, String> 
 
     List<PaymentEntity> findByUser(UserEntity user);
     List<PaymentEntity> findByUserAndIsPaid(UserEntity user, boolean isPaid);
+
+    PaymentEntity findBySession(ChargingSessionEntity session);
 }

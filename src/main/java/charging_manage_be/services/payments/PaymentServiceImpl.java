@@ -8,7 +8,9 @@ import charging_manage_be.repository.charging_session.ChargingSessionRepository;
 import charging_manage_be.repository.payments.PaymentMethodRepository;
 import charging_manage_be.repository.payments.PaymentRepository;
 import charging_manage_be.repository.users.UserRepository;
+import charging_manage_be.services.charging_session.ChargingSessionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -135,6 +137,12 @@ public class PaymentServiceImpl implements PaymentService {
     public List<PaymentEntity> findPaidPaymentsUser(String userId) {
         UserEntity user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         return paymentRepository.findByUserAndIsPaid(user, true);
+    }
+
+    @Override
+    public PaymentEntity getPaymentBySessionId(String sessionId) {
+        ChargingSessionEntity  session = chargingSessionRepository.findById(sessionId).orElseThrow(() -> new RuntimeException("Session not found"));
+        return paymentRepository.findBySession(session);
     }
 
     /*
