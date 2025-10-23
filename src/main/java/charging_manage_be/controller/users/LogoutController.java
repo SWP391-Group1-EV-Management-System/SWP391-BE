@@ -25,8 +25,7 @@ public class LogoutController {
                 .maxAge(0)
                 .build();
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .header(HttpHeaders.SET_COOKIE, cookie1.toString())
+                .header(HttpHeaders.SET_COOKIE, cookie.toString(), cookie1.toString())
                 .body("Đăng xuất thành công!");
     }
 }

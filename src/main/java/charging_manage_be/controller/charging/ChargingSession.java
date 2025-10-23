@@ -43,7 +43,6 @@ public class ChargingSession {
         waitingService.addExpectedWaitingTime(booking.getChargingPost().getIdChargingPost(), expectedEndTime);
         if (booking.getBookingId() == null) {
             sessionService.addSessionWithoutBooking(booking.getUser().getUserID(), booking.getChargingPost().getIdChargingPost(),expectedEndTime);
-
         } else {
             sessionService.addSessionWithBooking(booking.getBookingId(), expectedEndTime);
             //cập nhật trạng thái bên booking thành charging ngay khi tạo session thành công

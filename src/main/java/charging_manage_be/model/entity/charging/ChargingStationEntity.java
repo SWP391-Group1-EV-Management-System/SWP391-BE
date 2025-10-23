@@ -37,10 +37,10 @@ public class ChargingStationEntity {
     // tọa độ trạm sạc
     @Column (name = "coordinate", nullable = true)
     private  String coordinate;
-    @Column(name = "latitude", nullable = true)
-    private double latitude;
-    @Column(name = "longitude",  nullable = true)
-    private double longitude;
+//    @Column(name = "latitude", nullable = true)
+//    private double latitude;
+//    @Column(name = "longitude",  nullable = true)
+//    private double longitude;
 
 
 

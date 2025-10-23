@@ -5,6 +5,7 @@ import charging_manage_be.model.dto.user.UserResponse;
 import charging_manage_be.model.entity.users.UserEntity;
 import charging_manage_be.services.users.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,7 +20,8 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
     @PostMapping
     public ResponseEntity<UserEntity> createUser(@RequestBody UserEntity user) {
         UserEntity savedUser = userService.saveUser(user);
@@ -155,6 +157,10 @@ public class UserController {
                         savedUser.getPhoneNumber()
                 )).toList();
         return ResponseEntity.ok(admins);
+    }
+    @GetMapping("/status/{userId}")
+    public String getStatusUser(@PathVariable String userId){
+        return (String) stringRedisTemplate.opsForHash().get("user:"+ userId, "status");
     }
 
 }
