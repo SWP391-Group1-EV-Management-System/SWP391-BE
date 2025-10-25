@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/servicePackage")
 public class ServicePackageController {
@@ -58,5 +60,11 @@ public class ServicePackageController {
             ServicePackageResponseDTO result = servicePackageService.getServicePackageById(servicePackageId);
             return ResponseEntity.ok(result);
         }
+    }
+
+    @GetMapping("/getAllPackage")
+    ResponseEntity<List<ServicePackageResponseDTO>> getAllServicePackage() {
+        servicePackageService.getAllServicePackages();
+        return ResponseEntity.ok(servicePackageService.getAllServicePackages());
     }
 }

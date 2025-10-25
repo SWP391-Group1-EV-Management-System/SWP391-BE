@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import static charging_manage_be.util.RandomId.generateRandomId;
@@ -77,8 +78,22 @@ public class ServicePackageServiceImpl implements ServicePackageService {
     }
 
     @Override
-    public List<ServicePackageEntity> getServicePackages() {
-        return servicePackageRepository.findAll();
+    public List<ServicePackageResponseDTO> getAllServicePackages() {
+        List<ServicePackageEntity>  findAllServicePackages = servicePackageRepository.findAll();
+        List<ServicePackageResponseDTO>  servicePackageResponseDTOList = new ArrayList<>();
+        for(final ServicePackageEntity servicePackageEntity : findAllServicePackages){
+            ServicePackageResponseDTO servicePackageResponseDTO = new ServicePackageResponseDTO();
+            servicePackageResponseDTO.setPackageId(servicePackageEntity.getPackageId());
+            servicePackageResponseDTO.setPackageName(servicePackageEntity.getPackageName());
+            servicePackageResponseDTO.setDescription(servicePackageEntity.getDescription());
+            servicePackageResponseDTO.setBillingCycle(servicePackageEntity.getBillingCycle());
+            servicePackageResponseDTO.setPrice(servicePackageEntity.getPrice());
+            servicePackageResponseDTO.setUnit(servicePackageEntity.getUnit());
+            servicePackageResponseDTO.setQuota(servicePackageEntity.getQuota());
+
+            servicePackageResponseDTOList.add(servicePackageResponseDTO);
+        }
+        return servicePackageResponseDTOList;
     }
 
     @Override
