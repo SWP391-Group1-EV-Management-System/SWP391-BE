@@ -54,11 +54,11 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
     // phải add thời gian dự kiến sạc vào session
     // khi driver quẹt QR thì sẽ lấy thông tin userId, carId, và lấy booking nếu có để tạo session
     @Override
-    public boolean addSessionWithBooking(String bookingId, LocalDateTime expectedEndTime) {
+    public String addSessionWithBooking(String bookingId, LocalDateTime expectedEndTime) {
         try {
             Optional<BookingEntity> optionalBooking = bookingRepository.findById(bookingId);
             if (optionalBooking.isEmpty()) {
-                return false;
+                return null;
             }
 
             BookingEntity booking = optionalBooking.get();
@@ -73,25 +73,25 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
         session.setKWh(BigDecimal.valueOf(0)); // Lưu ý là cái này khi tạo session thì nó phải là 0, khi nào sạc xong thì mới update nó lên bằng số tiền được tính bằng công thức ở dưới
         session.setExpectedEndTime(expectedEndTime);
         chargingSession.save(session);
-        return true;
+        return session.getChargingSessionId();
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return null;
         }
     }
     // phải add thời gian dự kiến sạc vào session
     @Override
-    public boolean addSessionWithoutBooking(String userId,String postId, LocalDateTime expectedEndTime)
+    public String addSessionWithoutBooking(String userId,String postId, LocalDateTime expectedEndTime)
     {
         try {
 
         Optional<UserEntity> optional = userRepository.findById(userId);
         if (optional.isEmpty()) {
-            return false;
+            return null;
         }
             Optional<ChargingPostEntity> optional2 = chargingPostRepository.findById(postId);
             if (optional2.isEmpty()) {
-                return false;
+                return null;
             }
             ChargingPostEntity post = optional2.get();
             UserEntity user = optional.get();
@@ -106,10 +106,10 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
             session.setKWh(BigDecimal.valueOf(0));
             session.setExpectedEndTime(expectedEndTime);
             chargingSession.save(session);
-        return true;
+        return session.getChargingSessionId();
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return null;
         }
     }
 
