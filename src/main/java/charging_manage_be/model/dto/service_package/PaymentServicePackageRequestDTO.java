@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 public class PaymentServicePackageRequestDTO {
     private String paymentServicePackageId;
     private String servicePackageId;
-    private String paymentMethod;
+    private String paymentMethodId;
     private String userId;
     private LocalDateTime paidAt;
     private boolean isPaid;

@@ -1,19 +1,23 @@
 package charging_manage_be.services.payments;
 
+import charging_manage_be.model.dto.service_package.PackageTransactionResponseDTO;
 import charging_manage_be.model.entity.charging.ChargingSessionEntity;
 import charging_manage_be.model.entity.payments.PaymentEntity;
 import charging_manage_be.model.entity.payments.PaymentMethodEntity;
+import charging_manage_be.model.entity.service_package.PackageTransactionEntity;
 import charging_manage_be.model.entity.users.UserEntity;
 import charging_manage_be.repository.charging_session.ChargingSessionRepository;
 import charging_manage_be.repository.payments.PaymentMethodRepository;
 import charging_manage_be.repository.payments.PaymentRepository;
 import charging_manage_be.repository.users.UserRepository;
 import charging_manage_be.services.charging_session.ChargingSessionService;
+import charging_manage_be.services.service_package.PackageTransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -34,6 +38,8 @@ public class PaymentServiceImpl implements PaymentService {
     private PaymentMethodRepository paymentMethodRepository;
     @Autowired
     private ChargingSessionRepository chargingSessionRepository;
+    @Autowired
+    private PackageTransactionService packageTransactionService;
     //
     //@Autowired => private Pen pen;
     // no @Autowired =>private Pen  pen = new Pen;
@@ -48,7 +54,7 @@ public class PaymentServiceImpl implements PaymentService {
 
 
     @Override
-    public boolean addPayment(String sessionId)
+    public boolean addPayment(String sessionId, PaymentMethodEntity paymentMethod)
     {
         PaymentEntity paymentEntity = new PaymentEntity();
         paymentEntity.setPaymentId(generateUniquePaymentId());
@@ -56,37 +62,57 @@ public class PaymentServiceImpl implements PaymentService {
         ChargingSessionEntity session = chargingSessionRepository.findById(sessionId).orElseThrow(() -> new RuntimeException("Session not found"));
         paymentEntity.setSession(session);
         paymentEntity.setUser(session.getUser());
-        //paymentEntity.setPaymentMethod(paymentMethod);
-        // tạo hàm riêng chọn phương thức thanh toán
+        paymentEntity.setCreatedAt(LocalDateTime.now());
         paymentEntity.setPrice(session.getTotalAmount());
-
         paymentRepository.save(paymentEntity);
 
         return true;
     }
 
     @Override
-    public boolean processPayment(String paymentId,String paymentMethodId)
+    public boolean updatePaymentWithMethod(String paymentId,String paymentMethodId)
     {
         PaymentMethodEntity paymentMethod = paymentMethodRepository.findById(paymentMethodId).orElseThrow(() -> new RuntimeException("Payment method not found"));
         PaymentEntity payment = paymentRepository.findById(paymentId).orElseThrow(() -> new RuntimeException("Payment not found"));
-        payment.setPaymentMethod(paymentMethod);
 
-        paymentRepository.save(payment);
-        return true;
-    }
+        BigDecimal finalPrice = payment.getSession().getTotalAmount();
+
+        if ("PACKAGE".equalsIgnoreCase(paymentMethod.getNamePaymentMethod())) {
+            PackageTransactionResponseDTO activePackage =
+                    packageTransactionService.getLatestActivePackageByUserId(payment.getUser().getUserID());
+
+            if (activePackage != null) {
+                BigDecimal usedKWh = payment.getSession().getKWh(); // lấy số kwH trong session(500)
+                BigDecimal quotaRemaining = activePackage.getRemainingQuota();  // lấy kwH trong quota (100)
 
 
-    @Override
-    public boolean updatePayment(PaymentEntity payment)
-    {
-        if(payment == null || paymentRepository.findById(payment.getPaymentId()).isEmpty())
-        {
-            return false;
+                if (quotaRemaining.compareTo(usedKWh) >= 0) { // đây là trường hợp quota đủ để trả tiền --> không cần xuất bill mà chỉ xử lý luôn trong hệ thống là cập nhật payment --> isPaid = true;
+                    finalPrice = BigDecimal.ZERO;
+                    payment.setPrice(finalPrice);
+                    payment.setPaid(true);
+                    payment.setPaidAt(LocalDateTime.now());
+                    payment.setPaymentMethod(paymentMethod);
+
+                    packageTransactionService.updateQuotationPackageTransaction(activePackage.getPackageTransactionId(), payment.getSession().getChargingSessionId());
+                    paymentRepository.save(payment);
+                    return true;
+                }
+
+                else {
+                    BigDecimal overKWh = usedKWh.subtract(quotaRemaining); // 400
+                    BigDecimal unitPrice = finalPrice.divide(usedKWh, 2, RoundingMode.HALF_UP);       // giá mỗi kWh
+                    finalPrice = overKWh.multiply(unitPrice);   // 400 * 5000 = 2,000,000
+
+                }
+            }
+            payment.setPaymentMethod(paymentMethod);
+            payment.setPrice(finalPrice);
         }
+
         paymentRepository.save(payment);
         return true;
     }
+
 
     @Override
     public PaymentEntity getPaymentByPaymentId(String paymentId) {

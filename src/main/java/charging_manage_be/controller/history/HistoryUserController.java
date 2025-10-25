@@ -37,10 +37,21 @@ public class HistoryUserController {
             station.setId(session.getStation().getIdChargingStation());
             station.setName(session.getStation().getNameChargingStation());
             station.setAddress(session.getStation().getAddress());
+
             HistoryPostDTO post = new HistoryPostDTO();
             post.setId(session.getChargingPost().getIdChargingPost());
             post.setMaxPower(session.getChargingPost().getMaxPower());
 
+            PaymentEntity paymentEntity  = paymentService.getPaymentBySessionId(session.getChargingSessionId());
+            HistoryPaymentDTO payment = new HistoryPaymentDTO();
+            if(paymentEntity != null)
+            {
+                payment.setId(paymentEntity.getPaymentId());
+                payment.setPaid(paymentEntity.isPaid());
+                payment.setMethodId(paymentEntity.getPaymentMethod().getIdPaymentMethod());
+                payment.setMethodName(paymentEntity.getPaymentMethod().getNamePaymentMethod());
+                payment.setPaidAt(paymentEntity.getPaidAt());
+            }
 
             HistoryResponseDTO term = new  HistoryResponseDTO();
             term.setSessionId(session.getChargingSessionId());
@@ -49,17 +60,7 @@ public class HistoryUserController {
             term.setKWh(session.getKWh());
             term.setTotalAmount(session.getTotalAmount());
             term.setDone(session.isDone());
-            PaymentEntity paymentEntity  = paymentService.getPaymentBySessionId(session.getChargingSessionId());
-            if(paymentEntity != null)
-            {
-                HistoryPaymentDTO payment = new HistoryPaymentDTO();
-                payment.setId(paymentEntity.getPaymentId());
-                payment.setPaid(paymentEntity.isPaid());
-                payment.setMethodId(paymentEntity.getPaymentMethod().getIdPaymentMethod());
-                payment.setMethodName(paymentEntity.getPaymentMethod().getNamePaymentMethod());
-                payment.setPaidAt(paymentEntity.getPaidAt());
-                term.setPayment(payment);
-            }
+            term.setPayment(payment);
             term.setStation(station);
             term.setPost(post);
             response.add(term);

@@ -3,14 +3,14 @@ package charging_manage_be.controller.payment;
 import charging_manage_be.model.dto.momo_payment.CreateMomoRequestDTO;
 import charging_manage_be.model.dto.momo_payment.CreateMomoResponseDTO;
 import charging_manage_be.model.dto.payment.PaymentResponse;
+import charging_manage_be.model.dto.service_package.PackageTransactionResponseDTO;
 import charging_manage_be.model.entity.payments.PaymentEntity;
+import charging_manage_be.model.entity.service_package.PackageTransactionEntity;
 import charging_manage_be.model.entity.service_package.PaymentServicePackageEntity;
 import charging_manage_be.services.momo.MomoService;
 import charging_manage_be.services.payments.PaymentMethodService;
 import charging_manage_be.services.payments.PaymentService;
-import charging_manage_be.services.service_package.PaymentServicePackageService;
-import charging_manage_be.services.service_package.PaymentServicePackageServiceImpl;
-import charging_manage_be.services.service_package.ServicePackageService;
+import charging_manage_be.services.service_package.*;
 import charging_manage_be.services.users.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -44,7 +44,12 @@ public class PaymentController {
     private ServicePackageService servicePackageService;
     @Autowired
     private UserService  userService;
-    private final String  PAYMENTMOMO = "WDNDS27795";
+    @Autowired
+    private PackageTransactionService  packageTransactionService;
+    @Autowired
+    private PaymentServiceAndPackageTransactionService paymentServiceAndPackageTransactionService;
+
+    private final String  PAYMENTMOMO = "PMT_MOMO";
 // hàm end session tự động tạo
 //    @PostMapping
 //    public ResponseEntity<PaymentEntity> createPayment(@RequestBody PaymentEntity payment) {
@@ -58,7 +63,7 @@ public class PaymentController {
 
     @PostMapping("/paymentMethod")
     public ResponseEntity<String> processPayment( @RequestBody PaymentEntity payment) {
-        boolean isProcessed = paymentService.processPayment(payment.getPaymentId(), payment.getPaymentMethod().getIdPaymentMethod());
+        boolean isProcessed = paymentService.updatePaymentWithMethod(payment.getPaymentId(), payment.getPaymentMethod().getIdPaymentMethod());
         if (isProcessed) {
             return ResponseEntity.ok("Payment processed successfully");
         } else {
@@ -78,7 +83,8 @@ public class PaymentController {
                 //PaymentServicePackageEntity paymentPackage = paymentPackageService.getPaymentServicePackageById(requestData.getOrderId());
                 if(userId == null || packageId == null) {
                     throw new RuntimeException("Payment Service Package not found for orderId: " + requestData.getOrderId());
-                } else {
+                }
+                else {
                     //redisTemplate.opsForHash().put("userPackage:" + paymentPackage.getUser().getUserID(), "paymentPackageService", "YES");
                     requestData.setOrderId(requestData.getOrderId());
                     requestData.setAmount(servicePackageService.getPriceByPackegeId(packageId).longValue());
@@ -128,13 +134,27 @@ public class PaymentController {
                     paymentPackage.setPaymentMethod(paymentMethodService.getPaymentMethodById(PAYMENTMOMO).orElse(null));
                     paymentPackage.setServicePackage(servicePackageService.getServicePackageByPackageId((String) redisTemplate.opsForHash().get("userPackage:" + orderId, "packetId")));
                     paymentPackage.setUser(userService.getUserByID((String) redisTemplate.opsForHash().get("userPackage:" + orderId, "userId")).orElse(null));
-                    redisTemplate.opsForHash().delete("userPackage:" + orderId, "userId", "packetId", "paymentPackageService");
 
-                    paymentPackageService.insertPaymentServicePackage(paymentPackage.getServicePackage().getPackageId(), paymentPackage.getUser().getUserID(), paymentPackage.getPaymentMethod().getIdPaymentMethod());
+                    paymentServiceAndPackageTransactionService.completePackagePurchase(paymentPackage.getUser().getUserID(), paymentPackage.getServicePackage().getPackageId(), paymentPackage.getPaymentMethod().getIdPaymentMethod(), orderId);
+
+                    redisTemplate.opsForHash().delete("userPackage:" + orderId, "userId", "packetId", "paymentPackageService");
+//                  paymentPackageService.insertPaymentServicePackage(paymentPackage.getServicePackage().getPackageId(), paymentPackage.getUser().getUserID(), paymentPackage.getPaymentMethod().getIdPaymentMethod());
+//                  packageTransactionService.insertPackageTransaction(paymentPackage.getUser().getUserID(), paymentPackage.getServicePackage().getPackageId(), paymentPackage.getPaymentServicePackageId());
                     return ResponseEntity.ok("Payment Service Package activated successfully");
                 }
+
+
+
                 boolean isPaid = paymentService.invoicePayment(orderId);
                 if (isPaid) {
+                    PackageTransactionResponseDTO packageTransaction = packageTransactionService.getLatestActivePackageByUserId(payment.getUser().getUserID());
+                    if (packageTransaction != null) {
+                        boolean quotaUpdated = packageTransactionService.updateQuotationPackageTransaction(packageTransaction.getPackageTransactionId(), payment.getSession().getChargingSessionId());
+
+                        if (!quotaUpdated) {
+                            return ResponseEntity.status(400).body("Failed to update quota - insufficient quota or inactive package");
+                        }
+                    }
                     return ResponseEntity.ok("Payment successfully");
                 }
                 else{

@@ -43,7 +43,7 @@ import java.util.Date;
 import java.util.UUID;
 
 @Component
-public class DataInitializer  implements CommandLineRunner {
+public class  DataInitializer  implements CommandLineRunner {
     @Autowired
     private ReputationLevelRepository reputationLevelRepository;
     @Autowired
@@ -432,7 +432,7 @@ public class DataInitializer  implements CommandLineRunner {
         tx1.setUser(driverA);
         tx1.setServicePackage(basicPkg);
         tx1.setPaymentServicePackage(savedPsp1);
-        tx1.setRemainingQuota(basicPkg.getQuota());
+        tx1.setRemainingQuota(BigDecimal.valueOf(basicPkg.getQuota()));
         tx1.setStatus("ACTIVE");
         tx1.setSignPackageAt(LocalDateTime.now());
         tx1.setExpirePackageAt(LocalDateTime.now().plusMonths(basicPkg.getBillingCycle()));
@@ -454,7 +454,7 @@ public class DataInitializer  implements CommandLineRunner {
         tx2.setUser(driverB);
         tx2.setServicePackage(proPkg);
         tx2.setPaymentServicePackage(savedPsp2);
-        tx2.setRemainingQuota(proPkg.getQuota());
+        tx2.setRemainingQuota(BigDecimal.valueOf(proPkg.getQuota()));
         tx2.setStatus("ACTIVE");
         tx2.setSignPackageAt(LocalDateTime.now());
         tx2.setExpirePackageAt(LocalDateTime.now().plusMonths(proPkg.getBillingCycle()));

@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -18,7 +19,7 @@ public class PackageTransactionResponseDTO {
     private String userId;
     private String servicePackageId;
     private String paymentServicePackageId;
-    private double remainingQuota;
+    private BigDecimal remainingQuota;
     private String status;
     private LocalDateTime signPackageAt;
     private LocalDateTime expirePackageAt;

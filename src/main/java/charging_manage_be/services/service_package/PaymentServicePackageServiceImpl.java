@@ -42,25 +42,28 @@ public class PaymentServicePackageServiceImpl implements PaymentServicePackageSe
     }
 
     @Override
-    public boolean insertPaymentServicePackage(String packageId, String userId, String paymentMethodId) {
+    public boolean insertPaymentServicePackage(String packageId, String userId, String paymentMethodId, String orderId) {
         ServicePackageEntity findPackage = servicePackageRepository.findById(packageId).orElse(null);
         UserEntity user = userRepository.findById(userId).orElse(null);
         PaymentMethodEntity paymentMethod = paymentMethodRepository.findById(paymentMethodId).orElse(null);
+
         if (findPackage == null || user == null || paymentMethod == null) {
             return false;
         }
+
         PaymentServicePackageEntity paymentServicePackageEntity = new PaymentServicePackageEntity();
-        paymentServicePackageEntity.setPaymentServicePackageId(generateUniquePaymentId());
+        paymentServicePackageEntity.setPaymentServicePackageId(orderId);
         paymentServicePackageEntity.setServicePackage(findPackage);
         paymentServicePackageEntity.setPaymentMethod(paymentMethod);
         paymentServicePackageEntity.setUser(user);
         paymentServicePackageEntity.setPaid(true);
         paymentServicePackageEntity.setPaidAt(LocalDateTime.now());
         paymentServicePackageEntity.setPrice(findPackage.getPrice());
+
         paymentServicePackageRepository.save(paymentServicePackageEntity);
         return true;
-
     }
+
 
     @Override
     public PaymentServicePackageEntity getPaymentServicePackageById(String paymentServicePackageId) {
