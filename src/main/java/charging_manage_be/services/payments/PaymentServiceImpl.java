@@ -85,9 +85,20 @@ public class PaymentServiceImpl implements PaymentService {
                 BigDecimal usedKWh = payment.getSession().getKWh(); // lấy số kwH trong session(500)
                 BigDecimal quotaRemaining = activePackage.getRemainingQuota();  // lấy kwH trong quota (100)
 
-                if (quotaRemaining.compareTo(usedKWh) >= 0) {
+
+                if (quotaRemaining.compareTo(usedKWh) >= 0) { // đây là trường hợp quota đủ để trả tiền --> không cần xuất bill mà chỉ xử lý luôn trong hệ thống là cập nhật payment --> isPaid = true;
                     finalPrice = BigDecimal.ZERO;
-                } else {
+                    payment.setPrice(finalPrice);
+                    payment.setPaid(true);
+                    payment.setPaidAt(LocalDateTime.now());
+                    payment.setPaymentMethod(paymentMethod);
+
+                    packageTransactionService.updateQuotationPackageTransaction(activePackage.getPackageTransactionId(), payment.getSession().getChargingSessionId());
+                    paymentRepository.save(payment);
+                    return true;
+                }
+
+                else {
                     BigDecimal overKWh = usedKWh.subtract(quotaRemaining); // 400
                     BigDecimal unitPrice = finalPrice.divide(usedKWh, 2, RoundingMode.HALF_UP);       // giá mỗi kWh
                     finalPrice = overKWh.multiply(unitPrice);   // 400 * 5000 = 2,000,000
