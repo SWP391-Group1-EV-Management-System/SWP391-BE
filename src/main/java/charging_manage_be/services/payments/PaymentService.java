@@ -7,11 +7,10 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface PaymentService {
-    boolean addPayment(String sessionId);
-    boolean updatePayment(PaymentEntity payment);
+    boolean addPayment(String sessionId, PaymentMethodEntity paymentMethod);
+    boolean updatePaymentWithMethod(String paymentId,String paymentMethodId);
     PaymentEntity getPaymentByPaymentId(String paymentId);
     List<PaymentEntity> getPaymentByUserID(String userID);
-    boolean processPayment(String paymentId,String paymentMethodId);
     boolean invoicePayment (String paymentId);
     List<PaymentEntity> findAllPayment();
     List<PaymentEntity> findUnpaidPaymentsUser(String userId);

@@ -70,7 +70,7 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
         session.setUserManage(userManager);
         session.setStation(booking.getChargingStation());
         session.setChargingPost(booking.getChargingPost());
-        session.setKWh(booking.getChargingPost().getChargingFeePerKWh());
+        session.setKWh(BigDecimal.valueOf(0)); // Lưu ý là cái này khi tạo session thì nó phải là 0, khi nào sạc xong thì mới update nó lên bằng số tiền được tính bằng công thức ở dưới
         session.setExpectedEndTime(expectedEndTime);
         chargingSession.save(session);
         return true;
@@ -103,7 +103,7 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
             session.setUserManage(userManager);
             session.setStation(post.getChargingStation());
             session.setChargingPost(post);
-            session.setKWh(post.getChargingFeePerKWh());
+            session.setKWh(BigDecimal.valueOf(0));
             session.setExpectedEndTime(expectedEndTime);
             chargingSession.save(session);
         return true;
@@ -130,9 +130,9 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
     @Override
     public BigDecimal calculateAmount(ChargingSessionEntity session) {
         // lấy giá của trụ sạc và thời gian sạc để tính tiền
-        var rate = session.getChargingPost().getChargingFeePerKWh();
+        var rate = session.getKWh();
         var duration = Duration.between(session.getStartTime(), session.getEndTime()).toMinutes();
-        return rate.multiply(BigDecimal.valueOf(duration));
+        return BigDecimal.valueOf(1000).multiply(rate).multiply(BigDecimal.valueOf(duration));
     }
 
     @Override
@@ -147,12 +147,13 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
         }
         try {
             session.setDone(true);
+            session.setKWh(BigDecimal.valueOf(100)); // set tạm 1000 để tính tiền, chừng sau phải lấy theo số kwH trên trụ sạc để set vào này
             session.setEndTime(LocalDateTime.now());
             session.setTotalAmount(calculateAmount(session));
             updateSession(session);
             // gọi hóa đơn và tính tiền từ trụ sạc
             //PaymentEntity payment = new PaymentEntity();
-            paymentService.addPayment(sessionId);
+            paymentService.addPayment(sessionId, null);
             return true;
         } catch (Exception e) {
             e.printStackTrace();

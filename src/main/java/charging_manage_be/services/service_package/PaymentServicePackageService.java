@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface PaymentServicePackageService {
     String generateUniquePaymentId();
-    boolean insertPaymentServicePackage(String packageId, String userId, String paymentMethodId);
+    public boolean insertPaymentServicePackage(String packageId, String userId, String paymentMethodId, String orderId);
     PaymentServicePackageEntity getPaymentServicePackageById(String paymentServicePackageId);
     List<PaymentServicePackageEntity> getPaymentServicePackageByPackageId(String packageId);
     List<PaymentServicePackageEntity> getPaymentServicePackageByUserId(String userId);

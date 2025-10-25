@@ -11,9 +11,7 @@ import charging_manage_be.model.entity.service_package.PackageTransactionEntity;
 import charging_manage_be.model.entity.service_package.PaymentServicePackageEntity;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -75,7 +73,7 @@ public class UserEntity {
     @OneToMany(mappedBy = "user")
     private List<PaymentEntity> payments;
 
-    @OneToMany(mappedBy = "user" )
+    @OneToMany(mappedBy = "user")
     private List<WaitingListEntity> waitingLists;
 
     @OneToMany (mappedBy = "user")
@@ -85,8 +83,10 @@ public class UserEntity {
     private List<ChargingSessionEntity> userSession;
     @OneToMany(mappedBy = "userManage")
     private List<ChargingSessionEntity> userManagerSession;
+
     @OneToMany(mappedBy = "user")
-    private List<PackageTransactionEntity>  packageTransactions;
+    private List<PackageTransactionEntity> packageTransactions;
+
     @OneToMany(mappedBy = "user")
     private List<PaymentServicePackageEntity> paymentServicePackages;
 }
