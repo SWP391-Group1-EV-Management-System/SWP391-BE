@@ -1,12 +1,17 @@
 package charging_manage_be.controller.charging;
 
 
+import charging_manage_be.model.dto.session.ChargingSessionDetail;
 import charging_manage_be.model.dto.session.ChargingSessionRequest;
 import charging_manage_be.model.dto.session.ChargingSessionResponse;
 import charging_manage_be.model.entity.booking.BookingEntity;
+import charging_manage_be.model.entity.charging.ChargingPostEntity;
 import charging_manage_be.model.entity.charging.ChargingSessionEntity;
+import charging_manage_be.model.entity.charging.ChargingStationEntity;
 import charging_manage_be.services.booking.BookingService;
+import charging_manage_be.services.charging_post.ChargingPostService;
 import charging_manage_be.services.charging_session.ChargingSessionService;
+import charging_manage_be.services.charging_station.ChargingStationService;
 import charging_manage_be.services.status_service.UserStatusService;
 import charging_manage_be.services.user_reputations.UserReputationService;
 import charging_manage_be.services.waiting_list.WaitingListService;
@@ -19,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/charging/session")
@@ -34,6 +40,10 @@ public class ChargingSession {
     private UserReputationService userReputationService;
     @Autowired
     private UserStatusService userStatusService;
+    @Autowired
+    private ChargingStationService chargingStationService;
+    @Autowired
+    private ChargingPostService chargingPostService;
     private final String STATUS_SESSION = "session";
     private final String STATUS_PAYMENT = "payment";
     @PostMapping("/create")
@@ -87,7 +97,7 @@ public class ChargingSession {
         return ResponseEntity.ok("Charging Session finish completed successfully");
     }
     @GetMapping("/show/{sessionId}")
-    public ResponseEntity<ChargingSessionResponse> getSessionById(@PathVariable String sessionId){
+    public ResponseEntity<ChargingSessionDetail> getSessionById(@PathVariable String sessionId){
         String booking = "";
 
         ChargingSessionEntity session = sessionService.getSessionById(sessionId);
@@ -95,18 +105,47 @@ public class ChargingSession {
         {
             booking = session.getBooking().getBookingId();
         }
-        ChargingSessionResponse sessionR = new ChargingSessionResponse(session.getChargingSessionId(), session.getExpectedEndTime()
+        ChargingStationEntity station = chargingStationService.getStationById(session.getStation().getIdChargingStation());
+        ChargingPostEntity post = chargingPostService.getChargingPostById(session.getChargingPost().getIdChargingPost());
+        List<String> listType = post.getChargingType().stream()
+                .map(ct -> ct.getNameChargingType())
+                .collect(Collectors.toList());
+        ChargingSessionDetail sessionR = new ChargingSessionDetail(
+                session.getChargingSessionId()
+                ,session.getExpectedEndTime()
                 ,booking
                 ,session.getChargingPost().getIdChargingPost()
-                ,session.getStation().getIdChargingStation(),session.getUser().getUserID()
-                ,session.getUserManage().getUserID(), session.isDone(), session.getStartTime()
-                , session.getEndTime(),session.getKWh(), session.getTotalAmount() );
+                ,session.getStation().getIdChargingStation()
+                ,station.getNameChargingStation()
+                ,station.getAddress()
+                ,post.getChargingFeePerKWh()
+                ,post.getMaxPower()
+                ,listType
+                ,session.getUser().getUserID()
+                ,session.getUserManage().getUserID()
+                ,session.getStartTime());
         if(session == null)
         {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(sessionR);
-    }
+    }/*
+    public class ChargingSessionDetail {
+    private String chargingSessionId; 1
+    private LocalDateTime expectedEndTime;1
+    private String booking;1
+    private String chargingPost;1
+    private String station; 1
+    private String stationName;
+    private String addressStation;
+    private BigDecimal pricePerKWH;
+    private BigDecimal maxPower;
+    private List<String> typeCharging;
+    private String user;
+    private String userManage;
+    private LocalDateTime startTime;
+}
+    */
 
     @Scheduled(fixedRate = 60000) // Chạy mỗi phút
     @Transactional
