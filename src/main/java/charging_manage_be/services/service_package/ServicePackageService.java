@@ -11,7 +11,7 @@ public interface ServicePackageService{
     boolean createServicePackage(ServicePackageRequestDTO servicePackageRequestDTO);
     boolean updateServicePackage(String packageId, ServicePackageRequestDTO servicePackageRequestDTO);
     boolean deleteServicePackage(String packageId);
-    List<ServicePackageEntity> getServicePackages();
+    List<ServicePackageResponseDTO> getAllServicePackages();
     ServicePackageResponseDTO getServicePackageById(String packageId);
     BigDecimal getPriceByPackegeId(String packageId);
     ServicePackageEntity getServicePackageByPackageId(String packageId);
