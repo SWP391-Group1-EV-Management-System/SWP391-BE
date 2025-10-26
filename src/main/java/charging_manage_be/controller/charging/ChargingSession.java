@@ -86,9 +86,16 @@ public class ChargingSession {
     }
     @GetMapping("/show/{sessionId}")
     public ResponseEntity<ChargingSessionResponse> getSessionById(@PathVariable String sessionId){
+        String booking = "";
+
         ChargingSessionEntity session = sessionService.getSessionById(sessionId);
+        if(session.getBooking() != null)
+        {
+            booking = session.getBooking().getBookingId();
+        }
         ChargingSessionResponse sessionR = new ChargingSessionResponse(session.getChargingSessionId(), session.getExpectedEndTime()
-                ,session.getBooking().getBookingId(),session.getChargingPost().getIdChargingPost()
+                ,booking
+                ,session.getChargingPost().getIdChargingPost()
                 ,session.getStation().getIdChargingStation(),session.getUser().getUserID()
                 ,session.getUserManage().getUserID(), session.isDone(), session.getStartTime()
                 , session.getEndTime(),session.getKWh(), session.getTotalAmount() );
