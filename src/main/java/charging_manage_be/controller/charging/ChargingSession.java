@@ -164,7 +164,7 @@ public class ChargingSession {
             userStatusService.setUserStatus(chargingSession.getUser().getUserID(), STATUS_PAYMENT);
         }
     }
-    @GetMapping("showAll/{userId}")
+    @GetMapping("/showAll/{userId}")
     public ResponseEntity<List<ChargingSessionResponse>> getAllSessionsByUserId(@PathVariable String userId){
         List<ChargingSessionEntity> sessions = sessionService.getAllSessionByUserStatusDone(userId);
         List<ChargingSessionResponse> sessionResponses = sessions.stream().map(session -> new ChargingSessionResponse(
@@ -183,7 +183,7 @@ public class ChargingSession {
         return ResponseEntity.ok(sessionResponses);
     }
     // lấy tất cả session đang hoạt động theo trạm
-    @GetMapping("showChargingSession/{stationId}/undone")
+    @GetMapping("/showChargingSession/{stationId}/undone")
     public ResponseEntity<List<ChargingSessionResponse>> getAllActiveSessionsUndone(@PathVariable String stationId){
         List<ChargingSessionEntity> sessions = sessionService.getAllSessionInStationWithStatus(stationId, false);
         List<ChargingSessionResponse> sessionResponses = sessions.stream().map(session -> new ChargingSessionResponse(
@@ -202,7 +202,7 @@ public class ChargingSession {
         return ResponseEntity.ok(sessionResponses);
     }
     // lấy tất cả các session đã hoàn thành theo trạm
-    @GetMapping("showChargingSession/{stationId}/done")
+    @GetMapping("/showChargingSession/{stationId}/done")
     public ResponseEntity<List<ChargingSessionResponse>> getAllActiveSessionsDone(@PathVariable String stationId){
         List<ChargingSessionEntity> sessions = sessionService.getAllSessionInStationWithStatus(stationId, true);
         List<ChargingSessionResponse> sessionResponses = sessions.stream().map(session -> new ChargingSessionResponse(
@@ -221,7 +221,7 @@ public class ChargingSession {
         return ResponseEntity.ok(sessionResponses);
     }
     // lấy tất cả session
-    @GetMapping("showChargingSession/all")
+    @GetMapping("/showChargingSession/all")
     public ResponseEntity<List<ChargingSessionResponse>> getAllSessions(){
         List<ChargingSessionEntity> sessions = sessionService.getAllSessions();
         List<ChargingSessionResponse> sessionResponses = sessions.stream().map(session -> new ChargingSessionResponse(
