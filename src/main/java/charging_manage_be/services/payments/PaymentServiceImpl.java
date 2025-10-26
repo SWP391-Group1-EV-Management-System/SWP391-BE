@@ -107,8 +107,11 @@ public class PaymentServiceImpl implements PaymentService {
             }
             payment.setPaymentMethod(paymentMethod);
             payment.setPrice(finalPrice);
+            paymentRepository.save(payment);
+            return true;
         }
-
+        payment.setPaymentMethod(paymentMethod);
+        payment.setPrice(finalPrice);
         paymentRepository.save(payment);
         return true;
     }

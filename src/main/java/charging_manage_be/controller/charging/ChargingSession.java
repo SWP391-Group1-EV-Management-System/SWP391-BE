@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -57,11 +58,12 @@ public class ChargingSession {
         return ResponseEntity.ok(sessionId);
     }
     @PostMapping("/finish/{sessionId}")
-    public ResponseEntity<String> endChargingSession(@PathVariable String sessionId){
+    public ResponseEntity<String> endChargingSession(@PathVariable String sessionId, @RequestBody BigDecimal kWh){
         ChargingSessionEntity session = sessionService.getSessionById(sessionId);
         if (session == null) {
             throw new RuntimeException("Session not found");
         }
+        session.setKWh(kWh);
         sessionService.endSession(sessionId);
         // nếu có booking thì gọi thằng completeBooking để hoàn thành booking
         if (session.getBooking() == null) {
@@ -198,21 +200,4 @@ public class ChargingSession {
         )).toList();
         return ResponseEntity.ok(sessionResponses);
     }
-
-    /*
-    ## 5. Thống kê phiên sạc/trụ/hàng chờ (Statistics)
-    ### GET /api/charging/session/statistics
-    - **Trả về:** Tổng số phiên sạc, số phiên đang sạc, số phiên hoàn thành, tổng doanh thu, ...
-    - **Logic BE:** Tính toán số liệu tổng hợp cho dashboard staff.
-
-    ### GET /api/charging/station/statistics
-    - **Trả về:** Tổng số trụ online, offline, đang sạc, trống, ...
-    - **Logic BE:** Tính toán số liệu tổng hợp cho dashboard staff.
-
-    ---
-     */
-    // giả lập trụ ảo
-
-
-
 }

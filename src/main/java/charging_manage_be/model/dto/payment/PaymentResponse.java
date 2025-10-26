@@ -18,7 +18,6 @@ public class PaymentResponse {
     private LocalDateTime paidAt;
     private String paymentMethod;
     private BigDecimal price;
-    private String session;
 
 }
 

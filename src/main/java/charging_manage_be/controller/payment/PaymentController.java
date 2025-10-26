@@ -197,8 +197,7 @@ public class PaymentController {
                 payment.getCreatedAt(),
                 payment.getPaidAt(),
                 payment.getPaymentMethod() != null ? payment.getPaymentMethod().getIdPaymentMethod() : null,
-                payment.getPrice(),
-                payment.getSession().getChargingSessionId()
+                payment.getPrice()
         );
         if (payment != null) {
             return ResponseEntity.ok(paymentResponse);
@@ -218,8 +217,7 @@ public class PaymentController {
                 payment.getCreatedAt(),
                 payment.getPaidAt(),
                 payment.getPaymentMethod() != null ? payment.getPaymentMethod().getIdPaymentMethod() : null,
-                payment.getPrice(),
-                payment.getSession().getChargingSessionId()
+                payment.getPrice()
         )).toList();
         if (paymentResponses != null) {
             return ResponseEntity.ok(paymentResponses);
@@ -238,8 +236,7 @@ public class PaymentController {
                 payment.getCreatedAt(),
                 payment.getPaidAt(),
                 payment.getPaymentMethod() != null ? payment.getPaymentMethod().getIdPaymentMethod() : null,
-                payment.getPrice(),
-                payment.getSession().getChargingSessionId()
+                payment.getPrice()
         )).toList();
 
         return ResponseEntity.ok(paymentResponses);
@@ -255,8 +252,7 @@ public class PaymentController {
                 payment.getCreatedAt(),
                 payment.getPaidAt(),
                 payment.getPaymentMethod() != null ? payment.getPaymentMethod().getIdPaymentMethod() : null,
-                payment.getPrice(),
-                payment.getSession().getChargingSessionId()
+                payment.getPrice()
         )).toList();
         if (paymentResponses != null) {
             return ResponseEntity.ok(paymentResponses);
@@ -275,8 +271,7 @@ public class PaymentController {
                 payment.getCreatedAt(),
                 payment.getPaidAt(),
                 payment.getPaymentMethod() != null ? payment.getPaymentMethod().getIdPaymentMethod() : null,
-                payment.getPrice(),
-                payment.getSession().getChargingSessionId()
+                payment.getPrice()
         )).toList();
         if (paymentResponses != null) {
             return ResponseEntity.ok(paymentResponses);

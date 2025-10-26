@@ -147,7 +147,7 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
         }
         try {
             session.setDone(true);
-            session.setKWh(BigDecimal.valueOf(100)); // set tạm 1000 để tính tiền, chừng sau phải lấy theo số kwH trên trụ sạc để set vào này
+//          session.setKWh(BigDecimal.valueOf(100)); // set tạm 100 để tính tiền, chừng sau phải lấy theo số kwH trên trụ sạc để set vào này
             session.setEndTime(LocalDateTime.now());
             session.setTotalAmount(calculateAmount(session));
             updateSession(session);
