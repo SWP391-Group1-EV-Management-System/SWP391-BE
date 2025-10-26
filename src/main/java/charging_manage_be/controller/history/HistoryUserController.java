@@ -56,6 +56,7 @@ public class HistoryUserController {
             HistoryResponseDTO term = new  HistoryResponseDTO();
             term.setSessionId(session.getChargingSessionId());
             term.setStartTime(session.getStartTime());
+            term.setExpectedEndTime(session.getExpectedEndTime());
             term.setEndTime(session.getEndTime());
             term.setKWh(session.getKWh());
             term.setTotalAmount(session.getTotalAmount());

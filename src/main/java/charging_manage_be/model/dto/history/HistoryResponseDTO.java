@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 public class HistoryResponseDTO {
     private String sessionId;
     private LocalDateTime startTime;
+    private LocalDateTime expectedEndTime;
     private LocalDateTime endTime;
     private BigDecimal kWh;
     private BigDecimal totalAmount;
