@@ -6,21 +6,30 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChargingSessionResponse {
+public class ChargingSessionDetail {
     private String chargingSessionId;
     private LocalDateTime expectedEndTime;
     private String booking;
     private String chargingPost;
     private String station;
+    private String stationName;
+    private String addressStation;
+    private BigDecimal pricePerKWH;
+    private BigDecimal maxPower;
+    private List<String> typeCharging;
     private String user;
     private String userManage;
-    private boolean isDone;
     private LocalDateTime startTime;
-    private LocalDateTime endTime;
-    private BigDecimal kWh;
-    private BigDecimal totalAmount;
 }
+/*
+tên trạm
+địa chỉ trạm
+giá tiền kwh
+công xuất tối đa
+loại cổng sạc
+ */
