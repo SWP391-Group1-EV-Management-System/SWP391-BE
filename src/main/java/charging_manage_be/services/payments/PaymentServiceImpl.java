@@ -77,6 +77,12 @@ public class PaymentServiceImpl implements PaymentService {
 
         BigDecimal finalPrice = payment.getSession().getTotalAmount();
 
+        if ("PMT_MOMO".equalsIgnoreCase(paymentMethod.getIdPaymentMethod())){
+            payment.setPrice(finalPrice);
+            payment.setPaymentMethod(paymentMethod);
+            paymentRepository.save(payment);
+        }
+
         if ("PMT_PACKAGE".equalsIgnoreCase(paymentMethod.getIdPaymentMethod())) {
             PackageTransactionResponseDTO activePackage =
                     packageTransactionService.getLatestActivePackageByUserId(payment.getUser().getUserID());
@@ -102,22 +108,14 @@ public class PaymentServiceImpl implements PaymentService {
 //                    BigDecimal overKWh = usedKWh.subtract(quotaRemaining); // 400
 //                    BigDecimal unitPrice = finalPrice.divide(usedKWh, 2, RoundingMode.HALF_UP);       // giá mỗi kWh
 //                    finalPrice = overKWh.multiply(unitPrice);   // 400 * 5000 = 2,000,000
-                    PaymentMethodEntity paymentMethodEntity = paymentMethodRepository.findById("PMT_MOMO").orElseThrow(() -> new RuntimeException("Payment method not found"));
-                    payment.setPaymentMethod(paymentMethodEntity);
-                    payment.setPrice(finalPrice);
-                    paymentRepository.save(payment);
-
+//                    PaymentMethodEntity paymentMethodEntity = paymentMethodRepository.findById("PMT_MOMO").orElseThrow(() -> new RuntimeException("Payment method not found"));
+//                    payment.setPaymentMethod(paymentMethodEntity);
+//                    payment.setPrice(finalPrice);
+//                    paymentRepository.save(payment);
+                    return false;
                 }
             }
-            return true;
         }
-
-
-
-
-        payment.setPaymentMethod(paymentMethod);
-        payment.setPrice(finalPrice);
-        paymentRepository.save(payment);
         return true;
     }
 
