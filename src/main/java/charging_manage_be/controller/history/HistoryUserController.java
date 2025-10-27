@@ -48,8 +48,10 @@ public class HistoryUserController {
             {
                 payment.setId(paymentEntity.getPaymentId());
                 payment.setPaid(paymentEntity.isPaid());
-                payment.setMethodId(paymentEntity.getPaymentMethod().getIdPaymentMethod());
-                payment.setMethodName(paymentEntity.getPaymentMethod().getNamePaymentMethod());
+                if(paymentEntity.getPaymentMethod() != null) {
+                    payment.setMethodId(paymentEntity.getPaymentMethod().getIdPaymentMethod());
+                    payment.setMethodName(paymentEntity.getPaymentMethod().getNamePaymentMethod());
+                }
                 payment.setPaidAt(paymentEntity.getPaidAt());
             }
 
