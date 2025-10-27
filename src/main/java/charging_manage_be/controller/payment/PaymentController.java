@@ -3,6 +3,7 @@ package charging_manage_be.controller.payment;
 import charging_manage_be.model.dto.momo_payment.CreateMomoRequestDTO;
 import charging_manage_be.model.dto.momo_payment.CreateMomoResponseDTO;
 import charging_manage_be.model.dto.payment.PaymentResponse;
+import charging_manage_be.model.dto.payment.PaymentResponseDetail;
 import charging_manage_be.model.dto.service_package.PackageTransactionResponseDTO;
 import charging_manage_be.model.entity.payments.PaymentEntity;
 import charging_manage_be.model.entity.service_package.PackageTransactionEntity;
@@ -147,12 +148,14 @@ public class PaymentController {
 
                 boolean isPaid = paymentService.invoicePayment(orderId);
                 if (isPaid) {
-                    PackageTransactionResponseDTO packageTransaction = packageTransactionService.getLatestActivePackageByUserId(payment.getUser().getUserID());
-                    if (packageTransaction != null) {
-                        boolean quotaUpdated = packageTransactionService.updateQuotationPackageTransaction(packageTransaction.getPackageTransactionId(), payment.getSession().getChargingSessionId());
-
-                        if (!quotaUpdated) {
-                            return ResponseEntity.status(400).body("Failed to update quota - insufficient quota or inactive package");
+                    assert payment != null;
+                    if ("PMT_PACKAGE".equals(payment.getPaymentMethod().getIdPaymentMethod())){
+                        PackageTransactionResponseDTO packageTransaction = packageTransactionService.getLatestActivePackageByUserId(payment.getUser().getUserID());
+                        if (packageTransaction != null) {
+                            boolean quotaUpdated = packageTransactionService.updateQuotationPackageTransaction(packageTransaction.getPackageTransactionId(), payment.getSession().getChargingSessionId());
+                            if (!quotaUpdated) {
+                                return ResponseEntity.status(400).body("Failed to update quota - insufficient quota or inactive package");
+                            }
                         }
                     }
                     return ResponseEntity.ok("Payment successfully");
@@ -187,40 +190,34 @@ public class PaymentController {
     }
 
     @GetMapping("/{paymentId}")
-    public ResponseEntity<PaymentResponse> getPaymentByPaymentId(@PathVariable String paymentId) {
+    public ResponseEntity<PaymentResponseDetail> getPaymentByPaymentId(@PathVariable String paymentId) {
         PaymentEntity payment = paymentService.getPaymentByPaymentId(paymentId);
-        PaymentResponse paymentResponse = new PaymentResponse(
+        PaymentResponseDetail paymentResponseDetail = new PaymentResponseDetail(
                 payment.getPaymentId(),
-                payment.getUser().getUserID(),
                 payment.getSession().getChargingSessionId(),
-                payment.isPaid(),
-                payment.getCreatedAt(),
-                payment.getPaidAt(),
-                payment.getPaymentMethod() != null ? payment.getPaymentMethod().getIdPaymentMethod() : null,
+                payment.getSession().getStation().getNameChargingStation(),
+                payment.getSession().getKWh(),
                 payment.getPrice()
         );
         if (payment != null) {
-            return ResponseEntity.ok(paymentResponse);
+            return ResponseEntity.ok(paymentResponseDetail);
         } else {
             return ResponseEntity.notFound().build();
         }
     }
 
     @GetMapping("/paymentByUser/{userId}")
-    public ResponseEntity<List<PaymentResponse>> getPaymentByUserId(@PathVariable String userId) {
+    public ResponseEntity<List<PaymentResponseDetail>> getPaymentByUserId(@PathVariable String userId) {
         List<PaymentEntity> payments = paymentService.getPaymentByUserID(userId);
-        List<PaymentResponse> paymentResponses = payments.stream().map(payment -> new PaymentResponse(
+        List<PaymentResponseDetail> paymentResponseDetail = payments.stream().map(payment -> new PaymentResponseDetail(
                 payment.getPaymentId(),
-                payment.getUser().getUserID(),
                 payment.getSession().getChargingSessionId(),
-                payment.isPaid(),
-                payment.getCreatedAt(),
-                payment.getPaidAt(),
-                payment.getPaymentMethod() != null ? payment.getPaymentMethod().getIdPaymentMethod() : null,
+                payment.getSession().getStation().getNameChargingStation(),
+                payment.getSession().getKWh(),
                 payment.getPrice()
         )).toList();
-        if (paymentResponses != null) {
-            return ResponseEntity.ok(paymentResponses);
+        if (!paymentResponseDetail.isEmpty()) {
+            return ResponseEntity.ok(paymentResponseDetail);
         } else {
             return ResponseEntity.notFound().build();
         }
