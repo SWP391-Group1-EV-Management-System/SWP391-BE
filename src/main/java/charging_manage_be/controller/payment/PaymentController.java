@@ -148,16 +148,16 @@ public class PaymentController {
 
                 boolean isPaid = paymentService.invoicePayment(orderId);
                 if (isPaid) {
-                    assert payment != null;
-                    if ("PMT_PACKAGE".equals(payment.getPaymentMethod().getIdPaymentMethod())){
-                        PackageTransactionResponseDTO packageTransaction = packageTransactionService.getLatestActivePackageByUserId(payment.getUser().getUserID());
-                        if (packageTransaction != null) {
-                            boolean quotaUpdated = packageTransactionService.updateQuotationPackageTransaction(packageTransaction.getPackageTransactionId(), payment.getSession().getChargingSessionId());
-                            if (!quotaUpdated) {
-                                return ResponseEntity.status(400).body("Failed to update quota - insufficient quota or inactive package");
-                            }
-                        }
-                    }
+//                    assert payment != null;
+//                    if (payment.getPaymentMethod().getIdPaymentMethod().equals("PMT_PACKAGE")){
+//                        PackageTransactionResponseDTO packageTransaction = packageTransactionService.getLatestActivePackageByUserId(payment.getUser().getUserID());
+//                        if (packageTransaction != null) {
+//                            boolean quotaUpdated = packageTransactionService.updateQuotationPackageTransaction(packageTransaction.getPackageTransactionId(), payment.getSession().getChargingSessionId());
+//                            if (!quotaUpdated) {
+//                                return ResponseEntity.status(400).body("Failed to update quota - insufficient quota or inactive package");
+//                            }
+//                        }
+//                    }
                     return ResponseEntity.ok("Payment successfully");
                 }
                 else{
