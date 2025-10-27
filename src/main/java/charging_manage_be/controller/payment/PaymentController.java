@@ -2,6 +2,7 @@ package charging_manage_be.controller.payment;
 
 import charging_manage_be.model.dto.momo_payment.CreateMomoRequestDTO;
 import charging_manage_be.model.dto.momo_payment.CreateMomoResponseDTO;
+import charging_manage_be.model.dto.payment.PaymentRequest;
 import charging_manage_be.model.dto.payment.PaymentResponse;
 import charging_manage_be.model.dto.payment.PaymentResponseDetail;
 import charging_manage_be.model.dto.service_package.PackageTransactionResponseDTO;
@@ -63,12 +64,12 @@ public class PaymentController {
 //    }
 
     @PostMapping("/paymentMethod")
-    public ResponseEntity<String> processPayment( @RequestBody PaymentEntity payment) {
-        boolean isProcessed = paymentService.updatePaymentWithMethod(payment.getPaymentId(), payment.getPaymentMethod().getIdPaymentMethod());
+    public ResponseEntity<String> processPayment( @RequestBody PaymentRequest payment) {
+        boolean isProcessed = paymentService.updatePaymentWithMethod(payment.getPaymentId(), payment.getPaymentMethodId());
         if (isProcessed) {
             return ResponseEntity.ok("Payment processed successfully");
         } else {
-            return ResponseEntity.status(500).body("Failed to process payment");
+            return ResponseEntity.status(500).body("Failed to choose payment method");
         }
     }
 
