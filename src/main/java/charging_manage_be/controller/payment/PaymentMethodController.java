@@ -1,6 +1,7 @@
 package charging_manage_be.controller.payment;
 
 
+import charging_manage_be.model.dto.payment.PaymentMethodResponse;
 import charging_manage_be.model.entity.payments.PaymentMethodEntity;
 import charging_manage_be.services.payments.PaymentMethodService;
 import charging_manage_be.services.payments.PaymentService;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -29,20 +31,26 @@ public class PaymentMethodController {
     }
 
     @GetMapping("/{paymentMethodId}")
-    public ResponseEntity<PaymentMethodEntity> getPaymentMethodById(@PathVariable String paymentMethodId) {
+    public ResponseEntity<PaymentMethodResponse> getPaymentMethodById(@PathVariable String paymentMethodId) {
         boolean isExist = paymentMethodService.getPaymentMethodById(paymentMethodId).isPresent();
         if (isExist) {
             PaymentMethodEntity paymentMethod = paymentMethodService.getPaymentMethodById(paymentMethodId).get();
-            return ResponseEntity.ok(paymentMethod);
+            PaymentMethodResponse  paymentMethodResponse = new PaymentMethodResponse();
+            paymentMethodResponse.setNamePaymentMethod(paymentMethod.getNamePaymentMethod());
+            paymentMethodResponse.setIdPaymentMethod(paymentMethod.getIdPaymentMethod());
+            return ResponseEntity.ok(paymentMethodResponse);
         } else {
             return ResponseEntity.notFound().build();
         }
     }
 
-    @GetMapping
-    public ResponseEntity<List<PaymentMethodEntity>> getAllPaymentMethods() {
+    @GetMapping("/all")
+    public ResponseEntity<List<PaymentMethodResponse>> getAllPaymentMethods() {
         List<PaymentMethodEntity> paymentMethods = paymentMethodService.getAllPaymentMethod();
-        return ResponseEntity.ok(paymentMethods);
+        List<PaymentMethodResponse> listPaymentMethodResponse = paymentMethods.stream()
+                .map(pm -> new PaymentMethodResponse(pm.getIdPaymentMethod(), pm.getNamePaymentMethod()))
+                .collect(java.util.stream.Collectors.toList());
+        return ResponseEntity.ok(listPaymentMethodResponse);
     }
 
     @DeleteMapping("/{paymentMethodId}")
