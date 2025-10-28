@@ -1,5 +1,7 @@
 package charging_manage_be.services.booking;
 
+import charging_manage_be.model.dto.booking.BookingIdForSessionResDTO;
+import charging_manage_be.model.dto.booking.BookingResponseDTO;
 import charging_manage_be.model.entity.booking.BookingEntity;
 import charging_manage_be.model.entity.booking.WaitingListEntity;
 
@@ -22,5 +24,6 @@ public interface BookingService {
     BookingEntity getBookingByBookingId(String bookingId);
     List<BookingEntity> getBookingByStatus(String status);
     List<BookingEntity> getExpiredBookings(LocalDateTime currentTime);
+    BookingIdForSessionResDTO getLatestConfirmedBookingByUserId(String userId);
 
 }

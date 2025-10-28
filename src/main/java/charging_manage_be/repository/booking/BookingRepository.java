@@ -36,5 +36,9 @@ public interface BookingRepository extends JpaRepository<BookingEntity, String> 
     @Query("SELECT b FROM BookingEntity b WHERE b.arrivalTime IS NULL ")
     List<BookingEntity> findExpiredBookings();
 
+    // Viết một query để tự động lấy booking theo userId sao cho phải là booking mới nhất của user đó và có trạng thái là "CONFIRMED"
+
+    BookingEntity findFirstByUser_UserIDAndStatusOrderByCreatedAtDesc(String userId, String status);
+
 
 }

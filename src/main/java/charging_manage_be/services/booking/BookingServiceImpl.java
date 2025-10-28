@@ -1,5 +1,7 @@
 package charging_manage_be.services.booking;
 
+import charging_manage_be.model.dto.booking.BookingIdForSessionResDTO;
+import charging_manage_be.model.dto.booking.BookingResponseDTO;
 import charging_manage_be.model.entity.booking.BookingEntity;
 import charging_manage_be.model.entity.booking.WaitingListEntity;
 import charging_manage_be.model.entity.cars.CarEntity;
@@ -16,6 +18,7 @@ import charging_manage_be.services.status_service.UserStatusService;
 import charging_manage_be.services.waiting_list.WaitingListService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -321,6 +324,17 @@ public class BookingServiceImpl implements BookingService {
         return bookingRepository.findExpiredBookings().stream()
                 .filter(booking -> booking.getCreatedAt().plusMinutes(booking.getMaxWaitingTime()).isBefore(currentTime) ||
                          booking.getCreatedAt().plusMinutes(booking.getMaxWaitingTime()).isEqual(currentTime)).collect(Collectors.toList());
+    }
+
+    @Override
+    public BookingIdForSessionResDTO getLatestConfirmedBookingByUserId(String userId) {
+        BookingEntity booking = bookingRepository.findFirstByUser_UserIDAndStatusOrderByCreatedAtDesc(userId, "CONFIRMED");
+        if (booking == null) {
+            return null;
+        }
+        BookingIdForSessionResDTO bookingIdForSessionResDTO = new BookingIdForSessionResDTO();
+        bookingIdForSessionResDTO.setBookingId(booking.getBookingId());
+        return bookingIdForSessionResDTO;
     }
 
 

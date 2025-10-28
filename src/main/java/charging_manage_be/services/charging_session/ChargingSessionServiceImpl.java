@@ -60,7 +60,6 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
             if (optionalBooking.isEmpty()) {
                 return null;
             }
-
             BookingEntity booking = optionalBooking.get();
         ChargingSessionEntity session = new ChargingSessionEntity();
         session.setChargingSessionId(generateUniqueId());
