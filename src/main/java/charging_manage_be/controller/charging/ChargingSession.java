@@ -55,7 +55,6 @@ public class ChargingSession {
         String sessionId;
         if (bookingSession == null) {
             sessionId = sessionService.addSessionWithoutBooking(createSession.getBooking().getUser(), createSession.getBooking().getChargingPost(),expectedEndTime);
-            return ResponseEntity.ok(sessionId);
         }
         else {
         BookingEntity booking = bookingService.getBookingByBookingId(bookingSession.getBookingId());
