@@ -9,7 +9,6 @@ import charging_manage_be.model.entity.users.UserEntity;
 import charging_manage_be.services.booking.BookingService;
 import charging_manage_be.services.status_service.UserStatusService;
 import charging_manage_be.services.user_reputations.UserReputationService;
-import charging_manage_be.services.users.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +18,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/booking")
@@ -31,28 +32,20 @@ public class BookingController {
     private UserStatusService userStatusService;
     @Autowired
     private UserReputationService userReputationService;
-    @Autowired
-    private UserService  userService;
-
     private final String STATUS_BOOKING = "booking";
     private final String STATUS_WAITING = "waiting";
     @PostMapping("/create")
-    public ResponseEntity<?> processBooking(@RequestBody BookingRequestDTO booking) { // ? có nghĩa là có thể là Booking hoặc WaitingList
-        // điều kiện này để chuyển đổi email từ AI agent gọi về thành userId
-        if(booking.getUser().contains("@"))
-        {
-            UserEntity user =  userService.findByEmail(booking.getUser()).orElse(null);
-            if(user != null) {
-                booking.setUser(user.getUserID());
-            }
-        }
+    public ResponseEntity<Map<String, Object>> processBooking(@RequestBody BookingRequestDTO booking) { // ? có nghĩa là có thể là Booking hoặc WaitingList
         int result = bookingService.handleBookingNavigation(booking.getUser(), booking.getChargingPost(), booking.getCar()); // Trả về một result có thể là Booking hoặc WaitingList
+        String status;
         if (result != -1) {
-            userStatusService.setUserStatus(booking.getUser(), STATUS_WAITING);
+            status = userStatusService.setUserStatus(booking.getUser(), STATUS_WAITING);
         }else {
-            userStatusService.setUserStatus(booking.getUser(), STATUS_BOOKING);
+            status = userStatusService.setUserStatus(booking.getUser(), STATUS_BOOKING);
         }
-        return ResponseEntity.ok(result);
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", status);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/complete/{bookingId}")

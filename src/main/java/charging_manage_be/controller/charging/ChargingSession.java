@@ -24,7 +24,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -49,7 +51,7 @@ public class ChargingSession {
     private final String STATUS_SESSION = "session";
     private final String STATUS_PAYMENT = "payment";
     @PostMapping("/create")
-    public ResponseEntity<String> createChargingSession(@RequestBody ChargingSessionRequest createSession) { // gồm có đối tượng booking và expectedEndTime
+    public ResponseEntity<Map<String, Object>> createChargingSession(@RequestBody ChargingSessionRequest createSession) { // gồm có đối tượng booking và expectedEndTime
         BookingIdForSessionResDTO bookingSession = bookingService.getLatestConfirmedBookingByUserId(createSession.getBooking().getUser());
         LocalDateTime expectedEndTime = createSession.getExpectedEndTime();
         String sessionId;
@@ -67,8 +69,11 @@ public class ChargingSession {
             // sau đó gọi lại hàm completeBooking ở dưới khi kết thúc session
         }
         // yêu cầu FE xử lý khi realtime đạt tới expectedEndTime thì gọi API finish ở dưới
-        userStatusService.setUserStatus(createSession.getBooking().getUser(), STATUS_SESSION);
-        return ResponseEntity.ok(sessionId);
+        String status = userStatusService.setUserStatus(createSession.getBooking().getUser(), STATUS_SESSION);
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", status);
+        response.put("sessionId", sessionId);
+        return ResponseEntity.ok(response);
     }
     @PostMapping("/finish/{sessionId}")
     public ResponseEntity<String> endChargingSession(@PathVariable String sessionId, @RequestBody BigDecimal kWh){
