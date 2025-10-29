@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.util.WebUtils;
 
 @RestController
 @RequestMapping("/agent")
@@ -26,12 +27,10 @@ public class AgentCheckToken {
 
         String accessToken = null;
 
-        // 🔍 Duyệt cookie để lấy access_token
-        for (Cookie cookie : cookies) {
-            if ("jwt".equals(cookie.getName())) {
-                accessToken = cookie.getValue();
-                break;
-            }
+        //  Duyệt cookie để lấy access_token
+        Cookie jwtCookie = WebUtils.getCookie(request, "jwt");
+        if (jwtCookie != null) {
+            accessToken = jwtCookie.getValue();
         }
 
         if (accessToken == null) {
@@ -39,7 +38,7 @@ public class AgentCheckToken {
         }
 
         try {
-            // 🧩 Giải mã và xác thực JWT
+            // Giải mã và xác thực JWT
             String userName = jwtUtil.extractUsername(accessToken);
             return userName;
         } catch (Exception e) {

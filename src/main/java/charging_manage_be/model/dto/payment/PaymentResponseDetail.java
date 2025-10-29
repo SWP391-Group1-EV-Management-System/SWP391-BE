@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 public class PaymentResponseDetail {
     private String paymentId;
     private String sessionId;
+    private boolean isPaid;
     private String chargingStationName;
     private BigDecimal kWh;
     private BigDecimal price;

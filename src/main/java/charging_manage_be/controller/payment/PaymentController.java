@@ -196,6 +196,7 @@ public class PaymentController {
         PaymentResponseDetail paymentResponseDetail = new PaymentResponseDetail(
                 payment.getPaymentId(),
                 payment.getSession().getChargingSessionId(),
+                payment.isPaid(),
                 payment.getSession().getStation().getNameChargingStation(),
                 payment.getSession().getKWh(),
                 payment.getPrice()
@@ -213,6 +214,7 @@ public class PaymentController {
         List<PaymentResponseDetail> paymentResponseDetail = payments.stream().map(payment -> new PaymentResponseDetail(
                 payment.getPaymentId(),
                 payment.getSession().getChargingSessionId(),
+                payment.isPaid(),
                 payment.getSession().getStation().getNameChargingStation(),
                 payment.getSession().getKWh(),
                 payment.getPrice()
