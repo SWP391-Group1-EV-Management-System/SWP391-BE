@@ -9,8 +9,9 @@ public class UserStatusService {
     @Autowired
     private StringRedisTemplate redisTemplate;
 
-    public void setUserStatus(String userId, String status) {
+    public String setUserStatus(String userId, String status) {
         redisTemplate.opsForHash().put("user:" + userId, "status", status);
+        return status;
         //redisTemplate.expire("user:" + userId, Duration.ofHours(1));
     }
 

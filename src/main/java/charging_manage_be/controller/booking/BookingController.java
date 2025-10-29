@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/booking")
@@ -33,14 +35,17 @@ public class BookingController {
     private final String STATUS_BOOKING = "booking";
     private final String STATUS_WAITING = "waiting";
     @PostMapping("/create")
-    public ResponseEntity<?> processBooking(@RequestBody BookingRequestDTO booking) { // ? có nghĩa là có thể là Booking hoặc WaitingList
+    public ResponseEntity<Map<String, Object>> processBooking(@RequestBody BookingRequestDTO booking) { // ? có nghĩa là có thể là Booking hoặc WaitingList
         int result = bookingService.handleBookingNavigation(booking.getUser(), booking.getChargingPost(), booking.getCar()); // Trả về một result có thể là Booking hoặc WaitingList
+        String status;
         if (result != -1) {
-            userStatusService.setUserStatus(booking.getUser(), STATUS_WAITING);
+            status = userStatusService.setUserStatus(booking.getUser(), STATUS_WAITING);
         }else {
-            userStatusService.setUserStatus(booking.getUser(), STATUS_BOOKING);
+            status = userStatusService.setUserStatus(booking.getUser(), STATUS_BOOKING);
         }
-        return ResponseEntity.ok(result);
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", status);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/complete/{bookingId}")
