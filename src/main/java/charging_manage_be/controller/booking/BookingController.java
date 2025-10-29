@@ -9,6 +9,7 @@ import charging_manage_be.model.entity.users.UserEntity;
 import charging_manage_be.services.booking.BookingService;
 import charging_manage_be.services.status_service.UserStatusService;
 import charging_manage_be.services.user_reputations.UserReputationService;
+import charging_manage_be.services.users.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,10 +33,21 @@ public class BookingController {
     private UserStatusService userStatusService;
     @Autowired
     private UserReputationService userReputationService;
+    @Autowired
+    private UserService  userService;
+
     private final String STATUS_BOOKING = "booking";
     private final String STATUS_WAITING = "waiting";
     @PostMapping("/create")
     public ResponseEntity<Map<String, Object>> processBooking(@RequestBody BookingRequestDTO booking) { // ? có nghĩa là có thể là Booking hoặc WaitingList
+        // điều kiện này để chuyển đổi email từ AI agent gọi về thành userId
+        if(booking.getUser().contains("@"))
+        {
+            UserEntity user =  userService.findByEmail(booking.getUser()).orElse(null);
+            if(user != null) {
+                booking.setUser(user.getUserID());
+            }
+        }
         int result = bookingService.handleBookingNavigation(booking.getUser(), booking.getChargingPost(), booking.getCar()); // Trả về một result có thể là Booking hoặc WaitingList
         String status;
         if (result != -1) {
