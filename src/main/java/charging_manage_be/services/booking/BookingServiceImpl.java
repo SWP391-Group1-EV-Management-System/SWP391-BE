@@ -85,8 +85,7 @@ public class BookingServiceImpl implements BookingService {
         // Câu lệnh trên sẽ lấy trạng thái mới nhất của trạm sạc với ID trụ sạc là chargingPostID
         // Và trạng thái của booking là "waiting" hoặc "charging"
         // Status là status của trụ ở trong bảng booking chứ không phải trong bảng chargingPost
-
-        // Nếu trạng thái hiện tại của trạm sạc là "waiting" hoặc "charging" thì sẽ vào danh sách chờ bởi vì trạm sạc đang có người dùng
+        // Nếu trạng thái hiện tại của booking là "waiting" hoặc "charging" thì sẽ vào danh sách chờ bởi vì trạm sạc đang có người dùng
 
         if (latestStatusChargingPost.isEmpty()) { // Nếu trạm sạc hiện tại không có trạng thái "waiting" hoặc "charging" thì sẽ tạo booking luôn
             // Xoá userId khỏi danh sách chờ trong Redis vì user sắp được tạo booking
