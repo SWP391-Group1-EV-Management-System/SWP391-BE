@@ -35,7 +35,7 @@ public class BookingController {
     private UserReputationService userReputationService;
     @Autowired
     private UserService  userService;
-
+// cơ chế tự pop từ waiting list sang hàng đợi bị lỗi
     private final String STATUS_BOOKING = "booking";
     private final String STATUS_WAITING = "waiting";
     @PostMapping("/create")
@@ -57,6 +57,7 @@ public class BookingController {
         }
         Map<String, Object> response = new HashMap<>();
         response.put("status", status);
+        response.put("rank", result);
         return ResponseEntity.ok(response);
     }
 

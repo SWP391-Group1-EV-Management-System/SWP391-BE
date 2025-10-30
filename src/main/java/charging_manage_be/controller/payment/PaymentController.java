@@ -193,13 +193,19 @@ public class PaymentController {
     @GetMapping("/{paymentId}")
     public ResponseEntity<PaymentResponseDetail> getPaymentByPaymentId(@PathVariable String paymentId) {
         PaymentEntity payment = paymentService.getPaymentByPaymentId(paymentId);
+        String paymentMethod = null;
+        if (payment.getPaymentMethod() != null) {
+            paymentMethod = payment.getPaymentMethod().getNamePaymentMethod();
+        }
+
         PaymentResponseDetail paymentResponseDetail = new PaymentResponseDetail(
                 payment.getPaymentId(),
                 payment.getSession().getChargingSessionId(),
                 payment.isPaid(),
                 payment.getSession().getStation().getNameChargingStation(),
                 payment.getSession().getKWh(),
-                payment.getPrice()
+                payment.getPrice(),
+                paymentMethod
         );
         if (payment != null) {
             return ResponseEntity.ok(paymentResponseDetail);
@@ -211,14 +217,21 @@ public class PaymentController {
     @GetMapping("/paymentByUser/{userId}")
     public ResponseEntity<List<PaymentResponseDetail>> getPaymentByUserId(@PathVariable String userId) {
         List<PaymentEntity> payments = paymentService.getPaymentByUserID(userId);
-        List<PaymentResponseDetail> paymentResponseDetail = payments.stream().map(payment -> new PaymentResponseDetail(
-                payment.getPaymentId(),
-                payment.getSession().getChargingSessionId(),
-                payment.isPaid(),
-                payment.getSession().getStation().getNameChargingStation(),
-                payment.getSession().getKWh(),
-                payment.getPrice()
-        )).toList();
+        List<PaymentResponseDetail> paymentResponseDetail = payments.stream().map(payment -> {
+            String paymentMethod = null;
+            if (payment.getPaymentMethod() != null) {
+                paymentMethod = payment.getPaymentMethod().getNamePaymentMethod();
+            }
+            return new PaymentResponseDetail(
+                    payment.getPaymentId(),
+                    payment.getSession().getChargingSessionId(),
+                    payment.isPaid(),
+                    payment.getSession().getStation().getNameChargingStation(),
+                    payment.getSession().getKWh(),
+                    payment.getPrice(),
+                    paymentMethod
+            );
+        }).toList();
         if (!paymentResponseDetail.isEmpty()) {
             return ResponseEntity.ok(paymentResponseDetail);
         } else {

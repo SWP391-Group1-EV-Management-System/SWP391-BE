@@ -17,4 +17,5 @@ public class PaymentResponseDetail {
     private String chargingStationName;
     private BigDecimal kWh;
     private BigDecimal price;
+    private String paymentMethod;
 }
