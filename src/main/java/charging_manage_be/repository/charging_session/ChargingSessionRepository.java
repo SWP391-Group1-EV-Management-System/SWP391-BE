@@ -28,4 +28,9 @@ public interface ChargingSessionRepository extends JpaRepository<ChargingSession
     List<ChargingSessionEntity> findByStationAndIsDone(ChargingStationEntity station, boolean isDone);
 
     List<ChargingSessionEntity> findByUser(UserEntity user);
+
+    Optional<ChargingSessionEntity> findTopByChargingPostAndIsDoneOrderByStartTimeDesc(
+            ChargingPostEntity chargingPost,
+            boolean isDone
+    );
 }
