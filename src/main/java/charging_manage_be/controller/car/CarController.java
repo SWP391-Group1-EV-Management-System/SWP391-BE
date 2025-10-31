@@ -28,6 +28,8 @@ public class CarController {
     private CarRepository carRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private UserService userService;
 
     @PostMapping("/add")
     public ResponseEntity<String> addCar(@RequestBody CarRequestDTO carRequestDTO) {
@@ -54,7 +56,15 @@ public class CarController {
 
     @GetMapping("/all/{userId}")
     public ResponseEntity<List<CarResponseDTO>> getAllCarByUserId(@PathVariable String userId) {
-       List<CarResponseDTO> carResponseDTO = carService.findAllCarByUserID(userId).stream().map(CarEntity -> {
+        String userIdAfterCheck = userId;
+        if(userId.contains("@"))
+        {
+            UserEntity user =  userService.findByEmail(userId).orElse(null);
+            if(user != null) {
+                userIdAfterCheck = user.getUserID();
+            }
+        }
+       List<CarResponseDTO> carResponseDTO = carService.findAllCarByUserID(userIdAfterCheck).stream().map(CarEntity -> {
            CarResponseDTO carDTO = new CarResponseDTO();
            carDTO.setCarID(CarEntity.getCarID());
            carDTO.setLicensePlate(CarEntity.getLicensePlate());

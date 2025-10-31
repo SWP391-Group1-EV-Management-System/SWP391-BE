@@ -10,12 +10,15 @@ import charging_manage_be.repository.booking.BookingRepository;
 import charging_manage_be.repository.charging_post.ChargingPostRepository;
 import charging_manage_be.repository.charging_session.ChargingSessionRepository;
 import charging_manage_be.repository.users.UserRepository;
+import charging_manage_be.services.booking.BookingService;
 import charging_manage_be.services.charging_post.ChargingPostService;
 import charging_manage_be.services.charging_station.ChargingStationService;
 import charging_manage_be.services.payments.PaymentService;
 import charging_manage_be.services.users.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -32,14 +35,23 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
     private final int characterLength = 5;
     private final int numberLength = 4;
 
-    private final ChargingSessionRepository chargingSession;
-    private final PaymentService paymentService;
-    private final BookingRepository bookingRepository;
-    private final UserRepository userRepository;
-    private final ChargingPostRepository chargingPostRepository;
-    private final ChargingPostService ChargingPostService;
-    private final ChargingStationService stationService;
-    private final UserService userService;
+    @Autowired
+    private  ChargingSessionRepository chargingSession;
+    @Autowired
+    private  PaymentService paymentService;
+    @Lazy
+    @Autowired
+    private  BookingService bookingService;
+    @Autowired
+    private  UserRepository userRepository;
+    @Autowired
+    private  ChargingPostRepository chargingPostRepository;
+    @Autowired
+    private  ChargingPostService ChargingPostService;
+    @Autowired
+    private  ChargingStationService stationService;
+    @Autowired
+    private  UserService userService;
 
     public boolean isExistById(String sessionId) {
         return chargingSession.existsById(sessionId);
@@ -56,11 +68,10 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
     @Override
     public String addSessionWithBooking(String bookingId, LocalDateTime expectedEndTime) {
         try {
-            Optional<BookingEntity> optionalBooking = bookingRepository.findById(bookingId);
-            if (optionalBooking.isEmpty()) {
+                BookingEntity booking = bookingService.getBookingByBookingId(bookingId);
+            if (booking == null) {
                 return null;
             }
-            BookingEntity booking = optionalBooking.get();
         ChargingSessionEntity session = new ChargingSessionEntity();
         session.setChargingSessionId(generateUniqueId());
         session.setUser(booking.getUser());// trạm trụ trạng thái KWh tổng tiền
@@ -153,6 +164,8 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
             // gọi hóa đơn và tính tiền từ trụ sạc
             //PaymentEntity payment = new PaymentEntity();
             paymentService.addPayment(sessionId, null);
+            // tìm kiếm waiting tại trụ đó và chuyển họ qua booking
+            bookingService.processBooking(session.getChargingPost().getIdChargingPost());
             return true;
         } catch (Exception e) {
             e.printStackTrace();

@@ -6,19 +6,24 @@ import charging_manage_be.model.entity.booking.BookingEntity;
 import charging_manage_be.model.entity.booking.WaitingListEntity;
 import charging_manage_be.model.entity.cars.CarEntity;
 import charging_manage_be.model.entity.charging.ChargingPostEntity;
+import charging_manage_be.model.entity.charging.ChargingSessionEntity;
 import charging_manage_be.model.entity.charging.ChargingStationEntity;
 import charging_manage_be.model.entity.users.UserEntity;
 import charging_manage_be.repository.booking.BookingRepository;
 import charging_manage_be.repository.cars.CarRepository;
 import charging_manage_be.repository.charging_post.ChargingPostRepository;
+import charging_manage_be.repository.charging_session.ChargingSessionRepository;
 import charging_manage_be.repository.charging_station.ChargingStationRepository;
 import charging_manage_be.repository.users.UserRepository;
 import charging_manage_be.repository.waiting_list.WaitingListRepository;
+import charging_manage_be.services.charging_post.ChargingPostService;
+import charging_manage_be.services.charging_session.ChargingSessionService;
 import charging_manage_be.services.status_service.UserStatusService;
 import charging_manage_be.services.waiting_list.WaitingListService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cglib.core.Local;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -36,6 +41,8 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final ChargingStationRepository chargingStationRepository;
     private final WaitingListRepository waitingListRepository;
+    @Lazy
+    private final ChargingSessionRepository sessionRepo;
     private final WaitingListService waitingListService;
     private final UserRepository userRepository;
     private final CarRepository carRepository;
@@ -82,13 +89,16 @@ public class BookingServiceImpl implements BookingService {
         int positionInQueue;
         Optional<BookingEntity> latestStatusChargingPost = bookingRepository
                 .findFirstByChargingPost_IdChargingPostAndStatusInOrderByCreatedAtAsc(chargingPostId, List.of("CONFIRMED", "CHARGING"));
+        ChargingPostEntity postE = chargingPostRepository.findById(chargingPostId).orElse(null);
+        Optional<ChargingSessionEntity> latestStatusChargingPostInSession = sessionRepo.findTopByChargingPostAndIsDoneOrderByStartTimeDesc(postE,false);
+        // thêm xử lý khi có người đang trong session người dùng cũng phải vào waiting và chờ session end
         // Câu lệnh trên sẽ lấy trạng thái mới nhất của trạm sạc với ID trụ sạc là chargingPostID
         // Và trạng thái của booking là "waiting" hoặc "charging"
         // Status là status của trụ ở trong bảng booking chứ không phải trong bảng chargingPost
 
         // Nếu trạng thái hiện tại của trạm sạc là "waiting" hoặc "charging" thì sẽ vào danh sách chờ bởi vì trạm sạc đang có người dùng
 
-        if (latestStatusChargingPost.isEmpty()) { // Nếu trạm sạc hiện tại không có trạng thái "waiting" hoặc "charging" thì sẽ tạo booking luôn
+        if (latestStatusChargingPost.isEmpty() && latestStatusChargingPostInSession.isEmpty()) { // Nếu trạm sạc hiện tại không có trạng thái "waiting" hoặc "charging" thì sẽ tạo booking luôn
             // Xoá userId khỏi danh sách chờ trong Redis vì user sắp được tạo booking
             redisTemplate.opsForList().remove(redisKey(chargingPostId), 1, userId);
             BookingEntity bookingEntity = new BookingEntity();
