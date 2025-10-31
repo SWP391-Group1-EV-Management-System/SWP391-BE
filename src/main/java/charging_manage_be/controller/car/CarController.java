@@ -14,9 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/car")
@@ -107,5 +105,14 @@ public class CarController {
             carService.deleteCarByCarID(carId);
         }
         return ResponseEntity.ok().body("success");
+    }
+    @GetMapping("/random_pin")
+    public ResponseEntity<?> randomPin() {
+        int pin = carService.pinRandom();
+        int minuteMax = carService.maxMinutes(pin);
+        Map<String, Object> response = new HashMap<>();
+        response.put("pinNow", pin);
+        response.put("minuteMax", minuteMax);
+        return ResponseEntity.ok(response);
     }
 }
