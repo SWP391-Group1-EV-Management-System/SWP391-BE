@@ -83,83 +83,89 @@ public class BookingServiceImpl implements BookingService {
     // sửa tham số truyền vào đơn giản
     @Transactional
     public int handleBookingNavigation(String userId, String chargingPostId, String carId) {
-        // Check trạng thái hiện tại của trạm sạc
-        // push vào redis để tránh race condition
-        redisTemplate.opsForList().rightPush(redisKey(chargingPostId), userId);
-        int positionInQueue;
-        Optional<BookingEntity> latestStatusChargingPost = bookingRepository
-                .findFirstByChargingPost_IdChargingPostAndStatusInOrderByCreatedAtAsc(chargingPostId, List.of("CONFIRMED", "CHARGING"));
-        ChargingPostEntity postE = chargingPostRepository.findById(chargingPostId).orElse(null);
-        Optional<ChargingSessionEntity> latestStatusChargingPostInSession = sessionRepo.findTopByChargingPostAndIsDoneOrderByStartTimeDesc(postE,false);
-        // thêm xử lý khi có người đang trong session người dùng cũng phải vào waiting và chờ session end
-        // Câu lệnh trên sẽ lấy trạng thái mới nhất của trạm sạc với ID trụ sạc là chargingPostID
-        // Và trạng thái của booking là "waiting" hoặc "charging"
-        // Status là status của trụ ở trong bảng booking chứ không phải trong bảng chargingPost
+        if(isUserBooking(userId) || waitingListService.isUserWaiting(userId))
+        {
+            return -2;
+        }else {
+            // Check trạng thái hiện tại của trạm sạc
+            // push vào redis để tránh race condition
+            redisTemplate.opsForList().rightPush(redisKey(chargingPostId), userId);
+            int positionInQueue;
+            Optional<BookingEntity> latestStatusChargingPost = bookingRepository
+                    .findFirstByChargingPost_IdChargingPostAndStatusInOrderByCreatedAtAsc(chargingPostId, List.of("CONFIRMED", "CHARGING"));
+            ChargingPostEntity postE = chargingPostRepository.findById(chargingPostId).orElse(null);
+            Optional<ChargingSessionEntity> latestStatusChargingPostInSession = sessionRepo.findTopByChargingPostAndIsDoneOrderByStartTimeDesc(postE, false);
+            // thêm xử lý khi có người đang trong session người dùng cũng phải vào waiting và chờ session end
+            // Câu lệnh trên sẽ lấy trạng thái mới nhất của trạm sạc với ID trụ sạc là chargingPostID
+            // Và trạng thái của booking là "waiting" hoặc "charging"
+            // Status là status của trụ ở trong bảng booking chứ không phải trong bảng chargingPost
 
-        // Nếu trạng thái hiện tại của trạm sạc là "waiting" hoặc "charging" thì sẽ vào danh sách chờ bởi vì trạm sạc đang có người dùng
+            // Nếu trạng thái hiện tại của trạm sạc là "waiting" hoặc "charging" thì sẽ vào danh sách chờ bởi vì trạm sạc đang có người dùng
 
-        if (latestStatusChargingPost.isEmpty() && latestStatusChargingPostInSession.isEmpty()) { // Nếu trạm sạc hiện tại không có trạng thái "waiting" hoặc "charging" thì sẽ tạo booking luôn
-            // Xoá userId khỏi danh sách chờ trong Redis vì user sắp được tạo booking
-            redisTemplate.opsForList().remove(redisKey(chargingPostId), 1, userId);
-            BookingEntity bookingEntity = new BookingEntity();
-            bookingEntity.setBookingId(generateUniqueId());
+            if (latestStatusChargingPost.isEmpty() && latestStatusChargingPostInSession.isEmpty()) { // Nếu trạm sạc hiện tại không có trạng thái "waiting" hoặc "charging" thì sẽ tạo booking luôn
+                // Xoá userId khỏi danh sách chờ trong Redis vì user sắp được tạo booking
 
-            // fetch lại user từ DB để chắc chắn có userReputations
-            UserEntity user = userRepository.findById(userId)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+                redisTemplate.opsForList().remove(redisKey(chargingPostId), 1, userId);
+                BookingEntity bookingEntity = new BookingEntity();
+                bookingEntity.setBookingId(generateUniqueId());
 
-            // fetch car, chargingStation, post từ DB giống user
-            CarEntity car = carRepository.findById(carId)
-                    .orElseThrow(() -> new RuntimeException("Car not found"));
+                // fetch lại user từ DB để chắc chắn có userReputations
+                UserEntity user = userRepository.findById(userId)
+                        .orElseThrow(() -> new RuntimeException("User not found"));
 
-            ChargingPostEntity post = chargingPostRepository.findById(chargingPostId)
-                    .orElseThrow(() -> new RuntimeException("Post not found"));
-            ChargingStationEntity station = chargingStationRepository.findStationByChargingPostEntity(chargingPostId)
-                    .orElseThrow(() -> new RuntimeException("Station not found"));
+                // fetch car, chargingStation, post từ DB giống user
+                CarEntity car = carRepository.findById(carId)
+                        .orElseThrow(() -> new RuntimeException("Car not found"));
 
-            bookingEntity.setUser(user);
-            bookingEntity.setChargingStation(station);
-            bookingEntity.setChargingPost(post);
-            bookingEntity.setCar(car);
-            bookingEntity.setCreatedAt(LocalDateTime.now());
+                ChargingPostEntity post = chargingPostRepository.findById(chargingPostId)
+                        .orElseThrow(() -> new RuntimeException("Post not found"));
+                ChargingStationEntity station = chargingStationRepository.findStationByChargingPostEntity(chargingPostId)
+                        .orElseThrow(() -> new RuntimeException("Station not found"));
 
-            // Lấy maxWaitingTime từ bảng user_reputation
-            // Lấy tất cả các record trong bảng user_reputation của user, sau đó lấy max của maxWaitMinutes
-            // Nếu không có record nào trong bảng user_reputation thì sẽ ném ra ngoại lệ
-            bookingEntity.setMaxWaitingTime(user.getUserReputations()
-                    .stream().mapToInt(reputation -> reputation.getReputationLevel().getMaxWaitMinutes())
-                    .max().orElseThrow(() -> new RuntimeException("No reputation levels found for user")));
+                bookingEntity.setUser(user);
+                bookingEntity.setChargingStation(station);
+                bookingEntity.setChargingPost(post);
+                bookingEntity.setCar(car);
+                bookingEntity.setCreatedAt(LocalDateTime.now());
 
-            bookingEntity.setStatus("CONFIRMED");
-            BookingEntity savedBooking = bookingRepository.save(bookingEntity);
+                // Lấy maxWaitingTime từ bảng user_reputation
+                // Lấy tất cả các record trong bảng user_reputation của user, sau đó lấy max của maxWaitMinutes
+                // Nếu không có record nào trong bảng user_reputation thì sẽ ném ra ngoại lệ
+                bookingEntity.setMaxWaitingTime(user.getUserReputations()
+                        .stream().mapToInt(reputation -> reputation.getReputationLevel().getMaxWaitMinutes())
+                        .max().orElseThrow(() -> new RuntimeException("No reputation levels found for user")));
 
-            simpMessagingTemplate.convertAndSendToUser(userId,
-                    "/queue/notifications/" + chargingPostId,
-                    "User " + userId + " booked successfully");
+                bookingEntity.setStatus("CONFIRMED");
+                BookingEntity savedBooking = bookingRepository.save(bookingEntity);
 
-            return -1; // Trả về -1 để báo rằng không vào danh sách chờ mà đã tạo booking luôn
+                simpMessagingTemplate.convertAndSendToUser(userId,
+                        "/queue/notifications/" + chargingPostId,
+                        "User " + userId + " booked successfully");
+                return -1; // Trả về -1 để báo rằng không vào danh sách chờ mà đã tạo booking luôn
 
-        } else {
-            // Khi có các trạng thái "waiting" hoặc "charging" thì sẽ vào danh sách chờ
-            // Lưu record vào bảng waitingList
-            // WaitingListEntity savedWaiting = waitingListService.addToWaitingList(waitingRequest);
+
+            } else {
+                // Khi có các trạng thái "waiting" hoặc "charging" thì sẽ vào danh sách chờ
+                // Lưu record vào bảng waitingList
+                // WaitingListEntity savedWaiting = waitingListService.addToWaitingList(waitingRequest);
                 /*
                 Bạn nên forward các tham số đơn giản như userId, postId, carId sang service của waiting list để service đó tự xử lý
                 việc tạo WaitingListEntity. Điều này giúp tách biệt logic, dễ bảo trì, kiểm soát dữ liệu đầu vào tốt hơn
                 và tuân thủ nguyên tắc phân tầng trong Spring Boot. Không nên tạo entity trực tiếp ở service booking
                  */
-            waitingListService.addToWaitingList(userId, chargingPostId, carId);
-            // Thêm userID vào danh sách chờ trong Redis
+                waitingListService.addToWaitingList(userId, chargingPostId, carId);
+                // Thêm userID vào danh sách chờ trong Redis
 //            redisTemplate.opsForList().rightPush(redisKey(chargingPostID), waitingRequest.getUser().getUserID());
 
-            // Trả về thông báo tới user rằng đã vào danh sách chờ
-            // Nếu muốn gửi thông báo đến đích danh người dùng thì sẽ gửi đến kênh "/user/{userID}/queue/notifications"
-            // Muốn lấy số thứ tự của user trong danh sách chờ thì sẽ lấy vị trí của userID trong danh sách Redis
-            positionInQueue = redisTemplate.opsForList().range(redisKey(chargingPostId), 0, -1).indexOf(userId) + 1;
-            //simpMessagingTemplate.convertAndSendToUser(userId, "/queue/notifications",
-            //        "Your position in queue: " + positionInQueue);
+                // Trả về thông báo tới user rằng đã vào danh sách chờ
+                // Nếu muốn gửi thông báo đến đích danh người dùng thì sẽ gửi đến kênh "/user/{userID}/queue/notifications"
+                // Muốn lấy số thứ tự của user trong danh sách chờ thì sẽ lấy vị trí của userID trong danh sách Redis
+                positionInQueue = redisTemplate.opsForList().range(redisKey(chargingPostId), 0, -1).indexOf(userId) + 1;
+                //simpMessagingTemplate.convertAndSendToUser(userId, "/queue/notifications",
+                //        "Your position in queue: " + positionInQueue);
 
-            return positionInQueue; // số thứ tự chờ
+                return positionInQueue; // số thứ tự chờ
+            }
         }
     }
 
@@ -345,6 +351,17 @@ public class BookingServiceImpl implements BookingService {
         BookingIdForSessionResDTO bookingIdForSessionResDTO = new BookingIdForSessionResDTO();
         bookingIdForSessionResDTO.setBookingId(booking.getBookingId());
         return bookingIdForSessionResDTO;
+    }
+
+    @Override
+    public boolean isUserBooking(String userId) {
+        boolean booking = false;
+        BookingEntity bookingCheck = bookingRepository.findFirstByUser_UserIDAndStatusOrderByCreatedAtDesc(userId, "CONFIRMED");
+        BookingEntity bookingCheck2 = bookingRepository.findFirstByUser_UserIDAndStatusOrderByCreatedAtDesc(userId, "CHARGING");
+        if(bookingCheck != null || bookingCheck2 != null) {
+            booking = true;
+        }
+        return booking;
     }
 
 

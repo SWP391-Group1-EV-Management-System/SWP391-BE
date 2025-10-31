@@ -25,5 +25,6 @@ public interface BookingService {
     List<BookingEntity> getBookingByStatus(String status);
     List<BookingEntity> getExpiredBookings(LocalDateTime currentTime);
     BookingIdForSessionResDTO getLatestConfirmedBookingByUserId(String userId);
+    boolean isUserBooking(String userId);
 
 }

@@ -1,6 +1,7 @@
 package charging_manage_be.services.waiting_list;
 
 
+import charging_manage_be.model.entity.booking.BookingEntity;
 import charging_manage_be.model.entity.booking.WaitingListEntity;
 import charging_manage_be.model.entity.cars.CarEntity;
 
@@ -21,4 +22,5 @@ public interface WaitingListService{
     WaitingListEntity getWaitingListForWaitingListId(String waitingListId);
     List<WaitingListEntity> getWaitingListForDate(LocalDateTime startOfDay, LocalDateTime endOfDay);
     boolean addExpectedWaitingTime(String postId, LocalDateTime expectedWaitingTime);
+    public boolean isUserWaiting(String userId);
 }

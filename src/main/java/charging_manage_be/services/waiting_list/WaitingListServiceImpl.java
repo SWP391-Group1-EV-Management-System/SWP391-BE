@@ -62,52 +62,54 @@ public class WaitingListServiceImpl implements WaitingListService{
 
     @Override
     public WaitingListEntity addToWaitingList(String userId, String chargingPostId, String carId) {
-        WaitingListEntity waitingListEntity = new WaitingListEntity();
-        // Lưu vào DB
-        UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // fetch car, chargingStation, post từ DB giống user
-        CarEntity car = carRepository.findById(carId)
-                .orElseThrow(() -> new RuntimeException("Car not found"));
+            WaitingListEntity waitingListEntity = new WaitingListEntity();
+            // Lưu vào DB
+            UserEntity user = userRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
 
-        ChargingPostEntity post = chargingPostRepository.findById(chargingPostId)
-                .orElseThrow(() -> new RuntimeException("Post not found"));
-        ChargingStationEntity station = chargingStationRepository.findStationByChargingPostEntity(chargingPostId)
-                .orElseThrow(() -> new RuntimeException("Station not found"));
-        // xử lý trường hợp vô sau ( trụ đó có người cắm sạc và đã có expected end time trên session)
-        // còn bên API bên sessionController sẽ xử lý case khi driver đợi 1 driver chưa tới trạm ( tức driver booking chưa cắm sạc chưa lấy đuọc time)
-        LocalDateTime timeEnd = chargingSessionService.getExpectedEndTime(chargingPostId);
-        waitingListEntity.setExpectedWaitingTime(timeEnd);
-        waitingListEntity.setUser(user);
-        waitingListEntity.setCar(car);
-        waitingListEntity.setChargingPost(post);
-        waitingListEntity.setChargingStation(station);
-        waitingListEntity.setWaitingListId(generateUniqueId());
-        waitingListEntity.setStatus("WAITING");
-        waitingListEntity.setCreatedAt(LocalDateTime.now());
+            // fetch car, chargingStation, post từ DB giống user
+            CarEntity car = carRepository.findById(carId)
+                    .orElseThrow(() -> new RuntimeException("Car not found"));
 
-        // Push vào Redis để quản lý hàng đợi
-        //redisTemplate.opsForList().rightPush(redisKey(savedEntity.getChargingPost().getIdChargingPost()), savedEntity.getUser().getUserID());
-        // opsForList là hàm để thao tác với danh sách trong Redis
-        // rightPush là hàm để thêm phần tử vào cuối danh sách
-        // redisKey là hàm để lấy key của danh sách chờ dựa trên ID trạm sạc
-        // savedEntity.getUser().getUserID() là ID của user vừa được thêm vào
-        // Tức là sau thao tác này, ta sẽ có được thông tin userID được thêm vào cuối danh sách chờ của trạm sạc tương ứng trong Redis
+            ChargingPostEntity post = chargingPostRepository.findById(chargingPostId)
+                    .orElseThrow(() -> new RuntimeException("Post not found"));
+            ChargingStationEntity station = chargingStationRepository.findStationByChargingPostEntity(chargingPostId)
+                    .orElseThrow(() -> new RuntimeException("Station not found"));
+            // xử lý trường hợp vô sau ( trụ đó có người cắm sạc và đã có expected end time trên session)
+            // còn bên API bên sessionController sẽ xử lý case khi driver đợi 1 driver chưa tới trạm ( tức driver booking chưa cắm sạc chưa lấy đuọc time)
+            LocalDateTime timeEnd = chargingSessionService.getExpectedEndTime(chargingPostId);
+            waitingListEntity.setExpectedWaitingTime(timeEnd);
+            waitingListEntity.setUser(user);
+            waitingListEntity.setCar(car);
+            waitingListEntity.setChargingPost(post);
+            waitingListEntity.setChargingStation(station);
+            waitingListEntity.setWaitingListId(generateUniqueId());
+            waitingListEntity.setStatus("WAITING");
+            waitingListEntity.setCreatedAt(LocalDateTime.now());
 
-
-        //Sau khi lưu vào DB và Redis thành công, ta sẽ gửi một thông báo realtime đến tất cả các client đang lắng nghe kênh "/topic/waiting/{chargingPostId}"
-        // để thông báo rằng có một user mới đã được thêm vào danh sách chờ của trạm sạc tương ứng
-        //simpMessagingTemplate.convertAndSend("/topic/waiting/" + savedEntity.getChargingPost().getIdChargingPost(), "New user added to waiting list");
-        // convertAndSend là hàm để gửi tin nhắn đến một path cụ thể là "/topic/waiting/{chargingPostId}"
-        WaitingListEntity savedEntity = waitingListRepository.save(waitingListEntity);
+            // Push vào Redis để quản lý hàng đợi
+            //redisTemplate.opsForList().rightPush(redisKey(savedEntity.getChargingPost().getIdChargingPost()), savedEntity.getUser().getUserID());
+            // opsForList là hàm để thao tác với danh sách trong Redis
+            // rightPush là hàm để thêm phần tử vào cuối danh sách
+            // redisKey là hàm để lấy key của danh sách chờ dựa trên ID trạm sạc
+            // savedEntity.getUser().getUserID() là ID của user vừa được thêm vào
+            // Tức là sau thao tác này, ta sẽ có được thông tin userID được thêm vào cuối danh sách chờ của trạm sạc tương ứng trong Redis
 
 
+            //Sau khi lưu vào DB và Redis thành công, ta sẽ gửi một thông báo realtime đến tất cả các client đang lắng nghe kênh "/topic/waiting/{chargingPostId}"
+            // để thông báo rằng có một user mới đã được thêm vào danh sách chờ của trạm sạc tương ứng
+            //simpMessagingTemplate.convertAndSend("/topic/waiting/" + savedEntity.getChargingPost().getIdChargingPost(), "New user added to waiting list");
+            // convertAndSend là hàm để gửi tin nhắn đến một path cụ thể là "/topic/waiting/{chargingPostId}"
+            WaitingListEntity savedEntity = waitingListRepository.save(waitingListEntity);
 
-        simpMessagingTemplate.convertAndSendToUser(waitingListEntity.getUser().getUserID(), "/queue/notifications" + savedEntity.getChargingPost().getIdChargingPost(),
-                "User " + savedEntity.getUser().getFirstName() + " joined waiting list");
 
-        return savedEntity;
+
+            simpMessagingTemplate.convertAndSendToUser(waitingListEntity.getUser().getUserID(), "/queue/notifications" + savedEntity.getChargingPost().getIdChargingPost(),
+                    "User " + savedEntity.getUser().getFirstName() + " joined waiting list");
+
+            return savedEntity;
+
     }
 
     @Override
@@ -209,6 +211,16 @@ public class WaitingListServiceImpl implements WaitingListService{
         waiting.setExpectedWaitingTime(expectedWaitingTime);
         waitingListRepository.save(waiting);
         return true;
+    }
+
+    @Override
+    public boolean isUserWaiting(String userId) {
+        boolean waiting = false;
+        WaitingListEntity waitingCheck = waitingListRepository.findFirstByChargingPost_IdChargingPostAndStatusOrderByCreatedAtAsc(userId, "WAITING").orElse(null);
+        if(waitingCheck != null) {
+            waiting = true;
+        }
+        return waiting;
     }
 }
 /*
