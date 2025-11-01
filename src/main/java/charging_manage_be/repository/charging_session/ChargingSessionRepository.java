@@ -35,4 +35,6 @@ public interface ChargingSessionRepository extends JpaRepository<ChargingSession
     );
 
     ChargingSessionEntity findFirstByChargingPostAndIsDoneFalse(ChargingPostEntity chargingPost);
+
+    List<ChargingSessionEntity> findByIsDoneFalse();
 }

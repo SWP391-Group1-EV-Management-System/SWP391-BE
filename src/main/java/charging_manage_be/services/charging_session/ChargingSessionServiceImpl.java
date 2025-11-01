@@ -19,13 +19,15 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static charging_manage_be.util.RandomId.generateRandomId;
 
@@ -52,6 +54,8 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
     private  ChargingStationService stationService;
     @Autowired
     private  UserService userService;
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
     public boolean isExistById(String sessionId) {
         return chargingSession.existsById(sessionId);
@@ -141,8 +145,7 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
     public BigDecimal calculateAmount(ChargingSessionEntity session) {
         // lấy giá của trụ sạc và thời gian sạc để tính tiền
         var rate = session.getKWh();
-        var duration = Duration.between(session.getStartTime(), session.getEndTime()).toMinutes();
-        return BigDecimal.valueOf(1000).multiply(rate).multiply(BigDecimal.valueOf(duration));
+        return BigDecimal.valueOf(3858).multiply(rate);
     }
 
     @Override
@@ -156,8 +159,13 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
             return false; // session đã kết thúc rồi
         }
         try {
+            Map<Object, Object> progress = redisTemplate.opsForHash().entries("charging:session:" + sessionId);
+            double chargedEnergy = 0.0;
+            if (progress.containsKey("chargedEnergy_kWh")) {
+                chargedEnergy = Double.parseDouble(progress.get("chargedEnergy_kWh").toString().replace(",", "."));
+            }
+            session.setKWh(BigDecimal.valueOf(chargedEnergy));
             session.setDone(true);
-//          session.setKWh(BigDecimal.valueOf(100)); // set tạm 100 để tính tiền, chừng sau phải lấy theo số kwH trên trụ sạc để set vào này
             session.setEndTime(LocalDateTime.now());
             session.setTotalAmount(calculateAmount(session));
             updateSession(session);
@@ -166,6 +174,8 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
             paymentService.addPayment(sessionId, null);
             // tìm kiếm waiting tại trụ đó và chuyển họ qua booking
             bookingService.processBooking(session.getChargingPost().getIdChargingPost());
+
+            deleteProgress(sessionId);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -211,6 +221,49 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
         UserEntity user = userService.getUserByID(userId).orElseThrow(() -> new RuntimeException("User not found"));
         return chargingSession.findByUser(user);
     }
+
+
+    // Hàm cập nhật tiến trình sạc real-time (được gọi mỗi giây)
+    @Scheduled(fixedRate = 1000)
+    public void updateChargingProgress() {
+        List<ChargingSessionEntity> activeSessions = chargingSession.findByIsDoneFalse();
+
+        for (ChargingSessionEntity session : activeSessions) {
+            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime start = session.getStartTime();
+            if (start == null || now.isBefore(start)){
+                continue;
+            }
+
+            long elapsedSeconds = Duration.between(start, now).getSeconds(); // Lấy khoảng thời gian giữa 2 thời điểm và quy đổi ra giây
+
+            double power = session.getChargingPost().getMaxPower().doubleValue();
+            double energyCharged = (power * elapsedSeconds) / 3600.0; // kWh đã sạc được
+            updateProgress(session.getChargingSessionId(), energyCharged, elapsedSeconds);
+        }
+    }
+
+    // Update quá trình dô Redis
+    private void updateProgress(String sessionId, double energyCharged, long elapsedSeconds) {
+        String key = "charging:session:" + sessionId;
+        Map<String, String> map = new HashMap<>();
+        map.put("chargedEnergy_kWh", String.format(Locale.US, "%.2f", energyCharged));
+        map.put("elapsedSeconds", String.valueOf(elapsedSeconds));
+        redisTemplate.opsForHash().putAll(key, map);
+    }
+
+    // Lấy tiến trình hiện tại
+    @Override
+    public Map<Object, Object> getProgress(String sessionId) {
+        return redisTemplate.opsForHash().entries("charging:session:" + sessionId);
+    }
+
+    // Xóa tiến trình khi kết thúc session
+    private void deleteProgress(String sessionId) {
+        redisTemplate.delete("charging:session:" + sessionId);
+    }
+
+
 
     @Override
     public boolean isPostIdleBySession(String postId) {

@@ -18,9 +18,11 @@ import charging_manage_be.services.user_reputations.UserReputationService;
 import charging_manage_be.services.waiting_list.WaitingListService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -76,12 +78,11 @@ public class ChargingSession {
         return ResponseEntity.ok(response);
     }
     @PostMapping("/finish/{sessionId}")
-    public ResponseEntity<String> endChargingSession(@PathVariable String sessionId, @RequestBody BigDecimal kWh){
+    public ResponseEntity<String> endChargingSession(@PathVariable String sessionId){
         ChargingSessionEntity session = sessionService.getSessionById(sessionId);
         if (session == null) {
             throw new RuntimeException("Session not found");
         }
-        session.setKWh(kWh);
         sessionService.endSession(sessionId);
         // nếu có booking thì gọi thằng completeBooking để hoàn thành booking
         if (session.getBooking() == null) {
@@ -155,7 +156,7 @@ public class ChargingSession {
 }
     */
 
-    @Scheduled(fixedRate = 60000) // Chạy mỗi phút
+    @Scheduled(fixedRate = 10000) // Chạy mỗi 10 giây
     @Transactional
     public void checkAndEndSessions() {
         // idea là ngoài việc tự bấm nút kết thúc session trước khi đủ giờ sạc
@@ -247,4 +248,27 @@ public class ChargingSession {
         )).toList();
         return ResponseEntity.ok(sessionResponses);
     }
+
+
+    // Tạo một API để lấy ra giá trị dung lượng đã sạc được và thời gian đã sạc được kể từ lúc bắt đầu của một phiên sạc cụ thể
+    @GetMapping(value = "/progress/{sessionId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE) // produces để định nghĩa kiểu dữ liệu trả về là stream
+    public SseEmitter steamProgress(@PathVariable String sessionId){
+        SseEmitter emitter = new SseEmitter();
+
+        new Thread(()->{ // khởi chạy một luồng riêng để gửi dữ liệu liên tục
+            try {
+                while (true) {
+                    Map<Object, Object> progress = sessionService.getProgress(sessionId); // lấy từ Redis
+                    emitter.send(SseEmitter.event() // gửi sự kiện SSE
+                            .data(progress) // dữ liệu gửi đi
+                            .name("chargingProgress")); // tên sự kiện
+                    Thread.sleep(1000); // gửi mỗi giây
+                }
+            } catch (Exception e) {
+                emitter.completeWithError(e);
+            }
+        }).start(); // khởi chạy luồng riêng để không block luồng chính
+        return emitter;
+    }
+
 }

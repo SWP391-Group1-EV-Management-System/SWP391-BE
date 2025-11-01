@@ -256,7 +256,7 @@ public class BookingController {
     }
 
 
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 30000)
     @Transactional
     public void autoProcessBoookingWhenExpire() {
         List<BookingEntity> bookingEntityList = bookingService.getExpiredBookings(LocalDateTime.now());
