@@ -14,4 +14,6 @@ public interface CarService {
     boolean deleteCarByCarID(String carID);
     CarEntity getCarByCarID(String carID);
     List<CarEntity> findAllCarByUserID(String userID);
+    int pinRandom();
+    int maxMinutes(int pinRandom);
 }
