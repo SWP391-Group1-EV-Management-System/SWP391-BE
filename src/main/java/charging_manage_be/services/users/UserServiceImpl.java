@@ -69,8 +69,8 @@ public class UserServiceImpl implements UserService {
             user.setPhoneNumber(userRequest.getPhoneNumber());
             user.setRole(userRequest.getRole());
             user.setStatus(userRequest.isStatus());
-            user.setCreatedAt(user.getCreatedAt());
-
+            //user.setCreatedAt(user.getCreatedAt());
+            // không cho update ngày tạo tài khoản
             userRepository.save(user);
         }
         return true;

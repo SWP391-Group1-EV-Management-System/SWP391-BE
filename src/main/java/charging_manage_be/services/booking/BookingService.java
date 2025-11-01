@@ -26,5 +26,6 @@ public interface BookingService {
     List<BookingEntity> getExpiredBookings(LocalDateTime currentTime);
     BookingIdForSessionResDTO getLatestConfirmedBookingByUserId(String userId);
     boolean isUserBooking(String userId);
+    boolean isPostIdleInBooking(String postId);
 
 }

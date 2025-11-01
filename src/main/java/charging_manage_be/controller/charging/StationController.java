@@ -1,5 +1,7 @@
 package charging_manage_be.controller.charging;
 
+import charging_manage_be.model.dto.agent.LocationRequest;
+import charging_manage_be.model.dto.agent.StationAndPost;
 import charging_manage_be.model.dto.charging.post.PostResponseDTO;
 import charging_manage_be.model.dto.charging.station.ChargingStationRequestDTO;
 import charging_manage_be.model.dto.charging.station.ChargingStationResponseDTO;
@@ -11,12 +13,19 @@ import charging_manage_be.model.entity.charging.ChargingStationEntity;
 import charging_manage_be.model.entity.charging.ChargingTypeEntity;
 import charging_manage_be.model.entity.users.UserEntity;
 import charging_manage_be.repository.users.UserRepository;
+import charging_manage_be.services.booking.BookingService;
+import charging_manage_be.services.charging_post.ChargingPostService;
+import charging_manage_be.services.charging_session.ChargingSessionService;
 import charging_manage_be.services.charging_station.ChargingStationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/charging/station")
@@ -26,7 +35,10 @@ public class StationController {
     private ChargingStationService chargingStationService;
     @Autowired
     private UserRepository userRepository;
-
+    @Autowired
+    private BookingService bookingService;
+    @Autowired
+    private ChargingSessionService  chargingSessionService;
     @PostMapping("/create")
     public ResponseEntity<String> createChargingStation(@RequestBody ChargingStationRequestDTO chargingStationRequestDTO) {
         if (chargingStationRequestDTO == null) {
@@ -119,4 +131,94 @@ public class StationController {
         }).toList();
         return ResponseEntity.ok(posts);
     }
+
+//    @GetMapping("/available")
+//    public ResponseEntity<List<StationAndPost>> getAllChargingStationsAvailable() {
+//        List<StationAndPost> stations = chargingStationService.getAllStationAvailable().stream().map(chargingStationEntity -> {
+//            StationAndPost stationDTO = new StationAndPost();
+//            stationDTO.setIdChargingStation(chargingStationEntity.getIdChargingStation());
+//            stationDTO.setNameChargingStation(chargingStationEntity.getNameChargingStation());
+//            stationDTO.setAddress(chargingStationEntity.getAddress());
+//            stationDTO.setActive(chargingStationEntity.isActive());
+//            stationDTO.setEstablishedTime(chargingStationEntity.getEstablishedTime());
+//            stationDTO.setNumberOfPosts(chargingStationEntity.getNumberOfPosts());
+//            List<ChargingPostEntity> listPost = chargingStationEntity.getChargingPosts();
+//            Map<String, Boolean> map = new HashMap<>();
+//            for(ChargingPostEntity chargingPostEntity : listPost) {
+//                if (bookingService.isPostIdleInBooking(chargingPostEntity.getIdChargingPost()) && chargingSessionService.isPostIdleBySession(chargingPostEntity.getIdChargingPost())) {
+//                    map.put(chargingPostEntity.getIdChargingPost(), true);
+//                }else
+//                {
+//                    map.put(chargingPostEntity.getIdChargingPost(), false);
+//                }
+//
+//            }
+//            stationDTO.setPostAvailable(map);
+//
+//            return stationDTO;
+//        }).toList();
+//
+//        return ResponseEntity.ok(stations);
+//    }
+    // agent xem trạm có đang hoạt động không lấy hết trạm lên bao gồm cả khoảng cách
+    @PostMapping("/available")
+    public ResponseEntity<List<StationAndPost>> findNearestStations(
+             @RequestBody LocationRequest request) {
+
+        // 1. Lấy Entity từ Service
+        List<ChargingStationEntity> stations = chargingStationService.findNearestStations(request);
+
+        // 2. Map Entity sang DTO trong Controller
+        List<StationAndPost> stationDTOs = stations.stream()
+                .map(station -> mapToDTO(station, request.getLatitude(), request.getLongitude()))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(stationDTOs);
+    }
+
+
+    private StationAndPost mapToDTO(ChargingStationEntity station, Double userLat, Double userLon) {
+        StationAndPost dto = new StationAndPost();
+
+        // Map basic fields
+        dto.setIdChargingStation(station.getIdChargingStation());
+        dto.setNameChargingStation(station.getNameChargingStation());
+        dto.setAddress(station.getAddress());
+        dto.setActive(station.isActive());
+        dto.setEstablishedTime(station.getEstablishedTime());
+        dto.setNumberOfPosts(station.getNumberOfPosts());
+        dto.setLatitude(station.getLatitude());
+        dto.setLongitude(station.getLongitude());
+
+        // Tính distance nếu có tọa độ người dùng
+        if (userLat != null && userLon != null) {
+            double distance = chargingStationService.calculateDistance(
+                    userLat, userLon,
+                    station.getLatitude(), station.getLongitude()
+            );
+            dto.setDistanceKm(Math.round(distance * 100.0) / 100.0); // Làm tròn 2 chữ số
+            // nhân với 100 để giữ toàn vẹn 2 số sau dấu phẩy tránh bị làm tròn mất sau đó chia lại để hiển thị đúng gía trị ( Math.round(478,79899) = 479)
+        }
+
+        // Map post availability
+        dto.setPostAvailable(getPostAvailabilityMap(station.getChargingPosts()));
+
+        return dto;
+    }
+
+
+    private Map<String, Boolean> getPostAvailabilityMap(List<ChargingPostEntity> posts) {
+        Map<String, Boolean> map = new HashMap<>();
+
+        if (posts != null && !posts.isEmpty()) {
+            for (ChargingPostEntity post : posts) {
+                boolean isIdle = bookingService.isPostIdleInBooking(post.getIdChargingPost())
+                        && chargingSessionService.isPostIdleBySession(post.getIdChargingPost());
+                map.put(post.getIdChargingPost(), isIdle);
+            }
+        }
+
+        return map;
+    }
 }
+

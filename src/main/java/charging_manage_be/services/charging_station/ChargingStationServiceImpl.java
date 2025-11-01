@@ -1,5 +1,7 @@
 package charging_manage_be.services.charging_station;
 
+import charging_manage_be.model.dto.agent.LocationRequest;
+import charging_manage_be.model.dto.agent.StationAndPost;
 import charging_manage_be.model.dto.charging.station.ChargingStationRequestDTO;
 import charging_manage_be.model.entity.charging.ChargingPostEntity;
 import charging_manage_be.model.entity.charging.ChargingStationEntity;
@@ -14,6 +16,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.xml.stream.Location;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -119,6 +123,11 @@ public class ChargingStationServiceImpl implements  ChargingStationService {
         return station.getChargingPosts();
     }
 
+    @Override
+    public List<ChargingStationEntity> getAllStationAvailable() {
+        return chargingStationRepository.findAllByIsActiveTrue();
+    }
+
 
     public double[] getCoordinatesFromAddress(String address) {
         try {
@@ -156,6 +165,45 @@ public class ChargingStationServiceImpl implements  ChargingStationService {
         return null;
     }
 
+    @Override
+    public List<ChargingStationEntity> findNearestStations(LocationRequest request) {
+        List<ChargingStationEntity> allStations = chargingStationRepository.findAll();
 
+        // return bọc một chuỗi stream và trã về, tất cả những dòng return con là giá trị con của nó
+        //stream() cho phép lặp qua từng phần tử con trong list và gồm có lọc, lặp, sắp xếp, gom lại
+        //peek lấy mỗi phần từ con từ stream
+        return allStations.stream()
+                .map(station -> Map.entry( // .map biến đổi những phần tử thành thứ khác
+                        station,
+                        calculateDistance(
+                                request.getLatitude(),
+                                request.getLongitude(),
+                                station.getLatitude(),
+                                station.getLongitude()
+                        )
+                ))//mục đích lưu tạm giá trị distance vào Map để so sánh
+                // tiến hành lọc Map lấy value so sánh với bán kính
+                .filter(entry -> entry.getValue() <= request.getRadiusKm())
+                .sorted(Map.Entry.comparingByValue()) // sắp xếp bé đến lớn
+                .limit(request.getLimit()) // chỉ lấy limit phần tử
+                .map(Map.Entry::getKey)//lấy lại entity station
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+        final int R = 6371; // Bán kính Trái Đất (km)
+
+        double latDistance = Math.toRadians(lat2 - lat1);
+        double lonDistance = Math.toRadians(lon2 - lon1);
+
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return R * c; // Khoảng cách tính bằng km
+    }
 
 }

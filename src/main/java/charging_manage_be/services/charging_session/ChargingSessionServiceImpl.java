@@ -211,6 +211,21 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
         UserEntity user = userService.getUserByID(userId).orElseThrow(() -> new RuntimeException("User not found"));
         return chargingSession.findByUser(user);
     }
+
+    @Override
+    public boolean isPostIdleBySession(String postId) {
+        ChargingPostEntity post = ChargingPostService.getChargingPostById(postId);
+        if (post == null)
+        {
+            return false;
+        }
+        ChargingSessionEntity sessionCheck = chargingSession.findFirstByChargingPostAndIsDoneFalse(post);
+        if(sessionCheck != null)
+        {
+            return false;
+        }
+        return true;
+    }
 //    @Override
 //    @Transactional
 //    public boolean addExpectedEndTime(String bookingID, LocalDateTime expectedEndTime) {

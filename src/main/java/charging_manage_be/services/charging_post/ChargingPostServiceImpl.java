@@ -4,8 +4,11 @@ import charging_manage_be.model.entity.charging.ChargingPostEntity;
 import charging_manage_be.model.entity.charging.ChargingTypeEntity;
 import charging_manage_be.repository.charging_post.ChargingPostRepository;
 import charging_manage_be.repository.charging_type.ChargingTypeRepository;
+import charging_manage_be.services.booking.BookingService;
+import charging_manage_be.services.charging_session.ChargingSessionService;
 import charging_manage_be.services.charging_station.ChargingStationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -24,7 +27,7 @@ public class ChargingPostServiceImpl implements ChargingPostService {
     private ChargingTypeRepository chargingTypeRepository;
     @Autowired
     private ChargingStationService stationService;
-   // ChargingPostServiceImpl postService = context.getBean(ChargingPostServiceImpl.class); gọi trong main
+    // ChargingPostServiceImpl postService = context.getBean(ChargingPostServiceImpl.class); gọi trong main
     private String generateUniqueId() {
         String newId;
         do {
@@ -32,11 +35,10 @@ public class ChargingPostServiceImpl implements ChargingPostService {
         } while (isPaymentIdExists(newId));
         return newId;
     }
+
     @Override
-    public ChargingPostEntity getChargingPostById(String id)
-    {
-        if(!ChargingPostRepository.existsById(id))
-        {
+    public ChargingPostEntity getChargingPostById(String id) {
+        if (!ChargingPostRepository.existsById(id)) {
             return null;
         }
         return ChargingPostRepository.findById(id).get();
@@ -47,16 +49,14 @@ public class ChargingPostServiceImpl implements ChargingPostService {
     }
 
     @Override
-    public boolean addPost(String stationId, boolean isActive, List<Integer> listType, BigDecimal maxPower, BigDecimal chargingFeePerKWh)
-    {
+    public boolean addPost(String stationId, boolean isActive, List<Integer> listType, BigDecimal maxPower, BigDecimal chargingFeePerKWh) {
         var post = new ChargingPostEntity();
         post.setIdChargingPost(generateUniqueId());
         post.setActive(isActive);
-        List<ChargingTypeEntity> listChargingType =  new ArrayList<>();
-        for(int i : listType)
-        {
+        List<ChargingTypeEntity> listChargingType = new ArrayList<>();
+        for (int i : listType) {
             ChargingTypeEntity type = chargingTypeRepository.findById(i).orElse(null);
-            if(type != null) {
+            if (type != null) {
                 listChargingType.add(type);
             }
         }
@@ -64,8 +64,7 @@ public class ChargingPostServiceImpl implements ChargingPostService {
         post.setMaxPower(maxPower);
         post.setChargingFeePerKWh(chargingFeePerKWh);
         var station = stationService.getStationById(stationId);
-        if(station == null)
-        {
+        if (station == null) {
             return false;
         }
         post.setChargingStation(station);
@@ -74,11 +73,8 @@ public class ChargingPostServiceImpl implements ChargingPostService {
     }
 
     @Override
-    public boolean updatePost(ChargingPostEntity post)
-
-    {
-        if(post == null || !ChargingPostRepository.existsById(post.getIdChargingPost()))
-        {
+    public boolean updatePost(ChargingPostEntity post) {
+        if (post == null || !ChargingPostRepository.existsById(post.getIdChargingPost())) {
             return false;
         }
         ChargingPostRepository.save(post);
@@ -89,6 +85,8 @@ public class ChargingPostServiceImpl implements ChargingPostService {
     public List<ChargingPostEntity> getAllPosts() {
         return ChargingPostRepository.findAll();
     }
+
+}
 
 
 //    public boolean addPost(String stationId, boolean isActive, BigDecimal changingFeePerKWh, BigDecimal maxPower)
@@ -112,4 +110,4 @@ public class ChargingPostServiceImpl implements ChargingPostService {
 //    }
 
 
-}
+

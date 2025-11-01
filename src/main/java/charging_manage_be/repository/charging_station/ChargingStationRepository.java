@@ -20,4 +20,6 @@ public interface ChargingStationRepository extends JpaRepository<ChargingStation
     @Query ("SELECT c FROM ChargingStationEntity c JOIN c.chargingPosts p WHERE p.idChargingPost = :idChargingPostEntity")
     Optional<ChargingStationEntity> findStationByChargingPostEntity(@Param("idChargingPostEntity") String idChargingPostEntity);
 
+    List<ChargingStationEntity> findAllByIsActiveTrue();
+
 }

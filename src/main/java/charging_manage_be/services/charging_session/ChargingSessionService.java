@@ -20,4 +20,5 @@ public interface ChargingSessionService {
     List<ChargingSessionEntity> getAllSessionInStationWithStatus(String stationId, boolean isDone);
     List<ChargingSessionEntity> getAllSessions();
     List<ChargingSessionEntity> getAllSessionsByUserId(String userId);
+    boolean isPostIdleBySession(String postId);
 }

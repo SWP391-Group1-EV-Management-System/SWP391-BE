@@ -33,4 +33,6 @@ public interface ChargingSessionRepository extends JpaRepository<ChargingSession
             ChargingPostEntity chargingPost,
             boolean isDone
     );
+
+    ChargingSessionEntity findFirstByChargingPostAndIsDoneFalse(ChargingPostEntity chargingPost);
 }
