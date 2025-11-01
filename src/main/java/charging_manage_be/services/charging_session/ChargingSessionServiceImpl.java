@@ -26,10 +26,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static charging_manage_be.util.RandomId.generateRandomId;
@@ -165,7 +162,7 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
             Map<Object, Object> progress = redisTemplate.opsForHash().entries("charging:session:" + sessionId);
             double chargedEnergy = 0.0;
             if (progress.containsKey("chargedEnergy_kWh")) {
-                chargedEnergy = Double.parseDouble(progress.get("chargedEnergy_kWh").toString());
+                chargedEnergy = Double.parseDouble(progress.get("chargedEnergy_kWh").toString().replace(",", "."));
             }
             session.setKWh(BigDecimal.valueOf(chargedEnergy));
             session.setDone(true);
@@ -250,7 +247,7 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
     private void updateProgress(String sessionId, double energyCharged, long elapsedSeconds) {
         String key = "charging:session:" + sessionId;
         Map<String, String> map = new HashMap<>();
-        map.put("chargedEnergy_kWh", String.format("%.2f", energyCharged));
+        map.put("chargedEnergy_kWh", String.format(Locale.US, "%.2f", energyCharged));
         map.put("elapsedSeconds", String.valueOf(elapsedSeconds));
         redisTemplate.opsForHash().putAll(key, map);
     }
