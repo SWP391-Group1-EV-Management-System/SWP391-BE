@@ -78,12 +78,11 @@ public class ChargingSession {
         return ResponseEntity.ok(response);
     }
     @PostMapping("/finish/{sessionId}")
-    public ResponseEntity<String> endChargingSession(@PathVariable String sessionId, @RequestBody BigDecimal kWh){
+    public ResponseEntity<String> endChargingSession(@PathVariable String sessionId){
         ChargingSessionEntity session = sessionService.getSessionById(sessionId);
         if (session == null) {
             throw new RuntimeException("Session not found");
         }
-        session.setKWh(kWh);
         sessionService.endSession(sessionId);
         // nếu có booking thì gọi thằng completeBooking để hoàn thành booking
         if (session.getBooking() == null) {
