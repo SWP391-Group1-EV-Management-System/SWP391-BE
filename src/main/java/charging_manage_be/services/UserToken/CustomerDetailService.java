@@ -27,5 +27,7 @@ public class CustomerDetailService implements UserDetailsService {
                 .password(encodedPassword)
                 .roles(user.getRole())
                 .build();
+
+        
     }
 }
