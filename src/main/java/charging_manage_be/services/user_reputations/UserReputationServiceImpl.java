@@ -13,6 +13,7 @@ import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -31,8 +32,8 @@ public class UserReputationServiceImpl implements UserReputationService{
     @Autowired
     private ReputationLevelRepository reputationLevelRepository;
 
-    private int characterLength = 2;
-    private int numberLength = 3;
+    private int characterLength = 5;
+    private int numberLength = 5;
 
     public String generateUniqueId() {
         String newId;
@@ -103,7 +104,7 @@ public class UserReputationServiceImpl implements UserReputationService{
         // Lấy mốc thời gian 90% của tổng thời gian sạc dự kiến
         long ninetyPercentageTimeLimitation = (90 * totalExpectedTime)/100;
 
-        // Nếu sạc xong sớm hơn 90% thời gian dự kiến thì sẽ bị trừ điểm theo công thức 90% thời gian - thời gian thực tế chia 5 phút
+        // Nếu sạc xong sớm hơn 90% thời gian dự kiến thì sẽ bị trừ điểm theo công thức (90% thời gian - thời gian thực tế) chia 5 phút
         if (totalActualTime < ninetyPercentageTimeLimitation) {
             penaltyPoints = (int)Math.ceil((ninetyPercentageTimeLimitation - totalActualTime)/5.0); // Làm tròn lên đối với điểm bị trừ
             return -penaltyPoints;

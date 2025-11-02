@@ -1,7 +1,11 @@
 package charging_manage_be.services.users;
 
 import charging_manage_be.model.dto.user.UserRequest;
+import charging_manage_be.model.entity.reputations.ReputationLevelEntity;
+import charging_manage_be.model.entity.reputations.UserReputationEntity;
 import charging_manage_be.model.entity.users.UserEntity;
+import charging_manage_be.repository.reputations.ReputationLevelRepository;
+import charging_manage_be.repository.user_reputations.UserReputationRepository;
 import charging_manage_be.repository.users.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +26,10 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private ReputationLevelRepository reputationLevelRepository;
+    @Autowired
+    private UserReputationRepository userReputationRepository;
 
 
     private int characterLength = 5;
@@ -125,6 +133,10 @@ public class UserServiceImpl implements UserService {
         if (optionalUser.isPresent()) {
             throw  new IllegalArgumentException("User already exists");
         }
+        ReputationLevelEntity levelEntities = reputationLevelRepository.findByLevelName("Tốt");
+        if (levelEntities == null) {
+            throw new IllegalArgumentException("Reputation levels are not set up");
+        }
         UserEntity newUser = new UserEntity();
         newUser.setUserID(generateUniqueId());
         newUser.setEmail(userEntity.getEmail());
@@ -137,7 +149,18 @@ public class UserServiceImpl implements UserService {
         newUser.setCreatedAt(LocalDateTime.now());
         newUser.setRole("DRIVER"); // Mặc định user mới tạo có role là USER
         newUser.setStatus(true); // Mặc định user mới tạo có trạng thái active
-        return userRepository.save(newUser);
+        UserEntity saveUser = userRepository.save(newUser);
+
+        UserReputationEntity newUserReputation = new UserReputationEntity();
+        newUserReputation.setUser(saveUser);
+        newUserReputation.setUserReputationID(generateUniqueId());
+        newUserReputation.setReputationLevel(levelEntities); // Mặc định user mới tạo có reputation level là level thấp nhất
+        newUserReputation.setCurrentScore(100);
+        newUserReputation.setCreatedAt(LocalDateTime.now());
+        newUserReputation.setNotes("Init reputation for new user");
+        userReputationRepository.save(newUserReputation);
+
+        return saveUser;
     }
 
     @Override

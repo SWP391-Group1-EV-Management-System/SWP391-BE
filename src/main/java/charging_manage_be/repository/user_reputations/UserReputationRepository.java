@@ -11,7 +11,11 @@ import java.util.Optional;
 
 public interface UserReputationRepository extends JpaRepository<UserReputationEntity, String> {
     List<UserReputationEntity> findByUser_UserID(String userID);
-    Optional<UserReputationEntity> findFirstByUser_UserIDOrderByCreatedAtDesc(String userID);
+     Optional<UserReputationEntity> findFirstByUser_UserIDOrderByCreatedAtDesc(String userID); // Câu query tự động tạo ra bởi Spring Data JPA là:
+    // SELECT * FROM user_reputation WHERE user_id = ? ORDER BY created_at DESC LIMIT 1
+
+
+
     // Tạo một phương thức để lấy level Id dựa trên currentScore trên user_reputations và minScore, maxScore trên reputation_levels
     // Câu query được tạo ra là:
     // SELECT * FROM user_reputations ur

@@ -84,12 +84,12 @@ public class ChargingSession {
             throw new RuntimeException("Session not found");
         }
         sessionService.endSession(sessionId);
+        userReputationService.handleEarlyUnplugPenalty(session);
         // nếu có booking thì gọi thằng completeBooking để hoàn thành booking
         if (session.getBooking() == null) {
             return ResponseEntity.ok("Charging Session finish completed successfully");
         }
         bookingService.completeBooking(session.getBooking().getBookingId());
-        userReputationService.handleEarlyUnplugPenalty(session);
         // theo flow mới ( khi chưa đủ giờ) phải hỏi driver trong waiting rằng có muốn sạc luôn hay không, nếu đồng ý thì chuyển từ waiting ra
         // không muôn sạc luôn thì phải chờ đến giờ
         // khi đã đủ giờ tự động driver trong hàng đợi sẽ được lấy ra

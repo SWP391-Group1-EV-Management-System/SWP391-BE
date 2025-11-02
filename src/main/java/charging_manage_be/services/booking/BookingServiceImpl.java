@@ -8,12 +8,16 @@ import charging_manage_be.model.entity.cars.CarEntity;
 import charging_manage_be.model.entity.charging.ChargingPostEntity;
 import charging_manage_be.model.entity.charging.ChargingSessionEntity;
 import charging_manage_be.model.entity.charging.ChargingStationEntity;
+import charging_manage_be.model.entity.reputations.ReputationLevelEntity;
+import charging_manage_be.model.entity.reputations.UserReputationEntity;
 import charging_manage_be.model.entity.users.UserEntity;
 import charging_manage_be.repository.booking.BookingRepository;
 import charging_manage_be.repository.cars.CarRepository;
 import charging_manage_be.repository.charging_post.ChargingPostRepository;
 import charging_manage_be.repository.charging_session.ChargingSessionRepository;
 import charging_manage_be.repository.charging_station.ChargingStationRepository;
+import charging_manage_be.repository.reputations.ReputationLevelRepository;
+import charging_manage_be.repository.user_reputations.UserReputationRepository;
 import charging_manage_be.repository.users.UserRepository;
 import charging_manage_be.repository.waiting_list.WaitingListRepository;
 import charging_manage_be.services.charging_post.ChargingPostService;
@@ -47,6 +51,8 @@ public class BookingServiceImpl implements BookingService {
     private final UserRepository userRepository;
     private final CarRepository carRepository;
     private final ChargingPostRepository chargingPostRepository;
+    private final ReputationLevelRepository reputationLevelRepository;
+    private final UserReputationRepository userReputationRepository;
     private final RedisTemplate<String, String> redisTemplate;
     private final SimpMessagingTemplate simpMessagingTemplate;
     private static final String KEY_QUEUE_POST = "queue:post:";
@@ -122,6 +128,9 @@ public class BookingServiceImpl implements BookingService {
                 ChargingStationEntity station = chargingStationRepository.findStationByChargingPostEntity(chargingPostId)
                         .orElseThrow(() -> new RuntimeException("Station not found"));
 
+                // Phải lấy được độ uy tín hiện tại của user, sau đó xét trong danh sách các mức độ uy tín (reputation levels) để lấy maxWaitingTime tương ứng
+                UserReputationEntity userReputation = userReputationRepository.findFirstByUser_UserIDOrderByCreatedAtDesc(userId).orElseThrow();
+                bookingEntity.setMaxWaitingTime(userReputation.getReputationLevel().getMaxWaitMinutes());
                 bookingEntity.setUser(user);
                 bookingEntity.setChargingStation(station);
                 bookingEntity.setChargingPost(post);
@@ -131,9 +140,10 @@ public class BookingServiceImpl implements BookingService {
                 // Lấy maxWaitingTime từ bảng user_reputation
                 // Lấy tất cả các record trong bảng user_reputation của user, sau đó lấy max của maxWaitMinutes
                 // Nếu không có record nào trong bảng user_reputation thì sẽ ném ra ngoại lệ
-                bookingEntity.setMaxWaitingTime(user.getUserReputations()
-                        .stream().mapToInt(reputation -> reputation.getReputationLevel().getMaxWaitMinutes())
-                        .max().orElseThrow(() -> new RuntimeException("No reputation levels found for user")));
+//                bookingEntity.setMaxWaitingTime(user.getUserReputations()
+//                        .stream().mapToInt(reputation -> reputation.getReputationLevel().getMaxWaitMinutes())
+//                        .max().orElseThrow(() -> new RuntimeException("No reputation levels found for user")));
+
 
                 bookingEntity.setStatus("CONFIRMED");
                 BookingEntity savedBooking = bookingRepository.save(bookingEntity);

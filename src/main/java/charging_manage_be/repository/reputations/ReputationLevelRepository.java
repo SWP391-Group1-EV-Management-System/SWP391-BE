@@ -10,4 +10,6 @@ import org.springframework.stereotype.Repository;
 public interface ReputationLevelRepository extends JpaRepository<ReputationLevelEntity,Integer> {
     @Query("SELECT r FROM ReputationLevelEntity r WHERE :currentScore BETWEEN r.minScore AND r.maxScore")
     ReputationLevelEntity findLevelByScore(@Param("currentScore") int currentScore);
+
+    ReputationLevelEntity findByLevelName(String levelName);
 }
