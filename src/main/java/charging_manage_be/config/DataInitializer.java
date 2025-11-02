@@ -274,8 +274,10 @@ public class  DataInitializer  implements CommandLineRunner {
         // Initialize Charging Station
         ChargingStationEntity stationA1 = new ChargingStationEntity();
         stationA1.setIdChargingStation("STA001");
-        stationA1.setNameChargingStation("Trạm A1");
-        stationA1.setAddress("123 Test Street");
+        stationA1.setNameChargingStation("Trạm Đại học Bách Khoa TP HCM");
+        stationA1.setAddress("Ho Chi Minh city University of Technology, Binh Duong province, Vietnam");
+        stationA1.setLatitude(10.884256);
+        stationA1.setLongitude(106.810764);
         stationA1.setUserManager(manager);
         stationA1.setNumberOfPosts(3);
         stationA1.setActive(true);
@@ -317,8 +319,10 @@ public class  DataInitializer  implements CommandLineRunner {
         // Initialize Charging Station
         ChargingStationEntity stationA2 = new ChargingStationEntity();
         stationA2.setIdChargingStation("STA002");
-        stationA2.setNameChargingStation("Trạm A2");
-        stationA2.setAddress("531 Truong Chinh");
+        stationA2.setNameChargingStation("Trạm FPT University Hà Nội");
+        stationA2.setAddress("FPT University, Hanoi, Vietnam");
+        stationA2.setLatitude(21.016471);
+        stationA2.setLongitude(105.529897);
         stationA2.setUserManager(manager2);
         stationA2.setNumberOfPosts(4);
         stationA2.setActive(true);
@@ -326,8 +330,10 @@ public class  DataInitializer  implements CommandLineRunner {
 
         ChargingStationEntity stationA3 = new ChargingStationEntity();
         stationA3.setIdChargingStation("STA003");
-        stationA3.setNameChargingStation("Trạm A3");
-        stationA3.setAddress("Bỏ Hoang");
+        stationA3.setNameChargingStation("Trạm Đại học Quốc Gia TP HCM");
+        stationA3.setAddress("Vietnam National University HCMC, Binh Duong province, Vietnam");
+        stationA3.setLatitude(10.879875);
+        stationA3.setLongitude(106.807133);
         stationA3.setUserManager(manager3);
         stationA3.setNumberOfPosts(0);
         stationA3.setActive(false);
@@ -340,7 +346,7 @@ public class  DataInitializer  implements CommandLineRunner {
         post4.setChargingStation(stationA2);
         post4.setChargingType(Arrays.asList(type1, type3));
         post4.setChargingFeePerKWh(new BigDecimal("100"));
-        post4.setMaxPower(new BigDecimal("10000"));
+        post4.setMaxPower(new BigDecimal("250"));
         post4.setActive(true);
         chargingPostRepository.save(post4);
 
@@ -349,7 +355,7 @@ public class  DataInitializer  implements CommandLineRunner {
         post5.setChargingStation(stationA2);
         post5.setChargingType(Arrays.asList(type2,type3));
         post5.setChargingFeePerKWh(new BigDecimal("100"));
-        post5.setMaxPower(new BigDecimal("10000"));
+        post5.setMaxPower(new BigDecimal("250"));
         post5.setActive(true);
         chargingPostRepository.save(post5);
 
@@ -358,7 +364,7 @@ public class  DataInitializer  implements CommandLineRunner {
         post6.setChargingStation(stationA2);
         post6.setChargingType(Arrays.asList(type1, type2,type3));
         post6.setChargingFeePerKWh(new BigDecimal("100"));
-        post6.setMaxPower(new BigDecimal("10000"));
+        post6.setMaxPower(new BigDecimal("250"));
         post6.setActive(true);
         chargingPostRepository.save(post6);
         ChargingPostEntity post7 = new ChargingPostEntity();
@@ -366,7 +372,7 @@ public class  DataInitializer  implements CommandLineRunner {
         post7.setChargingStation(stationA2);
         post7.setChargingType(Arrays.asList(type1, type2));
         post7.setChargingFeePerKWh(new BigDecimal("100"));
-        post7.setMaxPower(new BigDecimal("10000"));
+        post7.setMaxPower(new BigDecimal("250"));
         post7.setActive(true);
         chargingPostRepository.save(post7);
         // SERVICE PACKET
@@ -402,10 +408,6 @@ public class  DataInitializer  implements CommandLineRunner {
         proPkg.setQuota(5000);
         servicePackageRepository.save(proPkg);
         // Payment method
-        PaymentMethodEntity cash = new PaymentMethodEntity();
-        cash.setIdPaymentMethod("PMT_CASH");
-        cash.setNamePaymentMethod("Cash");
-        paymentMethodRepository.save(cash);
 
         PaymentMethodEntity card = new PaymentMethodEntity();
         card.setIdPaymentMethod("PMT_MOMO");
@@ -602,7 +604,7 @@ public class  DataInitializer  implements CommandLineRunner {
         PaymentEntity p2 = new PaymentEntity();
         p2.setPaymentId("PAYMENT001");
         p2.setUser(driverB);
-        p2.setPaymentMethod(cash);
+        p2.setPaymentMethod(card);
         p2.setPrice(savedS2.getTotalAmount());
         p2.setSession(savedS2);
         p2.setCreatedAt(LocalDateTime.now());
@@ -658,7 +660,7 @@ public class  DataInitializer  implements CommandLineRunner {
         PaymentEntity p4 = new PaymentEntity();
         p4.setPaymentId("PAYMENT002");
         p4.setUser(driverB);
-        p4.setPaymentMethod(cash);
+        p4.setPaymentMethod(packet);
         p4.setPrice(savedS4.getTotalAmount());
         p4.setSession(savedS4);
         p4.setPaid(true);
