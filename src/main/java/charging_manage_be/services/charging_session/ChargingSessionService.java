@@ -23,7 +23,5 @@ public interface ChargingSessionService {
      List<ChargingSessionEntity> getAllSessionsByUserId(String userId);
 
     Map<Object, Object> getProgress(String sessionId);
-
-
-
+    boolean isPostIdleBySession(String postId);
 }

@@ -49,11 +49,13 @@ public class BookingController {
             }
         }
         int result = bookingService.handleBookingNavigation(booking.getUser(), booking.getChargingPost(), booking.getCar()); // Trả về một result có thể là Booking hoặc WaitingList
-        String status;
-        if (result != -1) {
-            status = userStatusService.setUserStatus(booking.getUser(), STATUS_WAITING);
-        }else {
-            status = userStatusService.setUserStatus(booking.getUser(), STATUS_BOOKING);
+        String status = null;
+        if(result != -2) {
+            if (result != -1) {
+                status = userStatusService.setUserStatus(booking.getUser(), STATUS_WAITING);
+            } else {
+                status = userStatusService.setUserStatus(booking.getUser(), STATUS_BOOKING);
+            }
         }
         Map<String, Object> response = new HashMap<>();
         response.put("status", status);

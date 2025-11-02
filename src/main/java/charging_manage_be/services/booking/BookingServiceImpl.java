@@ -374,6 +374,17 @@ public class BookingServiceImpl implements BookingService {
         return booking;
     }
 
+    @Override
+    public boolean isPostIdleInBooking(String postId) {
+        ChargingPostEntity chargingPost = chargingPostRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+        BookingEntity booking = bookingRepository.findFirstByChargingPost_IdChargingPostAndStatusInOrderByCreatedAtAsc(postId, List.of("CONFIRMED")).orElse(null);
+        if(booking != null) {
+            return  false; // bận
+        }
+        return true; //
+    }
+
 
 }
 /*
