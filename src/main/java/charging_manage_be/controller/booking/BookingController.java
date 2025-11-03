@@ -35,6 +35,7 @@ public class BookingController {
     private UserReputationService userReputationService;
     @Autowired
     private UserService  userService;
+    // lỗi B đang trong hàng chờ đặt booking trạm khác vẫn được
 // cơ chế tự pop từ waiting list sang hàng đợi bị lỗi
     private final String STATUS_BOOKING = "booking";
     private final String STATUS_WAITING = "waiting";

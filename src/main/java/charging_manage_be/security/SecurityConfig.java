@@ -27,6 +27,8 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        // Cho phép WebSocket connection
+                        .requestMatchers("/ws/**").permitAll()
                         // Cho phép MoMo gửi request
                         .requestMatchers("/api/payment/ipn-handler").permitAll()
                         .requestMatchers("/users/login", "/users/register/**", "/users/re-login", "/api/charging/session/progress/**").permitAll() // các end ponit auth không cần token ( login, register)
