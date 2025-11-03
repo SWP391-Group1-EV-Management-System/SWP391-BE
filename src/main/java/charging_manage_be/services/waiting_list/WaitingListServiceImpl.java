@@ -104,7 +104,7 @@ public class WaitingListServiceImpl implements WaitingListService{
             WaitingListEntity savedEntity = waitingListRepository.save(waitingListEntity);
 
             // Push vào Redis để quản lý hàng đợi
-            redisTemplate.opsForList().rightPush(redisKey(savedEntity.getChargingPost().getIdChargingPost()), savedEntity.getUser().getUserID());
+            //redisTemplate.opsForList().rightPush(redisKey(savedEntity.getChargingPost().getIdChargingPost()), savedEntity.getUser().getUserID());
 
             // Gửi thông báo cho user vừa join (sửa thêm dấu /)
             simpMessagingTemplate.convertAndSendToUser(
