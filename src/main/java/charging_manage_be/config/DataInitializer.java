@@ -294,7 +294,7 @@ public class  DataInitializer  implements CommandLineRunner {
         post1.setChargingStation(stationA1);
         post1.setChargingType(Arrays.asList(type1, type2,type3));
         post1.setChargingFeePerKWh(new BigDecimal("100"));
-        post1.setMaxPower(new BigDecimal("10000"));
+        post1.setMaxPower(new BigDecimal("250"));
         post1.setActive(true);
         chargingPostRepository.save(post1);
 
@@ -303,7 +303,7 @@ public class  DataInitializer  implements CommandLineRunner {
         post2.setChargingStation(stationA1);
         post2.setChargingType(Arrays.asList(type1, type2,type3));
         post2.setChargingFeePerKWh(new BigDecimal("100"));
-        post2.setMaxPower(new BigDecimal("10000"));
+        post2.setMaxPower(new BigDecimal("250"));
         post2.setActive(true);
         chargingPostRepository.save(post2);
 

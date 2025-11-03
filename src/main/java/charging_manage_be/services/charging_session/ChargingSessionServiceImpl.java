@@ -238,7 +238,7 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
 //                continue;
 //            }
 //
-//            long elapsedSeconds = Duration.between(start, now).getSeconds(); // Lấy khoảng thời gian giữa 2 thời điểm và quy đổi ra giây
+//            long elapsedSeconds = Duration.between(start.getSecond, now)s(;) // Lấy khoảng thời gian giữa 2 thời điểm và quy đổi ra giây
 //
 //            double power = session.getChargingPost().getMaxPower().doubleValue();
 //            double energyCharged = (power * elapsedSeconds) / 3600.0; // kWh đã sạc được

@@ -220,7 +220,8 @@ public class WaitingListServiceImpl implements WaitingListService{
     @Override
     public boolean isUserWaiting(String userId) {
         boolean waiting = false;
-        WaitingListEntity waitingCheck = waitingListRepository.findFirstByChargingPost_IdChargingPostAndStatusOrderByCreatedAtAsc(userId, "WAITING").orElse(null);
+        UserEntity user = userService.getUserByID(userId).orElse(null);
+        WaitingListEntity waitingCheck = waitingListRepository.findByUserAndStatus(user, "WAITING").orElse(null);
         if(waitingCheck != null) {
             waiting = true;
         }
