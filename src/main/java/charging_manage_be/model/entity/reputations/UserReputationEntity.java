@@ -17,8 +17,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class UserReputationEntity {
     @Id
-    // Làm cho userReputationID tự động random 4 chữ cái và 4 chữ số
-    @Column(name = "user_reputation_id", length = 8)
+    // Làm cho userReputationID tự động random 5 chữ cái và 5 chữ số
+    @Column(name = "user_reputation_id")
     private String userReputationID;
 
     @ManyToOne

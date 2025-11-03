@@ -2,6 +2,7 @@ package charging_manage_be.controller.users;
 
 import charging_manage_be.model.dto.user.UserRequest;
 import charging_manage_be.model.dto.user.UserResponse;
+import charging_manage_be.model.dto.user.UserResponseForAdmin;
 import charging_manage_be.model.entity.users.UserEntity;
 import charging_manage_be.services.users.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Optional;
 
@@ -70,12 +73,25 @@ public class UserController {
     }
 
     @GetMapping("/getUser/{userID}")
-    public ResponseEntity<UserEntity> getUser(@PathVariable String userID) {
+    public ResponseEntity<UserResponseForAdmin> getUser(@PathVariable String userID) throws ParseException {
         Optional<UserEntity> user = userService.getUserByID(userID);
+        UserResponseForAdmin userResponse = new UserResponseForAdmin();
         if (user.isPresent()) {
-            return ResponseEntity.ok(user.get());
+            userResponse.setId(user.get().getUserID());
+            userResponse.setEmail(user.get().getEmail());
+            userResponse.setFirstName(user.get().getFirstName());
+            userResponse.setLastName(user.get().getLastName());
+            userResponse.setRole(user.get().getRole());
+            userResponse.setActive(user.get().isStatus());
+            userResponse.setGender(user.get().isGender());
+            userResponse.setPhone(user.get().getPhoneNumber());
+            userResponse.setBirthDate(new SimpleDateFormat("yyyy-MM-dd").format(user.get().getBirthDate()));
+            userResponse.setPassword(user.get().getPassword());
+            return ResponseEntity.ok(userResponse);
         }
-        return ResponseEntity.notFound().build();
+        else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping("/getAllUsers")
