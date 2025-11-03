@@ -14,7 +14,7 @@ public class UserResponseForAdmin {
     private String id;
     private String firstName;
     private String lastName;
-    private Date birthDate;
+    private String birthDate;
     private boolean gender;
     private String role;
     private String email;

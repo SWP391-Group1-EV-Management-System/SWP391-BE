@@ -12,6 +12,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Optional;
 
@@ -71,7 +73,7 @@ public class UserController {
     }
 
     @GetMapping("/getUser/{userID}")
-    public ResponseEntity<UserResponseForAdmin> getUser(@PathVariable String userID) {
+    public ResponseEntity<UserResponseForAdmin> getUser(@PathVariable String userID) throws ParseException {
         Optional<UserEntity> user = userService.getUserByID(userID);
         UserResponseForAdmin userResponse = new UserResponseForAdmin();
         if (user.isPresent()) {
@@ -83,7 +85,7 @@ public class UserController {
             userResponse.setActive(user.get().isStatus());
             userResponse.setGender(user.get().isGender());
             userResponse.setPhone(user.get().getPhoneNumber());
-            userResponse.setBirthDate(user.get().getBirthDate());
+            userResponse.setBirthDate(new SimpleDateFormat("yyyy-MM-dd").format(user.get().getBirthDate()));
             userResponse.setPassword(user.get().getPassword());
             return ResponseEntity.ok(userResponse);
         }
