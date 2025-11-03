@@ -103,10 +103,15 @@ public class WaitingListServiceImpl implements WaitingListService{
             // convertAndSend là hàm để gửi tin nhắn đến một path cụ thể là "/topic/waiting/{chargingPostId}"
             WaitingListEntity savedEntity = waitingListRepository.save(waitingListEntity);
 
+            // Push vào Redis để quản lý hàng đợi
+            redisTemplate.opsForList().rightPush(redisKey(savedEntity.getChargingPost().getIdChargingPost()), savedEntity.getUser().getUserID());
 
-
-            simpMessagingTemplate.convertAndSendToUser(waitingListEntity.getUser().getUserID(), "/queue/notifications" + savedEntity.getChargingPost().getIdChargingPost(),
-                    "User " + savedEntity.getUser().getFirstName() + " joined waiting list");
+            // Gửi thông báo cho user vừa join (sửa thêm dấu /)
+            simpMessagingTemplate.convertAndSendToUser(
+                    savedEntity.getUser().getUserID(),
+                    "/queue/notifications/" + savedEntity.getChargingPost().getIdChargingPost(),
+                    "User " + savedEntity.getUser().getFirstName() + " joined waiting list"
+            );
 
             return savedEntity;
 
@@ -135,7 +140,7 @@ public class WaitingListServiceImpl implements WaitingListService{
 //        simpMessagingTemplate.convertAndSendToUser(entity.getUser().getUserID(),
 //                "/queue/notification/" + entity.getChargingPost().getIdChargingPost(), "User" +entity.getUser().getFirstName()+ "cancelled");
         // chỉ cần thông báo lại vị trí cho các user khác thôi, chứ thông báo thằng A đã rơi hàng cho mấy thằng trong list để làm gì
-        getPositionAllDriver(waitingListId);
+        getPositionAllDriver(entity.getChargingPost().getIdChargingPost());
 
     }
 
@@ -177,18 +182,17 @@ public class WaitingListServiceImpl implements WaitingListService{
         return waitingListRepository.findByCreatedAtBetween(startOfDay, endOfDay);
     }
 
-    public void getPositionAllDriver(String queueName) {
-        String key = "queue:" + queueName;
+    public void getPositionAllDriver(String postId) {
+        String key = redisKey(postId); // dùng redisKey() để tạo đúng format "queue:post:{postId}"
         List<String> queue = redisTemplate.opsForList().range(key, 0, -1);
+        if (queue == null || queue.isEmpty()) {
+            return; // Không có ai trong hàng đợi
+        }
         for (int i = 0; i < queue.size(); i++) {
-            String userId = queue.get(i); // sau này có thể đổi lại thành session id
+            String userId = queue.get(i);
             int position = i + 1;
-//            simpMessagingTemplate.convertAndSend(
-//                    "/topic/queue/" + queueName + "/" + uid,
-//                    "Bạn đang ở vị trí số " + position
-//            );
             simpMessagingTemplate.convertAndSendToUser(userId,
-                    "/queue/notifications/" + queueName,
+                    "/queue/notifications/" + postId,
                     "Bạn đang ở vị trí số " + position);
         }
     }
