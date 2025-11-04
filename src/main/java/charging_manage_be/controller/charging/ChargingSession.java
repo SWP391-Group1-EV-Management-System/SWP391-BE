@@ -65,6 +65,7 @@ public class ChargingSession {
         String bookingId = booking.getBookingId();
         // gọi thằng waiting ở sau lưng nếu có để cập nhật addExpectedWaitingTime
         waitingService.addExpectedWaitingTime(createSession.getBooking().getChargingPost(), expectedEndTime);
+
         bookingService.updateChargingBookingStatus(bookingId);
         sessionId = sessionService.addSessionWithBooking(bookingId, expectedEndTime);
         //cập nhật trạng thái bên booking thành charging ngay khi tạo session thành côngbookingService.updateChargingBookingStatus(booking.getBookingId());

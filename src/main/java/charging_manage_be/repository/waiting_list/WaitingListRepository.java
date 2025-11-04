@@ -22,4 +22,5 @@ public interface WaitingListRepository extends JpaRepository<WaitingListEntity, 
     List<WaitingListEntity> findByUser(UserEntity userEntity);
     List<WaitingListEntity> findByCreatedAtBetween(LocalDateTime startOfDay, LocalDateTime endOfDay);
 
+    WaitingListEntity findFirstByUser_UserIDAndStatusOrderByCreatedAtDesc(String userUserID, String status);
 }

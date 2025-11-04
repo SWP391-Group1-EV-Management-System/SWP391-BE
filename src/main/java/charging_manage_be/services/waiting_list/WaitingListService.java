@@ -24,4 +24,5 @@ public interface WaitingListService{
     boolean addExpectedWaitingTime(String postId, LocalDateTime expectedWaitingTime);
     public boolean isUserWaiting(String userId);
     void getPositionAllDriver(String postId);
+    String getWaitingListNewByUserId(String userID);
 }
