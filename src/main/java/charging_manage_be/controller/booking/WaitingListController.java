@@ -52,6 +52,7 @@ public class WaitingListController {
             dto.setOutedAt(waitingListEntity.getOutedAt());
             dto.setCreatedAt(waitingListEntity.getCreatedAt());
             dto.setStatus(waitingListEntity.getStatus());
+            dto.setStationName(waitingListEntity.getChargingStation().getNameChargingStation());
             return dto;
         }).toList();
         return ResponseEntity.ok(waitingList);
@@ -73,6 +74,7 @@ public class WaitingListController {
             dto.setOutedAt(waitingListEntity.getOutedAt());
             dto.setCreatedAt(waitingListEntity.getCreatedAt());
             dto.setStatus(waitingListEntity.getStatus());
+            dto.setStationName(waitingListEntity.getChargingStation().getNameChargingStation());
             return dto;
         }).toList();
         return ResponseEntity.ok(waitingList);
@@ -92,6 +94,7 @@ public class WaitingListController {
             dto.setOutedAt(waitingListEntity.getOutedAt());
             dto.setCreatedAt(waitingListEntity.getCreatedAt());
             dto.setStatus(waitingListEntity.getStatus());
+            dto.setStationName(waitingListEntity.getChargingStation().getNameChargingStation());
             return dto;
         }).toList();
         return ResponseEntity.ok(waitingList);
@@ -118,6 +121,7 @@ public class WaitingListController {
             dto.setOutedAt(waitingListEntity.getOutedAt());
             dto.setCreatedAt(waitingListEntity.getCreatedAt());
             dto.setStatus(waitingListEntity.getStatus());
+            dto.setStationName(waitingListEntity.getChargingStation().getNameChargingStation());
             return dto;
         }).toList();
         return ResponseEntity.ok(waitingList);
@@ -133,10 +137,11 @@ public class WaitingListController {
         dto.setUserId(waitingListEntity.getUser().getUserID());
         dto.setChargingStationId(waitingListEntity.getChargingStation().getIdChargingStation());
         dto.setChargingPostId(waitingListEntity.getChargingPost().getIdChargingPost());
-        dto.setCarId(waitingListEntity.getCar().getCarID());
+        dto.setCarId(waitingListEntity.getCar().getTypeCar());
         dto.setOutedAt(waitingListEntity.getOutedAt());
         dto.setCreatedAt(waitingListEntity.getCreatedAt());
         dto.setStatus(waitingListEntity.getStatus());
+        dto.setStationName(waitingListEntity.getChargingStation().getNameChargingStation());
         return ResponseEntity.ok(dto);
     }
 }
