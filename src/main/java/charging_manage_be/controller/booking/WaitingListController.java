@@ -8,7 +8,6 @@ import charging_manage_be.services.charging_station.ChargingStationService;
 import charging_manage_be.services.waiting_list.WaitingListService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;

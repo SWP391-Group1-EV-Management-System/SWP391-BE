@@ -104,9 +104,18 @@ public class WaitingListServiceImpl implements WaitingListService{
             WaitingListEntity savedEntity = waitingListRepository.save(waitingListEntity);
 
             // Push vào Redis để quản lý hàng đợi
-            redisTemplate.opsForList().rightPush(redisKey(savedEntity.getChargingPost().getIdChargingPost()), savedEntity.getUser().getUserID());
+            String redisKey = redisKey(savedEntity.getChargingPost().getIdChargingPost());
+            String userIdToPush = savedEntity.getUser().getUserID();
+
+            System.out.println("🔑 [addToWaitingList] Redis Key: " + redisKey);
+            System.out.println("👤 [addToWaitingList] User ID: " + userIdToPush);
+            System.out.println("📍 [addToWaitingList] Post ID: " + savedEntity.getChargingPost().getIdChargingPost());
+
+            //redisTemplate.opsForList().rightPush(redisKey, userIdToPush);
+            System.out.println("✅ [addToWaitingList] Pushed to Redis successfully");
 
             // ✅ Gửi vị trí cho TẤT CẢ user trong hàng đợi (bao gồm user vừa join)
+            System.out.println("🚀 [addToWaitingList] Calling getPositionAllDriver...");
             getPositionAllDriver(savedEntity.getChargingPost().getIdChargingPost());
 
             return savedEntity;
@@ -180,16 +189,30 @@ public class WaitingListServiceImpl implements WaitingListService{
 
     public void getPositionAllDriver(String postId) {
         String key = redisKey(postId); // dùng redisKey() để tạo đúng format "queue:post:{postId}"
+        System.out.println("🔍 [getPositionAllDriver] Redis key: " + key);
+
         List<String> queue = redisTemplate.opsForList().range(key, 0, -1);
+        System.out.println("📋 [getPositionAllDriver] Queue size: " + (queue != null ? queue.size() : 0));
+        System.out.println("📋 [getPositionAllDriver] Queue content: " + queue);
+
         if (queue == null || queue.isEmpty()) {
+            System.out.println("⚠️ [getPositionAllDriver] Queue is empty! No message sent.");
             return; // Không có ai trong hàng đợi
         }
+
         for (int i = 0; i < queue.size(); i++) {
             String userId = queue.get(i);
             int position = i + 1;
-            simpMessagingTemplate.convertAndSendToUser(userId,
-                    "/queue/notifications/" + postId,
-                    "Bạn đang ở vị trí số " + position);
+            String message = "Bạn đang ở vị trí số " + position;
+            String destination = "/queue/notifications/" + postId;
+
+            System.out.println("📤 [WebSocket] Sending to user: " + userId);
+            System.out.println("📤 [WebSocket] Destination: " + destination);
+            System.out.println("📤 [WebSocket] Message: " + message);
+
+            simpMessagingTemplate.convertAndSendToUser(userId, destination, message);
+
+            System.out.println("✅ [WebSocket] Sent successfully to " + userId);
         }
     }
 

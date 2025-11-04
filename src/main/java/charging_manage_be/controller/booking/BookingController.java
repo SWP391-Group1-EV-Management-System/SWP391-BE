@@ -26,6 +26,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/booking")
 public class BookingController {
+    // bên waiting lits khi cancel hàng đợi rồi booking A canecl thì hàng đợi của B (đã cancel) vân bị qua booking
 
     @Autowired
     private BookingService bookingService;
