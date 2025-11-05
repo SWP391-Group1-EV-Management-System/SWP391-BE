@@ -17,4 +17,5 @@ public interface ChargingPostService {
     List<ChargingPostEntity> getAllPosts();
     StationAndPost mapToDTO(ChargingStationEntity station, Double userLat, Double userLon);
     boolean isPostGotBooking(String postId);
+    Map<String, Boolean> getPostAvailabilityMap(List<ChargingPostEntity> posts);
 }

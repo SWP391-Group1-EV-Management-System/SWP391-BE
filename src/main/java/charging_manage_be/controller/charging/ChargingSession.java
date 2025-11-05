@@ -13,6 +13,7 @@ import charging_manage_be.model.entity.charging.ChargingSessionEntity;
 import charging_manage_be.model.entity.charging.ChargingStationEntity;
 import charging_manage_be.services.booking.BookingService;
 import charging_manage_be.services.charging_post.ChargingPostService;
+import charging_manage_be.services.charging_post.ChargingPostStatusService;
 import charging_manage_be.services.charging_session.ChargingSessionService;
 import charging_manage_be.services.charging_station.ChargingStationService;
 import charging_manage_be.services.status_service.UserStatusService;
@@ -51,9 +52,32 @@ public class ChargingSession {
     private ChargingStationService chargingStationService;
     @Autowired
     private ChargingPostService chargingPostService;
+    @Autowired
+    private ChargingPostStatusService chargingPostStatusService;
 
     private final String STATUS_SESSION = "session";
     private final String STATUS_PAYMENT = "payment";
+
+    @PostMapping("/update-preference")
+    public ResponseEntity<Map<String, Object>> updateChargingPreference(@RequestBody Map<String, Object> request) {
+        String userId = (String) request.get("userId");
+        int targetPin = (int) request.get("targetPin");
+        int maxSecond = (int) request.get("maxSecond"); // Nhận số giây từ frontend (đã tính sẵn)
+
+        // Frontend đã tính: (targetPin - currentPin) * 13.25
+        // Backend chỉ cần lưu vào Redis
+
+        // Lưu vào Redis
+        sessionService.storeChargingPreference(userId, targetPin, maxSecond);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "success");
+        response.put("message", "Charging preference updated successfully");
+        response.put("targetPin", targetPin);
+        response.put("maxSecond", maxSecond);
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping("/create")
     public ResponseEntity<Map<String, Object>> createChargingSession(@RequestBody ChargingSessionRequest createSession) { // gồm có đối tượng booking và expectedEndTime
         // check driver đã có booking thì check đúng trụ chưa
@@ -86,6 +110,11 @@ public class ChargingSession {
                 }
                 // yêu cầu FE xử lý khi realtime đạt tới expectedEndTime thì gọi API finish ở dưới
                 status = userStatusService.setUserStatus(createSession.getBooking().getUser(), STATUS_SESSION);
+
+                // ✅ THÊM: Broadcast trạng thái trụ đang charging (nhánh không có booking)
+                if (sessionId != null) {
+                    chargingPostStatusService.broadcastPostStatus(createSession.getBooking().getChargingPost());
+                }
             }else
             {
                 status = "trụ đang bận";
@@ -118,6 +147,11 @@ public class ChargingSession {
             }
             // yêu cầu FE xử lý khi realtime đạt tới expectedEndTime thì gọi API finish ở dưới
             status = userStatusService.setUserStatus(createSession.getBooking().getUser(), STATUS_SESSION);
+
+            // ✅ THÊM: Broadcast trạng thái trụ đang charging
+            if (sessionId != null) {
+                chargingPostStatusService.broadcastPostStatus(createSession.getBooking().getChargingPost());
+            }
         }
         Map<String, Object> response = new HashMap<>();
         response.put("status", status);
@@ -142,6 +176,9 @@ public class ChargingSession {
         }
 
         userStatusService.setUserStatus(session.getUser().getUserID(), STATUS_PAYMENT);
+
+        // ✅ THÊM: Broadcast trạng thái trụ đã kết thúc sạc (trụ rảnh)
+        chargingPostStatusService.broadcastPostStatus(session.getChargingPost().getIdChargingPost());
 
         // ✅ Trả về response chi tiết cho FE
         return ResponseEntity.ok(response);
@@ -215,6 +252,9 @@ public class ChargingSession {
                 userReputationService.handleEarlyUnplugPenalty(chargingSession);
             }
             userStatusService.setUserStatus(chargingSession.getUser().getUserID(), STATUS_PAYMENT);
+
+            // ✅ THÊM: Broadcast trạng thái trụ đã kết thúc tự động (trụ rảnh)
+            chargingPostStatusService.broadcastPostStatus(chargingSession.getChargingPost().getIdChargingPost());
         }
     }
     @GetMapping("/showAll/{userId}")

@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @AllArgsConstructor
@@ -20,6 +21,6 @@ public class ChargingStationResponseDTO {
     private String userManagerName;
     private double latitude;
     private double longitude;
-    private List<String> chargingPostIds;
+    private Map<String,Boolean> chargingPostsAvailable;
     private List<String> chargingSessionIds;
 }

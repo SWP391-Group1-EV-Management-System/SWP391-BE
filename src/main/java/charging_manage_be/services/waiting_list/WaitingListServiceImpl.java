@@ -13,6 +13,7 @@ import charging_manage_be.repository.charging_post.ChargingPostRepository;
 import charging_manage_be.repository.charging_station.ChargingStationRepository;
 import charging_manage_be.repository.users.UserRepository;
 import charging_manage_be.repository.waiting_list.WaitingListRepository;
+import charging_manage_be.services.charging_post.ChargingPostStatusService;
 import charging_manage_be.services.charging_session.ChargingSessionService;
 import charging_manage_be.services.users.UserService;
 import jakarta.transaction.Transactional;
@@ -40,6 +41,7 @@ public class WaitingListServiceImpl implements WaitingListService{
     private final UserService userService;
     private final ChargingSessionService chargingSessionService;
     private final SimpMessagingTemplate simpMessagingTemplate;
+    private final ChargingPostStatusService chargingPostStatusService;
 
     // ✅ THÊM BookingService với @Lazy để tránh circular dependency
     private final charging_manage_be.services.booking.BookingService bookingService;
@@ -59,6 +61,7 @@ public class WaitingListServiceImpl implements WaitingListService{
         UserService userService,
         ChargingSessionService chargingSessionService,
         SimpMessagingTemplate simpMessagingTemplate,
+        ChargingPostStatusService chargingPostStatusService,
         @Lazy charging_manage_be.services.booking.BookingService bookingService
     ) {
         this.waitingListRepository = waitingListRepository;
@@ -70,6 +73,7 @@ public class WaitingListServiceImpl implements WaitingListService{
         this.userService = userService;
         this.chargingSessionService = chargingSessionService;
         this.simpMessagingTemplate = simpMessagingTemplate;
+        this.chargingPostStatusService = chargingPostStatusService;
         this.bookingService = bookingService;
     }
 
@@ -164,6 +168,9 @@ public class WaitingListServiceImpl implements WaitingListService{
             System.out.println("🚀 [addToWaitingList] Calling getPositionAllDriver...");
             getPositionAllDriver(savedEntity.getChargingPost().getIdChargingPost());
 
+            // ✅ THÊM: Broadcast trạng thái trụ có người mới vào hàng chờ (cập nhật waitingCount)
+            chargingPostStatusService.broadcastPostStatus(savedEntity.getChargingPost().getIdChargingPost());
+
             return savedEntity;
 
     }
@@ -199,6 +206,9 @@ public class WaitingListServiceImpl implements WaitingListService{
 //                "/queue/notification/" + entity.getChargingPost().getIdChargingPost(), "User" +entity.getUser().getFirstName()+ "cancelled");
         // chỉ cần thông báo lại vị trí cho các user khác thôi, chứ thông báo thằng A đã rơi hàng cho mấy thằng trong list để làm gì
         getPositionAllDriver(entity.getChargingPost().getIdChargingPost());
+
+        // ✅ THÊM: Broadcast trạng thái trụ có người cancel hàng chờ (cập nhật waitingCount)
+        chargingPostStatusService.broadcastPostStatus(entity.getChargingPost().getIdChargingPost());
 
     }
 

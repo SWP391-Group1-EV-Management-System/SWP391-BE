@@ -56,6 +56,12 @@ public class ChargingSessionEntity {
     @Column(name = "total_amount")
     private BigDecimal totalAmount;
 
+    @Column(name = "initial_pin")
+    private Integer initialPin;
+
+    @Column(name = "initial_minute_max")
+    private Integer initialMinuteMax;
+
     @OneToOne(mappedBy = "session")
     private PaymentEntity payment;
     @PrePersist

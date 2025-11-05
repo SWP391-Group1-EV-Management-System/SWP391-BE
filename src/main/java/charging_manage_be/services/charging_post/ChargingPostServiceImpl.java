@@ -98,8 +98,8 @@ public class ChargingPostServiceImpl implements ChargingPostService {
         return ChargingPostRepository.findAll();
     }
 
-
-    private Map<String, Boolean> getPostAvailabilityMap(List<ChargingPostEntity> posts) {
+    @Override
+    public Map<String, Boolean> getPostAvailabilityMap(List<ChargingPostEntity> posts) {
         Map<String, Boolean> map = new HashMap<>();
 
         if (posts != null && !posts.isEmpty()) {

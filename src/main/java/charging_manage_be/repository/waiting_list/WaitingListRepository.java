@@ -26,4 +26,7 @@ public interface WaitingListRepository extends JpaRepository<WaitingListEntity, 
 
     // ✅ THÊM METHOD MỚI: Tìm tất cả waiting list đã đến giờ dự kiến
     List<WaitingListEntity> findByStatusAndExpectedWaitingTimeLessThanEqual(String status, LocalDateTime time);
+
+    // ✅ THÊM METHOD MỚI: Đếm số người đang chờ tại một trụ
+    long countByChargingPost_IdChargingPostAndStatus(String postId, String status);
 }

@@ -80,7 +80,7 @@ public class StationController {
             stationDTO.setUserManagerName(station.getUserManager().getLastName());
             stationDTO.setLatitude(station.getLatitude());
             stationDTO.setLongitude(station.getLongitude());
-            stationDTO.setChargingPostIds(station.getChargingPosts().stream().map(ChargingPostEntity::getIdChargingPost).toList());
+            stationDTO.setChargingPostsAvailable(chargingPostService.getPostAvailabilityMap(station.getChargingPosts()));
             stationDTO.setChargingSessionIds(station.getChargingSession().stream().map(ChargingSessionEntity::getChargingSessionId).toList());
             return ResponseEntity.ok(stationDTO);
         }
@@ -97,8 +97,10 @@ public class StationController {
             stationDTO.setEstablishedTime(chargingStationEntity.getEstablishedTime());
             stationDTO.setNumberOfPosts(chargingStationEntity.getNumberOfPosts());
             stationDTO.setUserManagerName(chargingStationEntity.getUserManager().getLastName());
-            stationDTO.setChargingPostIds(chargingStationEntity.getChargingPosts().stream().map(ChargingPostEntity::getIdChargingPost).toList());
+            stationDTO.setChargingPostsAvailable(chargingPostService.getPostAvailabilityMap(chargingStationEntity.getChargingPosts()));
             stationDTO.setChargingSessionIds(chargingStationEntity.getChargingSession().stream().map(ChargingSessionEntity::getChargingSessionId).toList());
+            stationDTO.setLatitude(chargingStationEntity.getLatitude());
+            stationDTO.setLongitude(chargingStationEntity.getLongitude());
             return stationDTO;
         }).toList();
         return ResponseEntity.ok(stations);
