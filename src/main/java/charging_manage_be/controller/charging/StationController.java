@@ -36,9 +36,8 @@ public class StationController {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private BookingService bookingService;
-    @Autowired
-    private ChargingSessionService  chargingSessionService;
+    @Lazy
+    private ChargingPostService chargingPostService;
     @PostMapping("/create")
     public ResponseEntity<String> createChargingStation(@RequestBody ChargingStationRequestDTO chargingStationRequestDTO) {
         if (chargingStationRequestDTO == null) {
@@ -170,55 +169,10 @@ public class StationController {
 
         // 2. Map Entity sang DTO trong Controller
         List<StationAndPost> stationDTOs = stations.stream()
-                .map(station -> mapToDTO(station, request.getLatitude(), request.getLongitude()))
+                .map(station -> chargingPostService.mapToDTO(station, request.getLatitude(), request.getLongitude()))
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(stationDTOs);
-    }
-
-
-    private StationAndPost mapToDTO(ChargingStationEntity station, Double userLat, Double userLon) {
-        StationAndPost dto = new StationAndPost();
-
-        // Map basic fields
-        dto.setIdChargingStation(station.getIdChargingStation());
-        dto.setNameChargingStation(station.getNameChargingStation());
-        dto.setAddress(station.getAddress());
-        dto.setActive(station.isActive());
-        dto.setEstablishedTime(station.getEstablishedTime());
-        dto.setNumberOfPosts(station.getNumberOfPosts());
-        dto.setLatitude(station.getLatitude());
-        dto.setLongitude(station.getLongitude());
-
-        // Tính distance nếu có tọa độ người dùng
-        if (userLat != null && userLon != null) {
-            double distance = chargingStationService.calculateDistance(
-                    userLat, userLon,
-                    station.getLatitude(), station.getLongitude()
-            );
-            dto.setDistanceKm(Math.round(distance * 100.0) / 100.0); // Làm tròn 2 chữ số
-            // nhân với 100 để giữ toàn vẹn 2 số sau dấu phẩy tránh bị làm tròn mất sau đó chia lại để hiển thị đúng gía trị ( Math.round(478,79899) = 479)
-        }
-
-        // Map post availability
-        dto.setPostAvailable(getPostAvailabilityMap(station.getChargingPosts()));
-
-        return dto;
-    }
-
-
-    private Map<String, Boolean> getPostAvailabilityMap(List<ChargingPostEntity> posts) {
-        Map<String, Boolean> map = new HashMap<>();
-
-        if (posts != null && !posts.isEmpty()) {
-            for (ChargingPostEntity post : posts) {
-                boolean isIdle = bookingService.isPostIdleInBooking(post.getIdChargingPost())
-                        && chargingSessionService.isPostIdleBySession(post.getIdChargingPost());
-                map.put(post.getIdChargingPost(), isIdle);
-            }
-        }
-
-        return map;
     }
 }
 

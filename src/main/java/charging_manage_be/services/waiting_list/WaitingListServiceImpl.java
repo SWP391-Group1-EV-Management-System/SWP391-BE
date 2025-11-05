@@ -217,8 +217,13 @@ public class WaitingListServiceImpl implements WaitingListService{
     }
 
     @Override
-    public String getWaitingListNewByUserId(String userID) {
-        return waitingListRepository.findFirstByUser_UserIDAndStatusOrderByCreatedAtDesc(userID, "WAITING").getWaitingListId();
+    public String getWaitingListNewByUserId(String userId) {
+        return waitingListRepository.findFirstByUser_UserIDAndStatusOrderByCreatedAtDesc(userId, "WAITING").getWaitingListId();
+    }
+
+    @Override
+    public WaitingListEntity getNewWaitingListByUserId(String userId) {
+        return waitingListRepository.findFirstByUser_UserIDAndStatusOrderByCreatedAtDesc(userId, "WAITING");
     }
 
     public void updateMaxWaitingTime(String postId, String userId, LocalDateTime endTime) {

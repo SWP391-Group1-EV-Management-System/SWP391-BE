@@ -418,5 +418,19 @@ public class BookingServiceImpl implements BookingService {
     public String getBookingIdNewByUserId(String userId) {
         return bookingRepository.findFirstByUser_UserIDAndStatusOrderByCreatedAtDesc(userId, "CONFIRMED").getBookingId();
     }
+
+    @Override
+    public String getPostIdByNewBookingOfUserId(String userId) {
+        BookingEntity book =  bookingRepository.findFirstByUser_UserIDAndStatusOrderByCreatedAtDesc(userId, "CONFIRMED");
+        if(book != null) {
+            return book.getChargingPost().getIdChargingPost();
+        }
+        return "null";
+    }
+
+    @Override
+    public BookingEntity getNewBookingByUserId(String userId) {
+        return bookingRepository.findFirstByUser_UserIDAndStatusOrderByCreatedAtDesc(userId, "CONFIRMED");
+    }
 }
 
