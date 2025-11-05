@@ -72,4 +72,67 @@ public class CountdownController {
         long secs = seconds % 60;
         return String.format("%02d:%02d:%02d", hours, minutes, secs);
     }
+    @GetMapping(value = "/battery/{currentBattery}/{remainingMinutes}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter batteryCountdown(
+            @PathVariable int currentBattery,
+            @PathVariable int remainingMinutes) {
+
+        SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
+
+        LocalDateTime endTime = LocalDateTime.now().plusMinutes(remainingMinutes);
+        final int[] batteryLevel = {currentBattery};
+        final LocalDateTime[] lastBatteryUpdate = {LocalDateTime.now()};
+
+        ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+        executor.scheduleAtFixedRate(() -> {
+            try {
+                long remainingSeconds = Duration.between(LocalDateTime.now(), endTime).getSeconds();
+
+                // Tính toán tăng pin (1% mỗi 13.25 giây)
+                long secondsSinceLastUpdate = Duration.between(lastBatteryUpdate[0], LocalDateTime.now()).getSeconds();
+                if (secondsSinceLastUpdate >= 13.25 && batteryLevel[0] < 100) {
+                    batteryLevel[0]++;
+                    lastBatteryUpdate[0] = LocalDateTime.now();
+                }
+
+                if (remainingSeconds <= 0 || batteryLevel[0] >= 100) {
+                    Map<String, Object> finalData = new HashMap<>();
+                    finalData.put("remainingSeconds", 0);
+                    finalData.put("batteryLevel", Math.min(batteryLevel[0], 100));
+                    finalData.put("status", "COMPLETED");
+                    finalData.put("message", "Charging completed!");
+
+                    emitter.send(SseEmitter.event()
+                            .name("charging")
+                            .data(finalData));
+
+                    emitter.complete();
+                    executor.shutdown();
+                    return;
+                }
+
+                Map<String, Object> data = new HashMap<>();
+                data.put("remainingSeconds", remainingSeconds);
+                data.put("remainingMinutes", remainingSeconds / 60);
+                data.put("displayTime", formatTime(remainingSeconds));
+                data.put("batteryLevel", batteryLevel[0]);
+                data.put("endTime", endTime);
+                data.put("status", "CHARGING");
+
+                emitter.send(SseEmitter.event()
+                        .name("charging")
+                        .data(data));
+
+            } catch (Exception e) {
+                emitter.completeWithError(e);
+                executor.shutdown();
+            }
+        }, 0, 1, TimeUnit.SECONDS);
+
+        emitter.onCompletion(executor::shutdown);
+        emitter.onTimeout(executor::shutdown);
+        emitter.onError(e -> executor.shutdown());
+
+        return emitter;
+    }
 }

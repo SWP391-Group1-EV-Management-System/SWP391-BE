@@ -228,59 +228,6 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
 
 
     // Hàm cập nhật tiến trình sạc real-time (được gọi mỗi giây)
-//    @Scheduled(fixedRate = 1000)
-//    public void updateChargingProgress() {
-//        List<ChargingSessionEntity> activeSessions = chargingSession.findByIsDoneFalse();
-//
-//        for (ChargingSessionEntity session : activeSessions) {
-//            LocalDateTime now = LocalDateTime.now();
-//            LocalDateTime start = session.getStartTime();
-//            if (start == null || now.isBefore(start)){
-//                continue;
-//            }
-//
-//            long elapsedSeconds = Duration.between(start.getSecond, now)s(;) // Lấy khoảng thời gian giữa 2 thời điểm và quy đổi ra giây
-//
-//            double power = session.getChargingPost().getMaxPower().doubleValue();
-//            double energyCharged = (power * elapsedSeconds) / 3600.0; // kWh đã sạc được
-//            updateProgress(session.getChargingSessionId(), energyCharged, elapsedSeconds);
-//        }
-//    }
-//    @Scheduled(fixedRate = 1000)
-//    public void updateChargingProgress() {
-//        List<ChargingSessionEntity> activeSessions = chargingSession.findByIsDoneFalse();
-//
-//        for (ChargingSessionEntity session : activeSessions) {
-//            LocalDateTime now = LocalDateTime.now();
-//            LocalDateTime start = session.getStartTime();
-//            if (start == null || now.isBefore(start)){
-//                continue;
-//            }
-//
-//            long elapsedSeconds = Duration.between(start, now).getSeconds();
-//
-//            double power = session.getChargingPost().getMaxPower().doubleValue();
-//            double energyCharged = (power * elapsedSeconds) / 3600.0;
-//            int pin = carService.pinRandom();
-//            int minuteMax = carService.maxMinutes(pin);
-//            Map<Object, Object> progress = redisTemplate.opsForHash().entries("charging:session:" + session.getChargingSessionId());
-//            Object pinObj = progress.get("pin");
-//            Object minuteMaxObj = progress.get("minuteMax");
-//            if(pinObj != null && minuteMaxObj != null) {
-//                pin = (Integer) pinObj;
-//                minuteMax = (Integer) minuteMaxObj;
-//            }
-//            // Tính pin dựa trên thời gian (tăng mỗi 13.25 giây)
-//            int pinIncrements = (int) (elapsedSeconds / 13.25);
-//            int currentPin = Math.min(pin + pinIncrements, 100); // giới hạn tối đa 100%
-//
-//            // Tính minuteMax còn lại (giảm mỗi phút)
-//            int minutesElapsed = (int) (elapsedSeconds / 60);
-//            int remainingMinutes = Math.max(minuteMax - minutesElapsed, 0); // không âm
-//
-//            updateProgress(session.getChargingSessionId(), energyCharged, elapsedSeconds, currentPin, remainingMinutes);
-//        }
-//    }
     @Scheduled(fixedRate = 1000)
     public void updateChargingProgress() {
         List<ChargingSessionEntity> activeSessions = chargingSession.findByIsDoneFalse();
@@ -292,51 +239,20 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
                 continue;
             }
 
-            long elapsedSeconds = Duration.between(start, now).getSeconds();
+            long elapsedSeconds = Duration.between(start, now).getSeconds(); // Lấy khoảng thời gian giữa 2 thời điểm và quy đổi ra giây
 
             double power = session.getChargingPost().getMaxPower().doubleValue();
-            double energyCharged = (power * elapsedSeconds) / 3600.0;
-
-            String key = "charging:session:" + session.getChargingSessionId();
-            Map<Object, Object> progress = redisTemplate.opsForHash().entries(key);
-
-            int initialPin;
-            int initialMinuteMax;
-
-            // Kiểm tra và khởi tạo giá trị ban đầu nếu chưa có
-            if (progress.isEmpty() || !progress.containsKey("initialPin")) {
-                initialPin = carService.pinRandom();
-                initialMinuteMax = carService.maxMinutes(initialPin);
-
-                Map<String, String> initMap = new HashMap<>();
-                initMap.put("initialPin", String.valueOf(initialPin));
-                initMap.put("initialMinuteMax", String.valueOf(initialMinuteMax));
-                redisTemplate.opsForHash().putAll(key, initMap);
-            } else {
-                initialPin = Integer.parseInt(progress.get("initialPin").toString());
-                initialMinuteMax = Integer.parseInt(progress.get("initialMinuteMax").toString());
-            }
-
-            // Tính pin dựa trên giá trị ban đầu (tăng mỗi 13.25 giây)
-            int pinIncrements = (int) (elapsedSeconds / 13.25);
-            int currentPin = Math.min(initialPin + pinIncrements, 100);
-
-            // Tính minuteMax còn lại (giảm mỗi phút)
-            int minutesElapsed = (int) (elapsedSeconds / 60);
-            int remainingMinutes = Math.max(initialMinuteMax - minutesElapsed, 0);
-
-            updateProgress(session.getChargingSessionId(), energyCharged, elapsedSeconds, currentPin, remainingMinutes);
+            double energyCharged = (power * elapsedSeconds) / 3600.0; // kWh đã sạc được
+            updateProgress(session.getChargingSessionId(), energyCharged, elapsedSeconds);
         }
     }
 
     // Update quá trình dô Redis
-    private void updateProgress(String sessionId, double energyCharged, long elapsedSeconds, int pin, int minuteMax) {
+    private void updateProgress(String sessionId, double energyCharged, long elapsedSeconds) {
         String key = "charging:session:" + sessionId;
         Map<String, String> map = new HashMap<>();
         map.put("chargedEnergy_kWh", String.format( Locale.US, "%.2f", energyCharged));
         map.put("elapsedSeconds", String.valueOf(elapsedSeconds));
-        map.put("pin", String.valueOf(pin));
-        map.put("minuteMax", String.valueOf(minuteMax));
         redisTemplate.opsForHash().putAll(key, map);
     }
 
