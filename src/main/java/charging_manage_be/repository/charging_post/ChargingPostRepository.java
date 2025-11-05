@@ -11,4 +11,5 @@ import java.util.List;
 
 @Repository
 public interface ChargingPostRepository extends JpaRepository<ChargingPostEntity, String> {
+    List<ChargingPostEntity> findByChargingStation_IdChargingStation(String stationId);
 }

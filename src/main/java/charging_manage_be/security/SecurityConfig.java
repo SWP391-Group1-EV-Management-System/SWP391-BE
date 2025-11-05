@@ -30,6 +30,8 @@ public class SecurityConfig {
                         // Cho phép WebSocket connection
                         .requestMatchers("/api/countdown/**").permitAll()
                         .requestMatchers("/ws/**").permitAll()
+                        // Cho phép truy cập trạng thái trụ sạc (cho UI trụ ảo)
+                        .requestMatchers("/api/charging-post/**").permitAll()
                         // Cho phép MoMo gửi request
                         .requestMatchers("/api/payment/ipn-handler").permitAll()
                         .requestMatchers("/users/login", "/users/register/**", "/users/re-login", "/api/charging/session/progress/**").permitAll() // các end ponit auth không cần token ( login, register)

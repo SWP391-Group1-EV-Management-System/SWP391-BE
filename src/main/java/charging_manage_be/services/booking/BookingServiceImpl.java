@@ -21,6 +21,7 @@ import charging_manage_be.repository.user_reputations.UserReputationRepository;
 import charging_manage_be.repository.users.UserRepository;
 import charging_manage_be.repository.waiting_list.WaitingListRepository;
 import charging_manage_be.services.charging_post.ChargingPostService;
+import charging_manage_be.services.charging_post.ChargingPostStatusService;
 import charging_manage_be.services.charging_session.ChargingSessionService;
 import charging_manage_be.services.status_service.UserStatusService;
 import charging_manage_be.services.waiting_list.WaitingListService;
@@ -58,6 +59,8 @@ public class BookingServiceImpl implements BookingService {
     private static final String KEY_QUEUE_POST = "queue:post:";
     private final String STATUS_BOOKING = "booking";
     private final UserStatusService userStatusService;
+    @Lazy
+    private final ChargingPostStatusService chargingPostStatusService;
     private final int characterLength = 5;
     private final int numberLength = 5;
 
@@ -151,6 +154,10 @@ public class BookingServiceImpl implements BookingService {
                 simpMessagingTemplate.convertAndSendToUser(userId,
                         "/queue/notifications/" + chargingPostId,
                         "User " + userId + " booked successfully");
+
+                // ✅ THÊM: Broadcast trạng thái trụ đã được booking
+                chargingPostStatusService.broadcastPostStatus(chargingPostId);
+
                 return -1; // Trả về -1 để báo rằng không vào danh sách chờ mà đã tạo booking luôn
 
 
@@ -174,6 +181,9 @@ public class BookingServiceImpl implements BookingService {
                 //simpMessagingTemplate.convertAndSendToUser(userId, "/queue/notifications",
                 //        "Your position in queue: " + positionInQueue);
 
+                // ✅ THÊM: Broadcast trạng thái trụ có người mới vào hàng chờ
+                chargingPostStatusService.broadcastPostStatus(chargingPostId);
+
                 return positionInQueue; // số thứ tự chờ
             }
         }
@@ -192,6 +202,12 @@ public class BookingServiceImpl implements BookingService {
         // Gửi thông báo đến user rằng booking đã hoàn thành
         simpMessagingTemplate.convertAndSendToUser(booking.getUser().getUserID(), "/queue/notifications",
                 "Your Booking: " + booking.getBookingId() + " completed successfully");
+
+        BookingEntity savedBooking = bookingRepository.save(booking);
+
+        // ✅ THÊM: Broadcast trạng thái trụ đã hoàn thành (trụ rảnh)
+        chargingPostStatusService.broadcastPostStatus(booking.getChargingPost().getIdChargingPost());
+
         // tự động thay thế bằng một booking mới từ waiting chờ nếu có
         // phải set nếu end time bên session bằng với thời gian expected end bên session thì mới gọi hàm này
 //        boolean isWaitingDriver = waitingListRepository
@@ -201,7 +217,7 @@ public class BookingServiceImpl implements BookingService {
 //        if (isWaitingDriver) {
 //            processBooking(booking.getChargingPost().getIdChargingPost());
 //        }
-        return bookingRepository.save(booking);
+        return savedBooking;
     }
 
     @Override
@@ -215,6 +231,10 @@ public class BookingServiceImpl implements BookingService {
         simpMessagingTemplate.convertAndSendToUser(booking.getUser().getUserID(), "/queue/notifications",
                 "Your Booking: " + booking.getBookingId() + " cancel booking successfully");
 
+        BookingEntity savedBooking = bookingRepository.save(booking);
+
+        // ✅ THÊM: Broadcast trạng thái trụ đã bị cancel (trụ rảnh)
+        chargingPostStatusService.broadcastPostStatus(booking.getChargingPost().getIdChargingPost());
 
         // theo flow mới ( khi chưa đủ giờ) phải hỏi driver trong waiting rằng có muốn sạc luôn hay không, nếu đồng ý thì chuyển từ waiting ra
         // không muôn sạc luôn thì phải chờ đến giờ
@@ -226,7 +246,7 @@ public class BookingServiceImpl implements BookingService {
 //        if (isWaitingDriver) {
 //            processBooking(booking.getChargingPost().getIdChargingPost());
 //        }
-        return bookingRepository.save(booking);
+        return savedBooking;
     }
 
 
