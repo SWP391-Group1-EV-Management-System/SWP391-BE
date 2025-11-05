@@ -1,6 +1,8 @@
 package charging_manage_be.services.charging_post;
 
+import charging_manage_be.model.dto.agent.StationAndPost;
 import charging_manage_be.model.entity.charging.ChargingPostEntity;
+import charging_manage_be.model.entity.charging.ChargingStationEntity;
 import charging_manage_be.model.entity.charging.ChargingTypeEntity;
 import charging_manage_be.repository.charging_post.ChargingPostRepository;
 import charging_manage_be.repository.charging_type.ChargingTypeRepository;
@@ -13,7 +15,9 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static charging_manage_be.util.RandomId.generateRandomId;
 @Service
@@ -27,6 +31,14 @@ public class ChargingPostServiceImpl implements ChargingPostService {
     private ChargingTypeRepository chargingTypeRepository;
     @Autowired
     private ChargingStationService stationService;
+    @Autowired
+    @Lazy
+    private ChargingSessionService chargingSessionService;
+
+    @Autowired
+    @Lazy
+    private BookingService bookingService;
+
     // ChargingPostServiceImpl postService = context.getBean(ChargingPostServiceImpl.class); gọi trong main
     private String generateUniqueId() {
         String newId;
@@ -86,6 +98,56 @@ public class ChargingPostServiceImpl implements ChargingPostService {
         return ChargingPostRepository.findAll();
     }
 
+
+    private Map<String, Boolean> getPostAvailabilityMap(List<ChargingPostEntity> posts) {
+        Map<String, Boolean> map = new HashMap<>();
+
+        if (posts != null && !posts.isEmpty()) {
+            for (ChargingPostEntity post : posts) {
+                boolean isIdle = bookingService.isPostIdleInBooking(post.getIdChargingPost())
+                        && chargingSessionService.isPostIdleBySession(post.getIdChargingPost());
+                map.put(post.getIdChargingPost(), isIdle);
+            }
+        }
+
+        return map;
+    }
+    @Override
+    public StationAndPost mapToDTO(ChargingStationEntity station, Double userLat, Double userLon) {
+        StationAndPost dto = new StationAndPost();
+
+        // Map basic fields
+        dto.setIdChargingStation(station.getIdChargingStation());
+        dto.setNameChargingStation(station.getNameChargingStation());
+        dto.setAddress(station.getAddress());
+        dto.setActive(station.isActive());
+        dto.setEstablishedTime(station.getEstablishedTime());
+        dto.setNumberOfPosts(station.getNumberOfPosts());
+        dto.setLatitude(station.getLatitude());
+        dto.setLongitude(station.getLongitude());
+
+        // Tính distance nếu có tọa độ người dùng
+        if (userLat != null && userLon != null) {
+            double distance = stationService.calculateDistance(
+                    userLat, userLon,
+                    station.getLatitude(), station.getLongitude()
+            );
+            dto.setDistanceKm(Math.round(distance * 100.0) / 100.0); // Làm tròn 2 chữ số
+            // nhân với 100 để giữ toàn vẹn 2 số sau dấu phẩy tránh bị làm tròn mất sau đó chia lại để hiển thị đúng gía trị ( Math.round(478,79899) = 479)
+        }
+
+        // Map post availability
+        dto.setPostAvailable(getPostAvailabilityMap(station.getChargingPosts()));
+
+        return dto;
+    }
+
+    @Override
+    public boolean isPostGotBooking(String postId) {
+        return bookingService.isPostIdleInBooking(postId) && chargingSessionService.isPostIdleBySession(postId);
+        // return true khi cả 2 đều true
+        // còn lại là false
+    }
 }
 
 

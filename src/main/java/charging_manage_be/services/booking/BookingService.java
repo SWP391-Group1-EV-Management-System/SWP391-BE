@@ -28,4 +28,6 @@ public interface BookingService {
     boolean isUserBooking(String userId);
     boolean isPostIdleInBooking(String postId);
     String getBookingIdNewByUserId(String userId);
+    String getPostIdByNewBookingOfUserId(String userId);
+    BookingEntity getNewBookingByUserId(String userId);
 }
