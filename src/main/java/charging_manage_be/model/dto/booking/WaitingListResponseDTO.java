@@ -12,6 +12,8 @@ import java.time.LocalDateTime;
 public class WaitingListResponseDTO {
     private String waitingListId;
     private LocalDateTime expectedWaitingTime;
+    private Long remainingSeconds;
+    private String remainingTimeFormatted;
     private String userId;
     private String chargingStationId;
     private String chargingPostId;

@@ -103,9 +103,28 @@ public class WaitingListServiceImpl implements WaitingListService{
                     .orElseThrow(() -> new RuntimeException("Post not found"));
             ChargingStationEntity station = chargingStationRepository.findStationByChargingPostEntity(chargingPostId)
                     .orElseThrow(() -> new RuntimeException("Station not found"));
+
+            // ============ THÊM DEBUG ============
+            LocalDateTime currentTime = LocalDateTime.now();
+            System.out.println("\n=== 🕐 [WAITING TIME DEBUG] ===");
+            System.out.println("👤 User ID: " + userId);
+            System.out.println("📍 Post ID: " + chargingPostId);
+            System.out.println("⏰ Current Time: " + currentTime);
+
             // xử lý trường hợp vô sau ( trụ đó có người cắm sạc và đã có expected end time trên session)
-            // còn bên API bên sessionController sẽ xử lý case khi driver đợi 1 driver chưa tới trạm ( tức driver booking chưa cắm sạc chưa lấy đuọc time)
             LocalDateTime timeEnd = chargingSessionService.getExpectedEndTime(chargingPostId);
+
+            System.out.println("⏱️  Expected End Time (from session): " + timeEnd);
+            if (timeEnd != null) {
+                long secondsRemaining = java.time.Duration.between(currentTime, timeEnd).getSeconds();
+                String formattedTime = formatSeconds(secondsRemaining);
+
+                System.out.println("⏳ Seconds Remaining: " + secondsRemaining);
+                System.out.println("⏳ Time Remaining (HH:MM:SS): " + formattedTime);
+            }
+            System.out.println("=== END DEBUG ===\n");
+            // ============ END DEBUG ============
+
             waitingListEntity.setExpectedWaitingTime(timeEnd);
             waitingListEntity.setUser(user);
             waitingListEntity.setCar(car);
@@ -147,6 +166,13 @@ public class WaitingListServiceImpl implements WaitingListService{
 
             return savedEntity;
 
+    }
+    // ============ THÊM HELPER METHOD ============
+    private String formatSeconds(long seconds) {
+        long hours = seconds / 3600;
+        long minutes = (seconds % 3600) / 60;
+        long secs = seconds % 60;
+        return String.format("%02d:%02d:%02d", hours, minutes, secs);
     }
 
     @Override

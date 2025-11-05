@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.Duration;
 import java.util.List;
 
 @RestController
@@ -93,6 +94,23 @@ public class WaitingListController {
             WaitingListResponseDTO dto = new WaitingListResponseDTO();
             dto.setWaitingListId(waitingListEntity.getWaitingListId());
             dto.setExpectedWaitingTime(waitingListEntity.getExpectedWaitingTime());
+
+            // ✅ TÍNH TOÁN THỜI GIAN CÒN LẠI CHÍNH XÁC
+            if (waitingListEntity.getExpectedWaitingTime() != null) {
+                LocalDateTime now = LocalDateTime.now();
+                LocalDateTime expectedTime = waitingListEntity.getExpectedWaitingTime();
+
+                long seconds = Duration.between(now, expectedTime).getSeconds();
+
+                // Nếu đã quá giờ thì set = 0
+                if (seconds < 0) {
+                    seconds = 0;
+                }
+
+                dto.setRemainingSeconds(seconds);
+                dto.setRemainingTimeFormatted(formatSeconds(seconds));
+            }
+
             dto.setUserId(waitingListEntity.getUser().getUserID());
             dto.setChargingStationId(waitingListEntity.getChargingStation().getIdChargingStation());
             dto.setChargingPostId(waitingListEntity.getChargingPost().getIdChargingPost());
@@ -105,6 +123,15 @@ public class WaitingListController {
         }).toList();
         return ResponseEntity.ok(response);
     }
+
+    // ✅ THÊM HELPER METHOD
+    private String formatSeconds(long seconds) {
+        long hours = seconds / 3600;
+        long minutes = (seconds % 3600) / 60;
+        long secs = seconds % 60;
+        return String.format("%02d:%02d:%02d", hours, minutes, secs);
+    }
+
     // Cho thêm path để lấy  hàn chờ theo trạm, lấy theo ngày tháng năm, lấy theo userID
 
     //Lấy theo trạm
@@ -120,6 +147,17 @@ public class WaitingListController {
             WaitingListResponseDTO dto = new WaitingListResponseDTO();
             dto.setWaitingListId(waitingListEntity.getWaitingListId());
             dto.setExpectedWaitingTime(waitingListEntity.getExpectedWaitingTime());
+
+            // ✅ TÍNH TOÁN THỜI GIAN CÒN LẠI CHÍNH XÁC
+            if (waitingListEntity.getExpectedWaitingTime() != null) {
+                LocalDateTime now = LocalDateTime.now();
+                LocalDateTime expectedTime = waitingListEntity.getExpectedWaitingTime();
+                long seconds = Duration.between(now, expectedTime).getSeconds();
+                if (seconds < 0) seconds = 0;
+                dto.setRemainingSeconds(seconds);
+                dto.setRemainingTimeFormatted(formatSeconds(seconds));
+            }
+
             dto.setUserId(waitingListEntity.getUser().getUserID());
             dto.setChargingStationId(waitingListEntity.getChargingStation().getIdChargingStation());
             dto.setChargingPostId(waitingListEntity.getChargingPost().getIdChargingPost());
@@ -146,6 +184,17 @@ public class WaitingListController {
             WaitingListResponseDTO dto = new WaitingListResponseDTO();
             dto.setWaitingListId(waitingListEntity.getWaitingListId());
             dto.setExpectedWaitingTime(waitingListEntity.getExpectedWaitingTime());
+
+            // ✅ TÍNH TOÁN THỜI GIAN CÒN LẠI CHÍNH XÁC
+            if (waitingListEntity.getExpectedWaitingTime() != null) {
+                LocalDateTime now = LocalDateTime.now();
+                LocalDateTime expectedTime = waitingListEntity.getExpectedWaitingTime();
+                long seconds = Duration.between(now, expectedTime).getSeconds();
+                if (seconds < 0) seconds = 0;
+                dto.setRemainingSeconds(seconds);
+                dto.setRemainingTimeFormatted(formatSeconds(seconds));
+            }
+
             dto.setUserId(waitingListEntity.getUser().getUserID());
             dto.setChargingStationId(waitingListEntity.getChargingStation().getIdChargingStation());
             dto.setChargingPostId(waitingListEntity.getChargingPost().getIdChargingPost());
@@ -163,9 +212,6 @@ public class WaitingListController {
     @GetMapping("/queue/date")
     public ResponseEntity<List<WaitingListResponseDTO>> getWaitingListForDate(@RequestParam LocalDate date) {
 
-        //LocalDateTime dateTime = LocalDate.parse(date).atStartOfDay(); // startOfDay là lấy khoảng thời gian từ 00:00:00 đến 23:59:59 của ngày đó
-        // Khi này, dateTime sẽ là 2023-10-10T00:00:00 và ta sẽ lấy tất cả các record có createdAt trong khoảng từ 2023-10-10T00:00:00 đến 2023-10-10T23:59:59
-
         LocalDateTime startOfDay = date.atStartOfDay();
         LocalDateTime endOfDay = date.plusDays(1).atStartOfDay();
 
@@ -179,6 +225,17 @@ public class WaitingListController {
             WaitingListResponseDTO dto = new WaitingListResponseDTO();
             dto.setWaitingListId(waitingListEntity.getWaitingListId());
             dto.setExpectedWaitingTime(waitingListEntity.getExpectedWaitingTime());
+
+            // ✅ TÍNH TOÁN THỜI GIAN CÒN LẠI CHÍNH XÁC
+            if (waitingListEntity.getExpectedWaitingTime() != null) {
+                LocalDateTime now = LocalDateTime.now();
+                LocalDateTime expectedTime = waitingListEntity.getExpectedWaitingTime();
+                long seconds = Duration.between(now, expectedTime).getSeconds();
+                if (seconds < 0) seconds = 0;
+                dto.setRemainingSeconds(seconds);
+                dto.setRemainingTimeFormatted(formatSeconds(seconds));
+            }
+
             dto.setUserId(waitingListEntity.getUser().getUserID());
             dto.setChargingStationId(waitingListEntity.getChargingStation().getIdChargingStation());
             dto.setChargingPostId(waitingListEntity.getChargingPost().getIdChargingPost());
@@ -204,6 +261,17 @@ public class WaitingListController {
         WaitingListResponseDTO dto = new WaitingListResponseDTO();
         dto.setWaitingListId(waitingListEntity.getWaitingListId());
         dto.setExpectedWaitingTime(waitingListEntity.getExpectedWaitingTime());
+
+        // ✅ TÍNH TOÁN THỜI GIAN CÒN LẠI CHÍNH XÁC
+        if (waitingListEntity.getExpectedWaitingTime() != null) {
+            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime expectedTime = waitingListEntity.getExpectedWaitingTime();
+            long seconds = Duration.between(now, expectedTime).getSeconds();
+            if (seconds < 0) seconds = 0;
+            dto.setRemainingSeconds(seconds);
+            dto.setRemainingTimeFormatted(formatSeconds(seconds));
+        }
+
         dto.setUserId(waitingListEntity.getUser().getUserID());
         dto.setChargingStationId(waitingListEntity.getChargingStation().getIdChargingStation());
         dto.setChargingPostId(waitingListEntity.getChargingPost().getIdChargingPost());
