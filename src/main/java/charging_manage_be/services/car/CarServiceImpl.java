@@ -13,10 +13,12 @@ import charging_manage_be.repository.payments.PaymentMethodRepository;
 import charging_manage_be.repository.users.UserRepository;
 import charging_manage_be.services.users.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import static charging_manage_be.util.RandomId.generateRandomId;
 
@@ -31,6 +33,8 @@ public class CarServiceImpl implements CarService {
     private UserRepository userRepository;
     @Autowired
     private ChargingTypeRepository chargingTypeRepository;
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
     private int characterLength = 5;
     private int numberLength = 5;
@@ -109,6 +113,22 @@ public class CarServiceImpl implements CarService {
     @Override
     public int maxMinutes(int pinRandom) {
         return (int) Math.ceil(((100 - pinRandom) * 13.25) / 60.0);
+    }
+
+    @Override
+    public void storeCurrentPin(String userId, int currentPin) {
+        String key = "charging:preference:" + userId;
+        redisTemplate.opsForHash().put(key, "currentPin", String.valueOf(currentPin));
+        // TTL 30 phút
+        redisTemplate.expire(key, 30, TimeUnit.MINUTES);
+    }
+
+    @Override
+    public int calculateMaxSeconds(int currentPin, int targetPin) {
+        // Tính số % pin cần sạc
+        int pinDifference = targetPin - currentPin;
+        // Mỗi 1% pin cần 13.25 giây
+        return (int) Math.ceil(pinDifference * 13.25);
     }
 
     // cố định 1 xe dung lượng từ 1 đến 100 là 92kW

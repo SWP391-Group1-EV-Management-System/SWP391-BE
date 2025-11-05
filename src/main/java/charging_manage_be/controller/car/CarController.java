@@ -107,12 +107,15 @@ public class CarController {
         return ResponseEntity.ok().body("success");
     }
     @GetMapping("/random_pin")
-    public ResponseEntity<?> randomPin() {
-        int pin = carService.pinRandom();
-        int minuteMax = carService.maxMinutes(pin);
+    public ResponseEntity<?> randomPin(@RequestParam String userId) {
+        int currentPin = carService.pinRandom();
+        int minuteMax = carService.maxMinutes(currentPin);
+
+        // Lưu PIN hiện tại vào Redis
+        carService.storeCurrentPin(userId, currentPin);
 
         Map<String, Object> response = new HashMap<>();
-        response.put("pinNow", pin);
+        response.put("currentPin", currentPin);
         response.put("minuteMax", minuteMax);
         return ResponseEntity.ok(response);
     }

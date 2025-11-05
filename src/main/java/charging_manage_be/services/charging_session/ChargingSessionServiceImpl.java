@@ -316,65 +316,108 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
             double power = session.getChargingPost().getMaxPower().doubleValue();
             double energyCharged = (power * elapsedSeconds) / 3600.0;
 
-            int initialPin;
-            int initialMinuteMax;
+            int currentPin;
+            int targetPin;
+            int maxSeconds;
+
+            // Lấy thông tin từ Redis
+            String userKey = "charging:preference:" + session.getUser().getUserID();
+            Map<Object, Object> preferenceData = redisTemplate.opsForHash().entries(userKey);
 
             // Kiểm tra xem entity đã có giá trị chưa (lần đầu tiên)
-            Integer sessionPin = session.getInitialPin();
-            Integer sessionMinuteMax = session.getInitialMinuteMax();
+            Integer sessionInitialPin = session.getInitialPin();
+            Integer sessionTargetPin = session.getInitialMinuteMax(); // Tạm dùng field cũ để lưu targetPin
 
-            if (sessionPin == null || sessionMinuteMax == null) {
-                // Lấy từ Redis theo userId
-                String userKey = "initial:pin:" + session.getUser().getUserID();
-                Map<Object, Object> pinData = redisTemplate.opsForHash().entries(userKey);
-
-                if (!pinData.isEmpty() && pinData.containsKey("initialPin")) {
-                    // Lấy từ Redis và lưu vào entity
-                    initialPin = Integer.parseInt(pinData.get("initialPin").toString());
-                    initialMinuteMax = Integer.parseInt(pinData.get("initialMinuteMax").toString());
+            if (sessionInitialPin == null || sessionTargetPin == null) {
+                // Lần đầu tiên: Lấy từ Redis và lưu vào database
+                if (!preferenceData.isEmpty() && preferenceData.containsKey("currentPin")) {
+                    currentPin = Integer.parseInt(preferenceData.get("currentPin").toString());
+                    targetPin = Integer.parseInt(preferenceData.get("targetPin").toString());
+                    maxSeconds = Integer.parseInt(preferenceData.get("desiredChargingTimeSeconds").toString());
 
                     // Lưu vào database
-                    session.setInitialPin(initialPin);
-                    session.setInitialMinuteMax(initialMinuteMax);
+                    session.setInitialPin(currentPin);
+                    session.setInitialMinuteMax(targetPin); // Tạm lưu targetPin vào field này
                     updateSession(session);
 
-                    // Xóa khỏi Redis sau khi đã lưu vào database
-                    redisTemplate.delete(userKey);
+                    System.out.println("✅ [INIT] Session " + session.getChargingSessionId() +
+                        " - CurrentPin: " + currentPin + " → TargetPin: " + targetPin +
+                        " - MaxSeconds: " + maxSeconds);
                 } else {
-                    // Trường hợp Redis bị mất hoặc chưa có -> random mới (fallback)
-                    initialPin = carService.pinRandom();
-                    initialMinuteMax = carService.maxMinutes(initialPin);
+                    // Fallback: Nếu Redis mất, random mới
+                    currentPin = carService.pinRandom();
+                    targetPin = 100;
+                    maxSeconds = carService.calculateMaxSeconds(currentPin, targetPin);
 
-                    session.setInitialPin(initialPin);
-                    session.setInitialMinuteMax(initialMinuteMax);
+                    session.setInitialPin(currentPin);
+                    session.setInitialMinuteMax(targetPin);
                     updateSession(session);
+
+                    System.out.println("⚠️ [FALLBACK] Session " + session.getChargingSessionId() +
+                        " - Redis empty, using fallback values");
                 }
             } else {
-                // Đã có trong database rồi, lấy ra dùng
-                initialPin = sessionPin;
-                initialMinuteMax = sessionMinuteMax;
+                // Đã có trong database, lấy ra dùng
+                currentPin = sessionInitialPin;
+                targetPin = sessionTargetPin;
+
+                // Lấy maxSeconds từ Redis (vẫn cần)
+                if (!preferenceData.isEmpty() && preferenceData.containsKey("desiredChargingTimeSeconds")) {
+                    maxSeconds = Integer.parseInt(preferenceData.get("desiredChargingTimeSeconds").toString());
+                } else {
+                    maxSeconds = carService.calculateMaxSeconds(currentPin, targetPin);
+                }
             }
 
-            // Tính pin dựa trên giá trị ban đầu (tăng mỗi 13.25 giây)
+            // Tính pin hiện tại dựa trên thời gian đã trôi qua (tăng mỗi 13.25 giây = 1%)
             int pinIncrements = (int) (elapsedSeconds / 13.25);
-            int currentPin = Math.min(initialPin + pinIncrements, 100);
+            int calculatedCurrentPin = Math.min(currentPin + pinIncrements, targetPin);
 
-            // Tính minuteMax còn lại (giảm mỗi phút)
-            int minutesElapsed = (int) (elapsedSeconds / 60);
-            int remainingMinutes = Math.max(initialMinuteMax - minutesElapsed, 0);
+            // Tính thời gian còn lại (giảm dần)
+            int secondRemaining = Math.max((int)(maxSeconds - elapsedSeconds), 0);
 
-            updateProgress(session.getChargingSessionId(), energyCharged, elapsedSeconds, currentPin, remainingMinutes);
+            // Kiểm tra điều kiện dừng
+            boolean shouldStop = false;
+            String stopReason = "";
+
+            // Điều kiện 1: Đã đạt target PIN
+            if (calculatedCurrentPin >= targetPin) {
+                shouldStop = true;
+                stopReason = "Target PIN reached";
+            }
+
+            // Điều kiện 2: Hết thời gian (secondRemaining = 0)
+            if (secondRemaining <= 0) {
+                shouldStop = true;
+                stopReason = "Time limit reached";
+            }
+
+            // Cập nhật progress vào Redis (bao gồm secondRemaining)
+            updateProgress(session.getChargingSessionId(), energyCharged, elapsedSeconds,
+                          calculatedCurrentPin, targetPin, secondRemaining, maxSeconds);
+
+            // Tự động kết thúc session nếu đạt điều kiện
+            if (shouldStop) {
+                System.out.println("🔴 [AUTO END] Session " + session.getChargingSessionId() +
+                    " - Reason: " + stopReason +
+                    " - PIN: " + calculatedCurrentPin + "/" + targetPin +
+                    " - Time: " + elapsedSeconds + "s/" + maxSeconds + "s (Remaining: " + secondRemaining + "s)");
+                endSession(session.getChargingSessionId());
+            }
         }
     }
 
     // Update quá trình dô Redis
-    private void updateProgress(String sessionId, double energyCharged, long elapsedSeconds, int pin, int minuteMax) {
+    private void updateProgress(String sessionId, double energyCharged, long elapsedSeconds,
+                                int pin, int targetPin, int secondRemaining, int maxSeconds) {
         String key = "charging:session:" + sessionId;
         Map<String, String> map = new HashMap<>();
-        map.put("chargedEnergy_kWh", String.format( Locale.US, "%.2f", energyCharged));
+        map.put("chargedEnergy_kWh", String.format(Locale.US, "%.2f", energyCharged));
         map.put("elapsedSeconds", String.valueOf(elapsedSeconds));
         map.put("pin", String.valueOf(pin));
-        map.put("minuteMax", String.valueOf(minuteMax));
+        map.put("targetPin", String.valueOf(targetPin));
+        map.put("secondRemaining", String.valueOf(secondRemaining));
+        map.put("maxSeconds", String.valueOf(maxSeconds));
         redisTemplate.opsForHash().putAll(key, map);
     }
 
@@ -407,14 +450,12 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
     }
 
     @Override
-    public void storeInitialPinData(String userId, int pin, int minuteMax) {
-        String key = "initial:pin:" + userId;
-        Map<String, String> pinData = new HashMap<>();
-        pinData.put("initialPin", String.valueOf(pin));
-        pinData.put("initialMinuteMax", String.valueOf(minuteMax));
+    public void storeChargingPreference(String userId, int targetPin, int desiredChargingTimeSeconds) {
+        String key = "charging:preference:" + userId;
+        redisTemplate.opsForHash().put(key, "targetPin", String.valueOf(targetPin));
+        redisTemplate.opsForHash().put(key, "desiredChargingTimeSeconds", String.valueOf(desiredChargingTimeSeconds));
 
-        // Lưu vào Redis với TTL 30 phút (trường hợp user không bấm sạc)
-        redisTemplate.opsForHash().putAll(key, pinData);
+        // TTL 30 phút (trường hợp user không bấm sạc)
         redisTemplate.expire(key, 30, java.util.concurrent.TimeUnit.MINUTES);
     }
 

@@ -58,18 +58,23 @@ public class ChargingSession {
     private final String STATUS_SESSION = "session";
     private final String STATUS_PAYMENT = "payment";
 
-    @PostMapping("/store-pin")
-    public ResponseEntity<Map<String, Object>> storeInitialPin(@RequestBody Map<String, Object> request) {
+    @PostMapping("/update-preference")
+    public ResponseEntity<Map<String, Object>> updateChargingPreference(@RequestBody Map<String, Object> request) {
         String userId = (String) request.get("userId");
-        int pin = (int) request.get("pin");
-        int minuteMax = (int) request.get("minuteMax");
+        int targetPin = (int) request.get("targetPin");
+        int maxSecond = (int) request.get("maxSecond"); // Nhận số giây từ frontend (đã tính sẵn)
 
-        // Lưu vào Redis với key là userId
-        sessionService.storeInitialPinData(userId, pin, minuteMax);
+        // Frontend đã tính: (targetPin - currentPin) * 13.25
+        // Backend chỉ cần lưu vào Redis
+
+        // Lưu vào Redis
+        sessionService.storeChargingPreference(userId, targetPin, maxSecond);
 
         Map<String, Object> response = new HashMap<>();
         response.put("status", "success");
-        response.put("message", "Initial PIN data stored successfully");
+        response.put("message", "Charging preference updated successfully");
+        response.put("targetPin", targetPin);
+        response.put("maxSecond", maxSecond);
         return ResponseEntity.ok(response);
     }
 
