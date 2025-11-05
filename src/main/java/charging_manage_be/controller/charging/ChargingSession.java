@@ -57,6 +57,22 @@ public class ChargingSession {
 
     private final String STATUS_SESSION = "session";
     private final String STATUS_PAYMENT = "payment";
+
+    @PostMapping("/store-pin")
+    public ResponseEntity<Map<String, Object>> storeInitialPin(@RequestBody Map<String, Object> request) {
+        String userId = (String) request.get("userId");
+        int pin = (int) request.get("pin");
+        int minuteMax = (int) request.get("minuteMax");
+
+        // Lưu vào Redis với key là userId
+        sessionService.storeInitialPinData(userId, pin, minuteMax);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "success");
+        response.put("message", "Initial PIN data stored successfully");
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping("/create")
     public ResponseEntity<Map<String, Object>> createChargingSession(@RequestBody ChargingSessionRequest createSession) { // gồm có đối tượng booking và expectedEndTime
         // check driver đã có booking thì check đúng trụ chưa

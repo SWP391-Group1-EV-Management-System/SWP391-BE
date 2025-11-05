@@ -110,6 +110,7 @@ public class CarServiceImpl implements CarService {
     public int maxMinutes(int pinRandom) {
         return (int) Math.ceil(((100 - pinRandom) * 13.25) / 60.0);
     }
+
     // cố định 1 xe dung lượng từ 1 đến 100 là 92kW
     // trạm sạc cố định là 250KW
     // vậy với trạm 250kW thì từ 0 đến 100 sẽ mất 22p -> 13 giây sẽ sạc đuọc 1% pin

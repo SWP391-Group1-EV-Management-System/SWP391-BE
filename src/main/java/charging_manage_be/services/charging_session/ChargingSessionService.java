@@ -25,4 +25,7 @@ public interface ChargingSessionService {
 
     Map<Object, Object> getProgress(String sessionId);
     boolean isPostIdleBySession(String postId);
+
+    // Store initial PIN data to Redis when user selects their charging preference
+    void storeInitialPinData(String userId, int pin, int minuteMax);
 }

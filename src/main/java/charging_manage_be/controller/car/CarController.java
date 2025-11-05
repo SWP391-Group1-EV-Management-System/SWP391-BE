@@ -110,6 +110,7 @@ public class CarController {
     public ResponseEntity<?> randomPin() {
         int pin = carService.pinRandom();
         int minuteMax = carService.maxMinutes(pin);
+
         Map<String, Object> response = new HashMap<>();
         response.put("pinNow", pin);
         response.put("minuteMax", minuteMax);
