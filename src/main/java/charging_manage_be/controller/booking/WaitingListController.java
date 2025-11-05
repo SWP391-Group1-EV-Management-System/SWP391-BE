@@ -7,6 +7,7 @@ import charging_manage_be.services.charging_post.ChargingPostService;
 import charging_manage_be.services.charging_station.ChargingStationService;
 import charging_manage_be.services.waiting_list.WaitingListService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +24,7 @@ public class WaitingListController {
     private final WaitingListService waitingListService;
     private final BookingService bookingService;
     private final ChargingPostService chargingPostService;
+    private final RedisTemplate<String, String> redisTemplate;
 
     // tạo API request người dùng có muôn vào sạc luôn hay không
     // nếu có thì gọi API này
@@ -37,6 +39,46 @@ public class WaitingListController {
     public ResponseEntity<String> cancelWaitingList(@PathVariable String waitingListId) {
         waitingListService.cancelWaiting(waitingListId);
         return ResponseEntity.ok("Cancelled waiting successfully");
+    }
+
+    // ✅ ENDPOINT MỚI: Driver B đồng ý sạc sớm
+    @PostMapping("/accept-early-charging/{userId}/{chargingPostId}")
+    public ResponseEntity<String> acceptEarlyCharging(
+            @PathVariable String userId,
+            @PathVariable String chargingPostId) {
+
+        // Kiểm tra xem user có phải là người đầu tiên trong hàng đợi không
+        String firstInQueue = redisTemplate.opsForList().index("queue:post:" + chargingPostId, 0);
+
+        if (firstInQueue == null || !firstInQueue.equals(userId)) {
+            return ResponseEntity.badRequest().body("Bạn không phải người đầu tiên trong hàng đợi");
+        }
+
+        // Chuyển driver vào booking ngay lập tức
+        bookingService.processBooking(chargingPostId);
+
+        return ResponseEntity.ok("Đã chuyển bạn vào booking. Vui lòng đến trạm sạc!");
+    }
+
+    // ✅ ENDPOINT MỚI: Driver B từ chối sạc sớm (giữ nguyên vị trí, chờ đến giờ)
+    @PostMapping("/decline-early-charging/{userId}/{chargingPostId}")
+    public ResponseEntity<String> declineEarlyCharging(
+            @PathVariable String userId,
+            @PathVariable String chargingPostId) {
+
+        // Kiểm tra xem user có trong hàng đợi không
+        List<String> queue = redisTemplate.opsForList().range("queue:post:" + chargingPostId, 0, -1);
+
+        if (queue == null || !queue.contains(userId)) {
+            return ResponseEntity.badRequest().body("Bạn không có trong hàng đợi");
+        }
+
+        System.out.println("✅ [DECLINE-EARLY] User " + userId + " declined early charging offer for post: " + chargingPostId);
+        System.out.println("✅ [DECLINE-EARLY] User will be automatically moved to booking when expectedWaitingTime is reached");
+
+        // Không làm gì cả, driver B vẫn ở vị trí đầu và sẽ tự động được chuyển khi đến giờ
+        // Scheduled task sẽ tự động xử lý khi đến expectedWaitingTime
+        return ResponseEntity.ok("Bạn sẽ được thông báo khi đến giờ dự kiến");
     }
 
     @GetMapping("/queue/post/{chargingPostId}")

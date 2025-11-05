@@ -1,5 +1,6 @@
 package charging_manage_be.services.charging_session;
 
+import charging_manage_be.model.dto.charging_session.EndSessionResponseDTO;
 import charging_manage_be.model.entity.charging.ChargingSessionEntity;
 
 import java.math.BigDecimal;
@@ -13,7 +14,7 @@ public interface ChargingSessionService {
      String addSessionWithoutBooking(String userId,String postId, LocalDateTime expectedEndTime);
      boolean updateSession(ChargingSessionEntity session);
      BigDecimal calculateAmount(ChargingSessionEntity session) ;
-     boolean endSession(String sessionId);
+     EndSessionResponseDTO endSession(String sessionId);
      ChargingSessionEntity getSessionById(String sessionId);
      LocalDateTime getExpectedEndTime(String post);
      List<ChargingSessionEntity> findSessionsToEnd(LocalDateTime currentTime);

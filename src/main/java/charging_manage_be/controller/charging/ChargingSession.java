@@ -2,6 +2,7 @@ package charging_manage_be.controller.charging;
 
 
 import charging_manage_be.model.dto.booking.BookingIdForSessionResDTO;
+import charging_manage_be.model.dto.charging_session.EndSessionResponseDTO;
 import charging_manage_be.model.dto.session.ChargingSessionDetail;
 import charging_manage_be.model.dto.session.ChargingSessionRequest;
 import charging_manage_be.model.dto.session.ChargingSessionResponse;
@@ -79,32 +80,26 @@ public class ChargingSession {
         return ResponseEntity.ok(response);
     }
     @PostMapping("/finish/{sessionId}")
-    public ResponseEntity<String> endChargingSession(@PathVariable String sessionId){
+    public ResponseEntity<?> endChargingSession(@PathVariable String sessionId){
         ChargingSessionEntity session = sessionService.getSessionById(sessionId);
         if (session == null) {
             throw new RuntimeException("Session not found");
         }
-        sessionService.endSession(sessionId);
+
+        // ✅ endSession() trả về DTO với thông tin chi tiết
+        EndSessionResponseDTO response = sessionService.endSession(sessionId);
+
         userReputationService.handleEarlyUnplugPenalty(session);
+
         // nếu có booking thì gọi thằng completeBooking để hoàn thành booking
-        if (session.getBooking() == null) {
-            return ResponseEntity.ok("Charging Session finish completed successfully");
+        if (session.getBooking() != null) {
+            bookingService.completeBooking(session.getBooking().getBookingId());
         }
-        bookingService.completeBooking(session.getBooking().getBookingId());
-        // theo flow mới ( khi chưa đủ giờ) phải hỏi driver trong waiting rằng có muốn sạc luôn hay không, nếu đồng ý thì chuyển từ waiting ra
-        // không muôn sạc luôn thì phải chờ đến giờ
-        // khi đã đủ giờ tự động driver trong hàng đợi sẽ được lấy ra
-        // so sánh giờ dự kiến kết thúc với giờ hiện tại
-        // nếu đủ thì lấy driver trong waiting list ra luôn
-//        boolean isOnTime = session.getExpectedEndTime().isEqual(session.getEndTime());
-//        if(!isOnTime){ --> Không cần check isOnTime nữa vì dù đúng giờ hay không đúng giờ thì cũng phải hỏi người trong hàng đợi và khi người trong hàng đợi đồng ý
-//        thì gọi API này thủ công nên không cần check isOnTime nữa còn nếu không đồng ý thì đã có hàm xử lý việc tự động lấy người trong hàng đợi ra khi đủ giờ rồi
-            bookingService.processBooking(session.getChargingPost().getIdChargingPost());
-            //đã set status thành booking cho thằng tiếp theo ở trong này rồi
-//        }
-        // không thì phải request cho người trong hàng đợi sau có muốn vào luôn hay không
+
         userStatusService.setUserStatus(session.getUser().getUserID(), STATUS_PAYMENT);
-        return ResponseEntity.ok("Charging Session finish completed successfully");
+
+        // ✅ Trả về response chi tiết cho FE
+        return ResponseEntity.ok(response);
     }
     @GetMapping("/show/{sessionId}")
     public ResponseEntity<ChargingSessionDetail> getSessionById(@PathVariable String sessionId){
@@ -161,14 +156,17 @@ public class ChargingSession {
     @Transactional
     public void checkAndEndSessions() {
         // idea là ngoài việc tự bấm nút kết thúc session trước khi đủ giờ sạc
-        // Thì mỗi phút hệ thống sẽ kiểm trả các session nào đã tới expectedEndTime mà chưa kết thúc thì tự động kết thúc
-        List<ChargingSessionEntity> session = sessionService.findSessionsToEnd(LocalDateTime.now()); // Tìm các session có thời gian kết thúc dự kiến <= thời gian hiện tại và chưa có tgian kết thúc kết thúc
+        // Thì mỗi phút hệ thống sẽ kiểm tra các session nào đã tới expectedEndTime mà chưa kết thúc thì tự động kết thúc
+        List<ChargingSessionEntity> session = sessionService.findSessionsToEnd(LocalDateTime.now());
         for (ChargingSessionEntity chargingSession : session) {
+            // ✅ endSession() ĐÃ XỬ LÝ HẾT LOGIC (bao gồm cả processBooking)
             sessionService.endSession(chargingSession.getChargingSessionId());
+
             // nếu có booking thì gọi thằng completeBooking để hoàn thành booking
             if (chargingSession.getBooking() != null) {
                 bookingService.completeBooking(chargingSession.getBooking().getBookingId());
-                bookingService.processBooking(chargingSession.getChargingPost().getIdChargingPost());
+
+
                 userReputationService.handleEarlyUnplugPenalty(chargingSession);
             }
             userStatusService.setUserStatus(chargingSession.getUser().getUserID(), STATUS_PAYMENT);

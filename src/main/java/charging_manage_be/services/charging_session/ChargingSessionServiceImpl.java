@@ -1,6 +1,7 @@
 package charging_manage_be.services.charging_session;
 
 import charging_manage_be.controller.charging.ChargingSession;
+import charging_manage_be.model.dto.charging_session.EndSessionResponseDTO;
 import charging_manage_be.model.entity.booking.BookingEntity;
 import charging_manage_be.model.entity.charging.ChargingPostEntity;
 import charging_manage_be.model.entity.charging.ChargingSessionEntity;
@@ -21,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -59,6 +61,8 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
     private StringRedisTemplate redisTemplate;
     @Autowired
     private CarService carService;
+    @Autowired
+    private SimpMessagingTemplate simpMessagingTemplate;
 
     public boolean isExistById(String sessionId) {
         return chargingSession.existsById(sessionId);
@@ -153,14 +157,25 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
     }
 
     @Override
-    public boolean endSession(String sessionId) {
+    public EndSessionResponseDTO endSession(String sessionId) {
         ChargingSessionEntity session = getSessionById(sessionId);
+
+        // Build response DTO
+        EndSessionResponseDTO response = EndSessionResponseDTO.builder()
+                .sessionId(sessionId)
+                .success(false)
+                .hasWaitingDriver(false)
+                .sentEarlyOffer(false)
+                .build();
+
         if(session == null)
         {
-            return false; // session không tồn tại
+            response.setMessage("Session không tồn tại");
+            return response;
         }
         if (session.isDone()) {
-            return false; // session đã kết thúc rồi
+            response.setMessage("Session đã kết thúc rồi");
+            return response;
         }
         try {
             Map<Object, Object> progress = redisTemplate.opsForHash().entries("charging:session:" + sessionId);
@@ -174,16 +189,73 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
             session.setTotalAmount(calculateAmount(session));
             updateSession(session);
             // gọi hóa đơn và tính tiền từ trụ sạc
-            //PaymentEntity payment = new PaymentEntity();
             paymentService.addPayment(sessionId, null);
-            // tìm kiếm waiting tại trụ đó và chuyển họ qua booking
-            bookingService.processBooking(session.getChargingPost().getIdChargingPost());
 
-            //deleteProgress(sessionId);
-            return true;
+            // Cập nhật response với thông tin session
+            response.setChargedEnergy(chargedEnergy);
+            response.setTotalAmount(session.getTotalAmount().doubleValue());
+            response.setActualEndTime(session.getEndTime());
+            response.setExpectedEndTime(session.getExpectedEndTime());
+
+            // xử lý 2 trường hợp cho waitingList
+            String postId = session.getChargingPost().getIdChargingPost();
+            LocalDateTime expectedEndTime = session.getExpectedEndTime();
+            LocalDateTime actualEndTime = session.getEndTime();
+
+            // c1: A RÚT SẠC SỚM → Hỏi B có muốn sạc ngay hay đợi đúng giờ
+            // c2: Đến đúng giờ (session tự động end) → B tự động vào booking
+
+            if (expectedEndTime != null && actualEndTime.isBefore(expectedEndTime)) {
+                // case 1: A RÚT SẠC SỚM → Gửi notification hỏi driver B
+                String nextDriverId = redisTemplate.opsForList().index("queue:post:" + postId, 0);
+
+                if (nextDriverId != null && !nextDriverId.isEmpty()) {
+                    // Tính thời gian còn lại phải chờ
+                    long minutesRemaining = java.time.Duration.between(actualEndTime, expectedEndTime).toMinutes();
+
+                    // Trim và remove quotes nếu có
+                    nextDriverId = nextDriverId.trim().replace("\"", "");
+
+                    // Tạo message
+                    Map<String, Object> offerData = new HashMap<>();
+                    offerData.put("postId", postId);
+                    offerData.put("message", "Driver trước đã kết thúc sớm. Bạn có muốn sạc ngay không?");
+                    offerData.put("minutesEarly", minutesRemaining);
+                    offerData.put("actualEndTime", actualEndTime.toString());
+                    offerData.put("expectedEndTime", expectedEndTime.toString());
+                    offerData.put("availableNow", true);
+
+                    // Gửi notification cho driver B
+                    simpMessagingTemplate.convertAndSendToUser(
+                        nextDriverId,
+                        "/queue/early-charging-offer",
+                        offerData
+                    );
+
+
+                    // ✅ Cập nhật response cho FE biết
+                    response.setHasWaitingDriver(true);
+                    response.setSentEarlyOffer(true);
+                    response.setNextDriverId(nextDriverId);
+                    response.setMinutesEarly(minutesRemaining);
+                    response.setMessage("Session kết thúc thành công. Đã gửi offer sạc sớm cho driver tiếp theo.");
+                } else {
+                    System.out.println("✅ No drivers in waiting list for post: " + postId);
+                    response.setMessage("Session kết thúc thành công. Không có driver nào trong hàng đợi.");
+                }
+            } else {
+                // CASE 2: ĐÚNG GIỜ (session tự động end) → Tự động chuyển B vào booking
+                bookingService.processBooking(postId);
+                System.out.println("✅ [CASE 2] Session ended on time - Automatically processing next booking for post: " + postId);
+                response.setMessage("Session kết thúc thành công. Driver tiếp theo đã được tự động chuyển vào booking.");
+            }
+
+            response.setSuccess(true);
+            return response;
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            response.setMessage("Lỗi khi kết thúc session: " + e.getMessage());
+            return response;
         }
     }
     @Override

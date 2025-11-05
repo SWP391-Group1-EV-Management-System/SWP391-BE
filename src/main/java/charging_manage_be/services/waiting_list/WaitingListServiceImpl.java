@@ -17,8 +17,11 @@ import charging_manage_be.services.charging_session.ChargingSessionService;
 import charging_manage_be.services.users.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -26,7 +29,6 @@ import java.util.List;
 import static charging_manage_be.util.RandomId.generateRandomId;
 
 @Service
-@RequiredArgsConstructor
 public class WaitingListServiceImpl implements WaitingListService{
     private static final String KEY_QUEUE_POST = "queue:post:";
     private final WaitingListRepository waitingListRepository;
@@ -36,15 +38,40 @@ public class WaitingListServiceImpl implements WaitingListService{
     private final ChargingPostRepository chargingPostRepository;
     private final ChargingStationRepository chargingStationRepository;
     private final UserService userService;
-    private  final ChargingSessionService chargingSessionService;
-    // RedisTemplate là một lớp trong Spring Data Redis, nó cung cấp các phương thức để tương tác với Redis
-    // Ở đây, RedisTemplate<String, String> có nghĩa là cả key và value trong Redis đều là String
+    private final ChargingSessionService chargingSessionService;
     private final SimpMessagingTemplate simpMessagingTemplate;
-    // SimpMessagingTemplate là một lớp trong Spring Framework, nó cung cấp các phương thức để gửi tin nhắn qua WebSocket
-    // Tin nhắn ở đây là các thông báo realtime khi có sự kiện mới xảy ra, ví dụ như có user mới vào danh sách chờ
+
+    // ✅ THÊM BookingService với @Lazy để tránh circular dependency
+    private final charging_manage_be.services.booking.BookingService bookingService;
 
     private int characterLength = 5;
     private int numberLength = 5;
+
+    // Constructor với @Lazy cho BookingService
+    @Autowired
+    public WaitingListServiceImpl(
+        WaitingListRepository waitingListRepository,
+        RedisTemplate<String, String> redisTemplate,
+        UserRepository userRepository,
+        CarRepository carRepository,
+        ChargingPostRepository chargingPostRepository,
+        ChargingStationRepository chargingStationRepository,
+        UserService userService,
+        ChargingSessionService chargingSessionService,
+        SimpMessagingTemplate simpMessagingTemplate,
+        @Lazy charging_manage_be.services.booking.BookingService bookingService
+    ) {
+        this.waitingListRepository = waitingListRepository;
+        this.redisTemplate = redisTemplate;
+        this.userRepository = userRepository;
+        this.carRepository = carRepository;
+        this.chargingPostRepository = chargingPostRepository;
+        this.chargingStationRepository = chargingStationRepository;
+        this.userService = userService;
+        this.chargingSessionService = chargingSessionService;
+        this.simpMessagingTemplate = simpMessagingTemplate;
+        this.bookingService = bookingService;
+    }
 
     public String generateUniqueId() {
         String newId;
@@ -268,5 +295,61 @@ public class WaitingListServiceImpl implements WaitingListService{
             waiting = true;
         }
         return waiting;
+    }
+
+    // ✅ SCHEDULED TASK: Tự động chuyển người đầu tiên trong waiting list vào booking khi đến expectedWaitingTime
+    @Scheduled(fixedRate = 10000) // Chạy mỗi 10 giây
+    @Transactional
+    public void processWaitingListAutoBooking() {
+        try {
+            // Lấy tất cả waiting list đã đến giờ và chưa được xử lý
+            List<WaitingListEntity> readyToBookList = waitingListRepository
+                .findByStatusAndExpectedWaitingTimeLessThanEqual("WAITING", LocalDateTime.now());
+
+            if (readyToBookList.isEmpty()) {
+                return; // Không có ai cần xử lý
+            }
+
+            System.out.println("🔔 [AUTO-PROCESS] Found " + readyToBookList.size() + " waiting entries ready to process at " + LocalDateTime.now());
+
+            for (WaitingListEntity waiting : readyToBookList) {
+                try {
+                    String postId = waiting.getChargingPost().getIdChargingPost();
+                    String userId = waiting.getUser().getUserID();
+                    LocalDateTime expectedTime = waiting.getExpectedWaitingTime();
+
+                    System.out.println("🔍 [AUTO-PROCESS] Checking waiting entry:");
+                    System.out.println("   - User ID: " + userId);
+                    System.out.println("   - Post ID: " + postId);
+                    System.out.println("   - Expected Time: " + expectedTime);
+                    System.out.println("   - Current Time: " + LocalDateTime.now());
+
+                    // Kiểm tra xem user có phải người đầu tiên trong Redis queue không
+                    String firstInQueue = redisTemplate.opsForList().index(redisKey(postId), 0);
+
+                    System.out.println("   - First in Redis Queue: " + firstInQueue);
+
+                    if (firstInQueue != null && firstInQueue.equals(userId)) {
+                        System.out.println("✅ [AUTO-PROCESS] Processing booking for user: " + userId + " at post: " + postId);
+
+                        // ✅ Gọi processBooking để tự động chuyển user vào booking
+                        bookingService.processBooking(postId);
+
+                        System.out.println("✅ [AUTO-PROCESS] Successfully processed booking for user: " + userId);
+                        System.out.println("🎉 [AUTO-PROCESS] User " + userId + " has been moved from waiting list to booking!");
+                    } else {
+                        System.out.println("⚠️ [AUTO-PROCESS] User " + userId + " is not first in queue (first: " + firstInQueue + ")");
+                        System.out.println("   This might happen if the user was already processed or removed from queue");
+                    }
+                } catch (Exception e) {
+                    System.err.println("❌ [AUTO-PROCESS] Error processing waiting entry: " + e.getMessage());
+                    e.printStackTrace();
+                    // Continue với các waiting entries khác
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("❌ [AUTO-PROCESS] Fatal error in scheduled task: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }
