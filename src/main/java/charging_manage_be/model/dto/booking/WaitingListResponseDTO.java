@@ -19,4 +19,5 @@ public class WaitingListResponseDTO {
     private LocalDateTime outedAt;
     private LocalDateTime createdAt;
     private String status;
+    private String stationName;
 }

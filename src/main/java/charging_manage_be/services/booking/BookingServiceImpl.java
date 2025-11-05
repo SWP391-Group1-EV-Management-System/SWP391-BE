@@ -385,6 +385,11 @@ public class BookingServiceImpl implements BookingService {
         return true; //
     }
 
+    @Override
+    public String getBookingIdNewByUserId(String userId) {
+        return bookingRepository.findFirstByUser_UserIDAndStatusOrderByCreatedAtDesc(userId, "CONFIRMED").getBookingId();
+    }
+
 
 }
 /*

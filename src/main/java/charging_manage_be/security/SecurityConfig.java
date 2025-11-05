@@ -28,6 +28,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         // Cho phép WebSocket connection
+                        .requestMatchers("/api/countdown/**").permitAll()
                         .requestMatchers("/ws/**").permitAll()
                         // Cho phép MoMo gửi request
                         .requestMatchers("/api/payment/ipn-handler").permitAll()

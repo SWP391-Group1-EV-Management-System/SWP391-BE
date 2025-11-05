@@ -27,5 +27,5 @@ public interface BookingService {
     BookingIdForSessionResDTO getLatestConfirmedBookingByUserId(String userId);
     boolean isUserBooking(String userId);
     boolean isPostIdleInBooking(String postId);
-
+    String getBookingIdNewByUserId(String userId);
 }

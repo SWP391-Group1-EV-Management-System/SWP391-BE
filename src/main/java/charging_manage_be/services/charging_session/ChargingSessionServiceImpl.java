@@ -89,6 +89,7 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
         session.setChargingPost(booking.getChargingPost());
         session.setKWh(BigDecimal.valueOf(0)); // Lưu ý là cái này khi tạo session thì nó phải là 0, khi nào sạc xong thì mới update nó lên bằng số tiền được tính bằng công thức ở dưới
         session.setExpectedEndTime(expectedEndTime);
+        // gọi qua cho webscoket
         chargingSession.save(session);
         return session.getChargingSessionId();
         } catch (Exception e) {
