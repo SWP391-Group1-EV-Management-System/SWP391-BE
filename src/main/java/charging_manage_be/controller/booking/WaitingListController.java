@@ -41,7 +41,13 @@ public class WaitingListController {
 
     @GetMapping("/queue/post/{chargingPostId}")
     public ResponseEntity<List<WaitingListResponseDTO>> getWaitingListForPost(@PathVariable String chargingPostId) {
-        List<WaitingListResponseDTO> waitingList = waitingListService.getWaitingListForPost(chargingPostId).stream().map(waitingListEntity -> {
+        List<WaitingListEntity> waitingList = waitingListService.getWaitingListForPost(chargingPostId);
+
+        if (waitingList == null || waitingList.isEmpty()) {
+            return ResponseEntity.ok(List.of()); // Trả về empty list thay vì error
+        }
+
+        List<WaitingListResponseDTO> response = waitingList.stream().map(waitingListEntity -> {
             WaitingListResponseDTO dto = new WaitingListResponseDTO();
             dto.setWaitingListId(waitingListEntity.getWaitingListId());
             dto.setExpectedWaitingTime(waitingListEntity.getExpectedWaitingTime());
@@ -55,15 +61,20 @@ public class WaitingListController {
             dto.setStationName(waitingListEntity.getChargingStation().getNameChargingStation());
             return dto;
         }).toList();
-        return ResponseEntity.ok(waitingList);
+        return ResponseEntity.ok(response);
     }
     // Cho thêm path để lấy  hàn chờ theo trạm, lấy theo ngày tháng năm, lấy theo userID
 
     //Lấy theo trạm
     @GetMapping("/queue/station/{chargingStationId}")
     public ResponseEntity<List<WaitingListResponseDTO>> getWaitingListForStation(@PathVariable String chargingStationId) {
-        List<WaitingListResponseDTO> waitingList = waitingListService.getWaitingListForStation(chargingStationId).stream().map(waitingListEntity -> {
-            ;
+        List<WaitingListEntity> waitingList = waitingListService.getWaitingListForStation(chargingStationId);
+
+        if (waitingList == null || waitingList.isEmpty()) {
+            return ResponseEntity.ok(List.of());
+        }
+
+        List<WaitingListResponseDTO> response = waitingList.stream().map(waitingListEntity -> {
             WaitingListResponseDTO dto = new WaitingListResponseDTO();
             dto.setWaitingListId(waitingListEntity.getWaitingListId());
             dto.setExpectedWaitingTime(waitingListEntity.getExpectedWaitingTime());
@@ -77,13 +88,19 @@ public class WaitingListController {
             dto.setStationName(waitingListEntity.getChargingStation().getNameChargingStation());
             return dto;
         }).toList();
-        return ResponseEntity.ok(waitingList);
+        return ResponseEntity.ok(response);
     }
 
     // Lấy theo userID
     @GetMapping("/queue/users/{userId}")
     public ResponseEntity<List<WaitingListResponseDTO>> getWaitingListForUser(@PathVariable String userId) {
-        List<WaitingListResponseDTO> waitingList = waitingListService.getWaitingListForUser(userId).stream().map(waitingListEntity -> {
+        List<WaitingListEntity> waitingList = waitingListService.getWaitingListForUser(userId);
+
+        if (waitingList == null || waitingList.isEmpty()) {
+            return ResponseEntity.ok(List.of());
+        }
+
+        List<WaitingListResponseDTO> response = waitingList.stream().map(waitingListEntity -> {
             WaitingListResponseDTO dto = new WaitingListResponseDTO();
             dto.setWaitingListId(waitingListEntity.getWaitingListId());
             dto.setExpectedWaitingTime(waitingListEntity.getExpectedWaitingTime());
@@ -97,7 +114,7 @@ public class WaitingListController {
             dto.setStationName(waitingListEntity.getChargingStation().getNameChargingStation());
             return dto;
         }).toList();
-        return ResponseEntity.ok(waitingList);
+        return ResponseEntity.ok(response);
     }
 
     // Lấy theo ngày tháng năm
@@ -110,7 +127,13 @@ public class WaitingListController {
         LocalDateTime startOfDay = date.atStartOfDay();
         LocalDateTime endOfDay = date.plusDays(1).atStartOfDay();
 
-        List<WaitingListResponseDTO> waitingList = waitingListService.getWaitingListForDate(startOfDay, endOfDay).stream().map(waitingListEntity -> {
+        List<WaitingListEntity> waitingList = waitingListService.getWaitingListForDate(startOfDay, endOfDay);
+
+        if (waitingList == null || waitingList.isEmpty()) {
+            return ResponseEntity.ok(List.of());
+        }
+
+        List<WaitingListResponseDTO> response = waitingList.stream().map(waitingListEntity -> {
             WaitingListResponseDTO dto = new WaitingListResponseDTO();
             dto.setWaitingListId(waitingListEntity.getWaitingListId());
             dto.setExpectedWaitingTime(waitingListEntity.getExpectedWaitingTime());
@@ -124,13 +147,18 @@ public class WaitingListController {
             dto.setStationName(waitingListEntity.getChargingStation().getNameChargingStation());
             return dto;
         }).toList();
-        return ResponseEntity.ok(waitingList);
+        return ResponseEntity.ok(response);
     }
 
     // Lấy hàng chờ theo WaitingListId
     @GetMapping("/queue/{waitingListId}")
     public ResponseEntity<WaitingListResponseDTO> getWaitingListById(@PathVariable String waitingListId) {
         WaitingListEntity waitingListEntity = waitingListService.getWaitingListForWaitingListId(waitingListId);
+
+        if (waitingListEntity == null) {
+            return ResponseEntity.notFound().build();
+        }
+
         WaitingListResponseDTO dto = new WaitingListResponseDTO();
         dto.setWaitingListId(waitingListEntity.getWaitingListId());
         dto.setExpectedWaitingTime(waitingListEntity.getExpectedWaitingTime());
