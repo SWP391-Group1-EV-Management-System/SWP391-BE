@@ -459,6 +459,11 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
         redisTemplate.expire(key, 30, java.util.concurrent.TimeUnit.MINUTES);
     }
 
+    @Override
+    public ChargingSessionEntity getNewSessionInPostId(String postId) {
+        return chargingSession.findFirstByChargingPost_IdChargingPostAndIsDoneOrderByStartTimeDesc(postId, false);
+    }
+
 //    @Override
 //    @Transactional
 //    public boolean addExpectedEndTime(String bookingID, LocalDateTime expectedEndTime) {

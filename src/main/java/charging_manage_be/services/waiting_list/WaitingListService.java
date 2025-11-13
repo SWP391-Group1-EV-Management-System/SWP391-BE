@@ -25,5 +25,5 @@ public interface WaitingListService{
     public boolean isUserWaiting(String userId);
     void getPositionAllDriver(String postId);
     String getWaitingListNewByUserId(String userID);
-    WaitingListEntity getNewWaitingListByUserId(String userID);
+    WaitingListEntity getNewWaitingListByUserId(String userId);
 }
