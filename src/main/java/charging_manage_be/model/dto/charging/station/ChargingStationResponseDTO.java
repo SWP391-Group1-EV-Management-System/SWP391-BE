@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -22,5 +23,6 @@ public class ChargingStationResponseDTO {
     private double latitude;
     private double longitude;
     private Map<String,Boolean> chargingPostsAvailable;
+    private Map<String, BigDecimal> kWh;
     private List<String> chargingSessionIds;
 }
