@@ -19,4 +19,6 @@ public interface ChargingStationService {
     List<ChargingStationEntity> getAllStationAvailable();
     List<ChargingStationEntity> findNearestStations(LocationRequest request);
     double calculateDistance(double lat1, double lon1, double lat2, double lon2);
+
+    long countTotalActiveStations();
 }

@@ -38,6 +38,14 @@ public interface ChargingSessionRepository extends JpaRepository<ChargingSession
 
     List<ChargingSessionEntity> findByIsDoneFalse();
 
+    // src/main/java/charging_manage_be/repository/charging_session/ChargingSessionRepository.java
+    @Query("SELECT COUNT(s) FROM ChargingSessionEntity s WHERE s.startTime BETWEEN :start AND :end")
+    long countSessionsInMonth(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+
+    // JpaRepository already provides:
+    long count();
+
+
     ChargingSessionEntity findFirstByChargingPost_IdChargingPostOrderByStartTimeDesc(String chargingPostIdChargingPost);
 
     ChargingSessionEntity findFirstByChargingPost_IdChargingPostAndIsDoneOrderByStartTimeDesc(String chargingPostIdChargingPost, boolean isDone);

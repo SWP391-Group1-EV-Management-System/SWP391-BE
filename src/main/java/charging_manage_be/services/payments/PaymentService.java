@@ -16,5 +16,9 @@ public interface PaymentService {
     List<PaymentEntity> findUnpaidPaymentsUser(String userId);
     List<PaymentEntity> findPaidPaymentsUser(String userId);
     PaymentEntity getPaymentBySessionId(String sessionId);
+
+    BigDecimal totalPriceCurrentDay();
+    BigDecimal totalPriceCurrentMonth();
+    long totalByPaymentMethod(String paymentMethodId);
 }
 

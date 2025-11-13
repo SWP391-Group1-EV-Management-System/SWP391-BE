@@ -206,4 +206,9 @@ public class ChargingStationServiceImpl implements  ChargingStationService {
         return R * c; // Khoảng cách tính bằng km
     }
 
+    @Override
+    public long countTotalActiveStations() {
+        return chargingStationRepository.countByIsActiveTrue();
+    }
+
 }

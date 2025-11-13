@@ -204,5 +204,10 @@ public class UserServiceImpl implements UserService {
           return userRepository.findByEmail(email).orElse(null);
     }
 
+    @Override
+    public long countTotalActiveUsers() {
+        return userRepository.countByStatusTrue();
+    }
+
 
 }

@@ -245,7 +245,7 @@ public class ChargingSession {
 }
     */
 
-    @Scheduled(fixedRate = 10000) // Chạy mỗi 10 giây
+    @Scheduled(fixedRate = 1000) // Chạy mỗi 1 giây
     @Transactional
     public void checkAndEndSessions() {
         // idea là ngoài việc tự bấm nút kết thúc session trước khi đủ giờ sạc

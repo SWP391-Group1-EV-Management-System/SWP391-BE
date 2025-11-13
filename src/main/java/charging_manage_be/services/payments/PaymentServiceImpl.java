@@ -177,6 +177,25 @@ public class PaymentServiceImpl implements PaymentService {
         return paymentRepository.findBySession(session);
     }
 
+    @Override
+    public BigDecimal totalPriceCurrentDay() {
+        LocalDateTime startOfDay = LocalDateTime.now().toLocalDate().atStartOfDay();
+        LocalDateTime endOfDay = startOfDay.plusDays(1).minusNanos(1);
+        return paymentRepository.sumPriceByCreatedAtBetween(startOfDay, endOfDay);
+    }
+
+    @Override
+    public BigDecimal totalPriceCurrentMonth() {
+        LocalDateTime startOfMonth = LocalDateTime.now().withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime endOfMonth = startOfMonth.plusMonths(1).minusSeconds(1);
+        return paymentRepository.sumPriceByCreatedAtBetween(startOfMonth, endOfMonth);
+    }
+
+    @Override
+    public long totalByPaymentMethod(String paymentMethodId) {
+        return paymentRepository.countByPaymentMethod_IdPaymentMethod(paymentMethodId);
+    }
+
     /*
     public PaymentEntity createPayment(UserEntity userId, String chargingSessionId, BigDecimal price) {
         PaymentEntity payment = new PaymentEntity();

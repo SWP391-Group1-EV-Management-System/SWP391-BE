@@ -336,7 +336,7 @@ public class WaitingListServiceImpl implements WaitingListService{
     }
 
     // ✅ SCHEDULED TASK: Tự động chuyển người đầu tiên trong waiting list vào booking khi đến expectedWaitingTime
-    @Scheduled(fixedRate = 10000) // Chạy mỗi 10 giây
+    @Scheduled(fixedRate = 1000) // Chạy mỗi 10 giây
     @Transactional
     public void processWaitingListAutoBooking() {
         try {
