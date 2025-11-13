@@ -27,5 +27,5 @@ public interface WaitingListRepository extends JpaRepository<WaitingListEntity, 
     // ✅ THÊM METHOD MỚI: Đếm số người đang chờ tại một trụ
     long countByChargingPost_IdChargingPostAndStatus(String postId, String status);
 
-    WaitingListEntity findFirstByChargingPost_IdChargingPostOrderByCreatedAtDesc(String chargingPostIdChargingPost);
+    Optional<WaitingListEntity> findFirstByChargingPost_IdChargingPostOrderByCreatedAtDesc(String chargingPostIdChargingPost);
 }

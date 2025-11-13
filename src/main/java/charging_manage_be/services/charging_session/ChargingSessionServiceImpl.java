@@ -454,9 +454,15 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
         String key = "charging:preference:" + userId;
         redisTemplate.opsForHash().put(key, "targetPin", String.valueOf(targetPin));
         redisTemplate.opsForHash().put(key, "desiredChargingTimeSeconds", String.valueOf(desiredChargingTimeSeconds));
+        redisTemplate.opsForHash().put(key, "maxSecond", String.valueOf(desiredChargingTimeSeconds));
 
         // TTL 30 phút (trường hợp user không bấm sạc)
         redisTemplate.expire(key, 30, java.util.concurrent.TimeUnit.MINUTES);
+    }
+
+    @Override
+    public Map<Object, Object> getPreferenceFromRedis(String preferenceKey) {
+        return redisTemplate.opsForHash().entries(preferenceKey);
     }
 
     @Override

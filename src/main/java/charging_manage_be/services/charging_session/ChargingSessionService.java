@@ -28,5 +28,9 @@ public interface ChargingSessionService {
 
     // Store user's charging preference (target PIN and desired charging time)
     void storeChargingPreference(String userId, int targetPin, int desiredChargingTimeSeconds);
+
+    // Get user's charging preference from Redis
+    Map<Object, Object> getPreferenceFromRedis(String preferenceKey);
+
     ChargingSessionEntity getNewSessionInPostId(String postId);
 }

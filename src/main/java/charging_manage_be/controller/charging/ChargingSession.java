@@ -87,13 +87,24 @@ public class ChargingSession {
         String postId = bookingService.getPostIdByNewBookingOfUserId(createSession.getBooking().getUser());
         WaitingListEntity waitingE = waitingService.getNewWaitingListByUserId(createSession.getBooking().getUser());
         BookingEntity bookingE = bookingService.getNewBookingByUserId(createSession.getBooking().getUser());
+
+        String userId = createSession.getBooking().getUser();
+        LocalDateTime  expectedEndTime = null; // Giá trị mặc định từ FE
+        // Lấy preference từ Redis nếu có
+        String preferenceKey = "charging:preference:" + userId;
+        Map<Object, Object> preferenceData = sessionService.getPreferenceFromRedis(preferenceKey);
+        if (preferenceData != null && !preferenceData.isEmpty() && preferenceData.containsKey("maxSecond")) {
+            int maxSecond = Integer.parseInt(preferenceData.get("maxSecond").toString());
+            // Tính lại expectedEndTime dựa trên maxSecond từ Redis (cộng thêm thời gian sạc đã update)
+             expectedEndTime = LocalDateTime.now().plusSeconds(maxSecond);
+        }
+
         // thêm trường hợp trụ này đã được booking bởi driver khác
         if(waitingE == null && bookingE == null) // nếu không có booking và waiting và trụ đó cũng không bị booking và waiting
         {
             if(chargingPostService.isPostGotBooking(createSession.getBooking().getChargingPost())) // post không có booking
             {
                 BookingIdForSessionResDTO bookingSession = bookingService.getLatestConfirmedBookingByUserId(createSession.getBooking().getUser());
-                LocalDateTime expectedEndTime = createSession.getExpectedEndTime();
 
                 if (bookingSession == null) {
                     sessionId = sessionService.addSessionWithoutBooking(createSession.getBooking().getUser(), createSession.getBooking().getChargingPost(), expectedEndTime);
@@ -130,7 +141,7 @@ public class ChargingSession {
         } else { // nếu có booking và quét đúng trụ
 
             BookingIdForSessionResDTO bookingSession = bookingService.getLatestConfirmedBookingByUserId(createSession.getBooking().getUser());
-            LocalDateTime expectedEndTime = createSession.getExpectedEndTime();
+            // ✅ SỬ DỤNG expectedEndTime ĐÃ ĐƯỢC TÍNH TỪ REDIS (không lấy lại từ request)
 
             if (bookingSession == null) {
                 sessionId = sessionService.addSessionWithoutBooking(createSession.getBooking().getUser(), createSession.getBooking().getChargingPost(), expectedEndTime);
