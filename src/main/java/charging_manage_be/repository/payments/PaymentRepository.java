@@ -4,8 +4,11 @@ import charging_manage_be.model.entity.charging.ChargingSessionEntity;
 import charging_manage_be.model.entity.payments.PaymentEntity;
 import charging_manage_be.model.entity.users.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -18,4 +21,9 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, String> 
     List<PaymentEntity> findByUserAndIsPaid(UserEntity user, boolean isPaid);
 
     PaymentEntity findBySession(ChargingSessionEntity session);
+
+    @Query("SELECT SUM(p.price) FROM PaymentEntity p WHERE p.createdAt BETWEEN :start AND :end")
+    BigDecimal sumPriceByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
+
+    long countByPaymentMethod_IdPaymentMethod(String paymentMethodId);
 }

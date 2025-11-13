@@ -28,4 +28,7 @@ public interface ChargingSessionService {
 
     // Store user's charging preference (target PIN and desired charging time)
     void storeChargingPreference(String userId, int targetPin, int desiredChargingTimeSeconds);
+
+    long countSessionsInCurrentMonth();
+    long countTotalSessions();
 }

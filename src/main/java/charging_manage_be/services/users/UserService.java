@@ -25,4 +25,6 @@ public interface UserService {
     UserEntity getTempUserByEmail(String email);
     List<UserEntity> getUserByRole(String role);
     UserEntity getUserEmail(String email);
+
+    long countTotalActiveUsers();
 }

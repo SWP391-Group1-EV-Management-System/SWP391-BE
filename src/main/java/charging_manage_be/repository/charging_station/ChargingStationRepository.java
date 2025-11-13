@@ -22,4 +22,6 @@ public interface ChargingStationRepository extends JpaRepository<ChargingStation
 
     List<ChargingStationEntity> findAllByIsActiveTrue();
 
+    long countByIsActiveTrue();
+
 }

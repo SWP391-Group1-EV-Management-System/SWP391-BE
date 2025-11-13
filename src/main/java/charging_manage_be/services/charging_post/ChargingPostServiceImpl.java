@@ -112,6 +112,12 @@ public class ChargingPostServiceImpl implements ChargingPostService {
 
         return map;
     }
+
+    @Override
+    public long countActivePosts() {
+        return ChargingPostRepository.countByIsActiveTrue();
+    }
+
     @Override
     public StationAndPost mapToDTO(ChargingStationEntity station, Double userLat, Double userLon) {
         StationAndPost dto = new StationAndPost();

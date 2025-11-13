@@ -18,6 +18,7 @@ import charging_manage_be.services.charging_station.ChargingStationService;
 import charging_manage_be.services.payments.PaymentService;
 import charging_manage_be.services.users.UserService;
 import jakarta.transaction.Transactional;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -457,6 +458,19 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
 
         // TTL 30 phút (trường hợp user không bấm sạc)
         redisTemplate.expire(key, 30, java.util.concurrent.TimeUnit.MINUTES);
+    }
+
+    @Override
+    public long countSessionsInCurrentMonth() {
+        // Phải lấy theo thời gian HIỆN TẠI luôn
+        LocalDateTime start = LocalDateTime.now().withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0); // Đầu tháng này
+        LocalDateTime end = start.plusMonths(1).minusSeconds(1); // Cuối tháng này
+        return chargingSession.countSessionsInMonth(start, end);
+    }
+
+    @Override
+    public long countTotalSessions() {
+        return chargingSession.count();
     }
 
 //    @Override
