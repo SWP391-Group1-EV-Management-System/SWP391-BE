@@ -16,7 +16,8 @@ import java.util.List;
 public class ReputationLevelEntity {
     @Id
     @Column(name = "level_id")
-    private int levelID;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int levelId;
 
     @Column(name = "level_name", nullable = false, length = 50)
     private String levelName;

@@ -19,7 +19,7 @@ public class UserReputationController {
 
     // Create user reputation
     @PostMapping
-    public ResponseEntity<UserReputationEntity> createUserReputation( @RequestBody UserReputationEntity userReputation) {
+    public ResponseEntity<UserReputationEntity> createUserReputation(@RequestBody UserReputationEntity userReputation) {
         UserReputationEntity savedReputation = userReputationService.saveUserReputation(userReputation);
         return ResponseEntity.ok(savedReputation);
     }

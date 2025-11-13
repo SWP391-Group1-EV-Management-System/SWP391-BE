@@ -30,17 +30,14 @@ import charging_manage_be.repository.service_package.ServicePackageRepository;
 import charging_manage_be.repository.user_reputations.UserReputationRepository;
 import charging_manage_be.repository.users.UserRepository;
 import charging_manage_be.repository.waiting_list.WaitingListRepository;
-import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.UUID;
 
 @Component
 public class  DataInitializer  implements CommandLineRunner {
@@ -83,7 +80,7 @@ public class  DataInitializer  implements CommandLineRunner {
             return; // Dữ liệu đã được khởi tạo, không cần thêm nữa
         }
         ReputationLevelEntity good = new ReputationLevelEntity();
-        good.setLevelID(1);
+        good.setLevelId(1);
         good.setLevelName("Tốt");
         good.setMaxWaitMinutes(30);
         good.setMinScore(71);
@@ -92,7 +89,7 @@ public class  DataInitializer  implements CommandLineRunner {
         reputationLevelRepository.save(good);
 
         ReputationLevelEntity medium = new ReputationLevelEntity();
-        medium.setLevelID(2);
+        medium.setLevelId(2);
         medium.setLevelName("Khá");
         medium.setMaxWaitMinutes(20);
         medium.setMinScore(31);
@@ -101,7 +98,7 @@ public class  DataInitializer  implements CommandLineRunner {
         reputationLevelRepository.save(medium);
 
         ReputationLevelEntity bad = new ReputationLevelEntity();
-        bad.setLevelID(3);
+        bad.setLevelId(3);
         bad.setLevelName("Xấu");
         bad.setMaxWaitMinutes(10);
         bad.setMinScore(0);
