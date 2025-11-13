@@ -1,5 +1,6 @@
 package charging_manage_be.controller.reputations;
 
+import charging_manage_be.model.dto.reputation.ReputationRequest;
 import charging_manage_be.model.entity.reputations.ReputationLevelEntity;
 import charging_manage_be.services.reputations.ReputationLevelService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,18 +18,17 @@ public class ReputationLevelController {
     private ReputationLevelService reputationLevelService;
 
     //Create reputation level
-    @PostMapping
-    public ResponseEntity<ReputationLevelEntity> createReputationLevel( @RequestBody ReputationLevelEntity reputationLevel) {
-        ReputationLevelEntity savedLevel = reputationLevelService.saveReputationLevel(reputationLevel);
+    @PostMapping("/add")
+    public ResponseEntity<ReputationLevelEntity> createReputationLevel( @RequestBody ReputationRequest reputationR) {
+        ReputationLevelEntity savedLevel = reputationLevelService.saveReputationLevel(reputationR);
         return ResponseEntity.ok(savedLevel);
     }
 
     // Update reputation level
-    @PutMapping("/{levelID}")
-    public ResponseEntity<ReputationLevelEntity> updateReputationLevel(@PathVariable int levelID, @RequestBody ReputationLevelEntity levelDetails) {
+    @PostMapping("/update/{levelId}")
+    public ResponseEntity<ReputationLevelEntity> updateReputationLevel(@PathVariable int levelId, @RequestBody ReputationRequest levelR) {
         try {
-            levelDetails.setLevelID(levelID);
-            ReputationLevelEntity updatedLevel = reputationLevelService.updateReputationLevel(levelDetails);
+            ReputationLevelEntity updatedLevel = reputationLevelService.updateReputationLevel(levelId, levelR);
             return ResponseEntity.ok(updatedLevel);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
@@ -37,19 +37,19 @@ public class ReputationLevelController {
     }
 
     // Delete reputation level
-    @DeleteMapping("/{levelID}")
-    public ResponseEntity<String> deleteReputationLevel(@PathVariable int levelID) {
-        boolean deleted = reputationLevelService.deleteReputationLevelById(levelID);
-        if (deleted == true) {
+    @DeleteMapping("/delete/{levelId}")
+    public ResponseEntity<String> deleteReputationLevel(@PathVariable int levelId) {
+        boolean deleted = reputationLevelService.deleteReputationLevelById(levelId);
+        if (deleted) {
             return ResponseEntity.ok("Reputation level deleted successfully");
         }
         return ResponseEntity.notFound().build();
     }
 
     // Get reputation level by ID
-    @GetMapping("/{levelID}")
-        public  ResponseEntity<ReputationLevelEntity> getReputationLevelById(@PathVariable int levelID) {
-            Optional<ReputationLevelEntity> level = reputationLevelService.getReputationLevelById(levelID);
+    @GetMapping("/{levelId}")
+        public  ResponseEntity<ReputationLevelEntity> getReputationLevelById(@PathVariable int levelId) {
+            Optional<ReputationLevelEntity> level = reputationLevelService.getReputationLevelById(levelId);
             if (level.isPresent()) {
                 return ResponseEntity.ok(level.get());
             }
@@ -57,7 +57,7 @@ public class ReputationLevelController {
         }
 
     // Get all reputation levels
-    @GetMapping
+    @GetMapping("all")
     public ResponseEntity<List<ReputationLevelEntity>> getAllReputationLevels() {
         List<ReputationLevelEntity> levels = reputationLevelService.getAllReputationLevels();
         return ResponseEntity.ok(levels);

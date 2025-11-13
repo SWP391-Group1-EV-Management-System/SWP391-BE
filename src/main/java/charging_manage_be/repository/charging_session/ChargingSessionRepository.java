@@ -45,4 +45,8 @@ public interface ChargingSessionRepository extends JpaRepository<ChargingSession
     // JpaRepository already provides:
     long count();
 
+
+    ChargingSessionEntity findFirstByChargingPost_IdChargingPostOrderByStartTimeDesc(String chargingPostIdChargingPost);
+
+    ChargingSessionEntity findFirstByChargingPost_IdChargingPostAndIsDoneOrderByStartTimeDesc(String chargingPostIdChargingPost, boolean isDone);
 }

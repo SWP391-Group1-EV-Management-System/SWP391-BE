@@ -1,13 +1,10 @@
 package charging_manage_be.services.waiting_list;
 
-import charging_manage_be.controller.charging.ChargingSession;
-import charging_manage_be.model.entity.booking.BookingEntity;
 import charging_manage_be.model.entity.booking.WaitingListEntity;
 import charging_manage_be.model.entity.cars.CarEntity;
 import charging_manage_be.model.entity.charging.ChargingPostEntity;
 import charging_manage_be.model.entity.charging.ChargingStationEntity;
 import charging_manage_be.model.entity.users.UserEntity;
-import charging_manage_be.repository.booking.BookingRepository;
 import charging_manage_be.repository.cars.CarRepository;
 import charging_manage_be.repository.charging_post.ChargingPostRepository;
 import charging_manage_be.repository.charging_station.ChargingStationRepository;
@@ -17,7 +14,6 @@ import charging_manage_be.services.charging_post.ChargingPostStatusService;
 import charging_manage_be.services.charging_session.ChargingSessionService;
 import charging_manage_be.services.users.UserService;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -288,6 +284,7 @@ public class WaitingListServiceImpl implements WaitingListService{
     public WaitingListEntity getNewWaitingListByUserId(String userId) {
         return waitingListRepository.findFirstByUser_UserIDAndStatusOrderByCreatedAtDesc(userId, "WAITING");
     }
+
 
     public void updateMaxWaitingTime(String postId, String userId, LocalDateTime endTime) {
         String key = redisKey(postId); // dùng redisKey() để tạo đúng format "queue:post:{postId}"

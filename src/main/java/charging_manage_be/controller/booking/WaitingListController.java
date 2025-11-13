@@ -2,11 +2,14 @@ package charging_manage_be.controller.booking;
 
 import charging_manage_be.model.dto.booking.WaitingListResponseDTO;
 import charging_manage_be.model.entity.booking.WaitingListEntity;
+import charging_manage_be.model.entity.charging.ChargingSessionEntity;
 import charging_manage_be.services.booking.BookingService;
 import charging_manage_be.services.charging_post.ChargingPostService;
+import charging_manage_be.services.charging_session.ChargingSessionService;
 import charging_manage_be.services.charging_station.ChargingStationService;
 import charging_manage_be.services.waiting_list.WaitingListService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +27,7 @@ import java.util.List;
 public class WaitingListController {
     private final WaitingListService waitingListService;
     private final BookingService bookingService;
-    private final ChargingPostService chargingPostService;
+    private final ChargingSessionService  chargingSessionService;
     private final RedisTemplate<String, String> redisTemplate;
 
     // tạo API request người dùng có muôn vào sạc luôn hay không
@@ -281,5 +284,14 @@ public class WaitingListController {
         dto.setStatus(waitingListEntity.getStatus());
         dto.setStationName(waitingListEntity.getChargingStation().getNameChargingStation());
         return ResponseEntity.ok(dto);
+    }
+    @GetMapping("/getWaitingTimeByPost/{postId}")
+    public long getWaitingTimeByPost(@PathVariable String postId) {
+        long time =0; // mặc định chưa biết
+        ChargingSessionEntity session = chargingSessionService.getNewSessionInPostId(postId);
+        if(session != null) {
+            time = Duration.between(LocalDateTime.now(), session.getExpectedEndTime()).getSeconds();
+        }
+        return time;
     }
 }

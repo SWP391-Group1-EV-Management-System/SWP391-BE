@@ -461,6 +461,11 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
     }
 
     @Override
+    public ChargingSessionEntity getNewSessionInPostId(String postId) {
+        return chargingSession.findFirstByChargingPost_IdChargingPostAndIsDoneOrderByStartTimeDesc(postId, false);
+    }
+
+    @Override
     public long countSessionsInCurrentMonth() {
         // Phải lấy theo thời gian HIỆN TẠI luôn
         LocalDateTime start = LocalDateTime.now().withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0); // Đầu tháng này

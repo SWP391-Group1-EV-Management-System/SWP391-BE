@@ -32,8 +32,8 @@ public class UserReputationServiceImpl implements UserReputationService{
     @Autowired
     private ReputationLevelRepository reputationLevelRepository;
 
-    private int characterLength = 5;
-    private int numberLength = 5;
+    private int characterLength = 3;
+    private int numberLength = 2;
 
     public String generateUniqueId() {
         String newId;

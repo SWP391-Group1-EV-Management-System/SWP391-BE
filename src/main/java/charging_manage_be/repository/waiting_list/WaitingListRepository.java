@@ -1,12 +1,9 @@
 package charging_manage_be.repository.waiting_list;
-import charging_manage_be.model.entity.booking.BookingEntity;
 import charging_manage_be.model.entity.booking.WaitingListEntity;
-import charging_manage_be.model.entity.cars.CarEntity;
 import charging_manage_be.model.entity.charging.ChargingPostEntity;
 import charging_manage_be.model.entity.charging.ChargingStationEntity;
 import charging_manage_be.model.entity.users.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -29,4 +26,6 @@ public interface WaitingListRepository extends JpaRepository<WaitingListEntity, 
 
     // ✅ THÊM METHOD MỚI: Đếm số người đang chờ tại một trụ
     long countByChargingPost_IdChargingPostAndStatus(String postId, String status);
+
+    WaitingListEntity findFirstByChargingPost_IdChargingPostOrderByCreatedAtDesc(String chargingPostIdChargingPost);
 }

@@ -3,7 +3,10 @@ package charging_manage_be.controller.users;
 import charging_manage_be.model.dto.user.UserRequest;
 import charging_manage_be.model.dto.user.UserResponse;
 import charging_manage_be.model.dto.user.UserResponseForAdmin;
+import charging_manage_be.model.entity.reputations.UserReputationEntity;
 import charging_manage_be.model.entity.users.UserEntity;
+import charging_manage_be.services.user_reputations.UserReputationService;
+import charging_manage_be.services.user_reputations.UserReputationServiceImpl;
 import charging_manage_be.services.users.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -25,6 +28,8 @@ public class UserController {
     private UserService userService;
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+    @Autowired
+    private UserReputationService userReputationService;
     @PostMapping
     public ResponseEntity<UserEntity> createUser(@RequestBody UserEntity user) {
         UserEntity savedUser = userService.saveUser(user);
@@ -177,6 +182,11 @@ public class UserController {
     @GetMapping("/status/{userId}")
     public String getStatusUser(@PathVariable String userId){
         return (String) stringRedisTemplate.opsForHash().get("user:"+ userId, "status");
+    }
+    @GetMapping("/bookingTime/{userId}")
+    public int getBookingTime(@PathVariable String userId){
+        UserReputationEntity user = userReputationService.getCurrentUserReputationById(userId).orElse(null);
+        return user.getReputationLevel().getMaxWaitMinutes();
     }
 
 }

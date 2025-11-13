@@ -31,4 +31,5 @@ public interface ChargingSessionService {
 
     long countSessionsInCurrentMonth();
     long countTotalSessions();
+    ChargingSessionEntity getNewSessionInPostId(String postId);
 }

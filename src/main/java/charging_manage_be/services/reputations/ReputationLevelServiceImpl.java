@@ -1,5 +1,6 @@
 package charging_manage_be.services.reputations;
 
+import charging_manage_be.model.dto.reputation.ReputationRequest;
 import charging_manage_be.model.entity.reputations.ReputationLevelEntity;
 import charging_manage_be.repository.reputations.ReputationLevelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,48 +14,51 @@ public class ReputationLevelServiceImpl implements ReputationLevelService {
 
     @Autowired
     private ReputationLevelRepository reputationLevelRepository;
+    /*
+        private int minScore;
+    private int maxScore;
+    private int maxWaitMinutes;
+    private String description;
+     */
+    @Override
+    public ReputationLevelEntity saveReputationLevel(ReputationRequest reputationR) {
+        ReputationLevelEntity reputationLevelEntity = new ReputationLevelEntity();
+        reputationLevelEntity.setLevelName(reputationR.getLevelName());
+        reputationLevelEntity.setMaxScore(reputationR.getMaxScore());
+        reputationLevelEntity.setMinScore(reputationR.getMinScore());
+        reputationLevelEntity.setDescription(reputationR.getDescription());
+        reputationLevelEntity.setMaxWaitMinutes(reputationR.getMaxWaitMinutes());
+        return reputationLevelRepository.save(reputationLevelEntity);
+    }
 
     @Override
-    public ReputationLevelEntity saveReputationLevel(ReputationLevelEntity reputationLevelEntity) {
-        if (reputationLevelEntity == null) {
-            throw new IllegalArgumentException("ReputationLevelEntity cannot be null");
-        }
-        else if (reputationLevelRepository.existsById(reputationLevelEntity.getLevelID())){
-            throw new IllegalArgumentException("ReputationLevelEntity with ID " + reputationLevelEntity.getLevelID() + " already exists");
+    public ReputationLevelEntity updateReputationLevel(int repuId, ReputationRequest reputationR) {
+        ReputationLevelEntity repuO = reputationLevelRepository.findById(repuId).orElse(null);
+        if (repuO == null){
+            throw new IllegalArgumentException("ReputationLevelEntity with ID " + repuId + " does not exist");
         }
         else {
-            return reputationLevelRepository.save(reputationLevelEntity);
+            repuO.setLevelName(reputationR.getLevelName());
+            repuO.setMaxScore(reputationR.getMaxScore());
+            repuO.setMinScore(reputationR.getMinScore());
+            repuO.setMaxWaitMinutes(reputationR.getMaxWaitMinutes());
+            repuO.setDescription(reputationR.getDescription());
+            return reputationLevelRepository.save(repuO);
         }
     }
 
     @Override
-    public ReputationLevelEntity updateReputationLevel(ReputationLevelEntity reputationLevelEntity) {
-        if (reputationLevelEntity == null) {
-            throw new IllegalArgumentException("ReputationLevelEntity cannot be null");
-        }
-        else if (!reputationLevelRepository.existsById(reputationLevelEntity.getLevelID())){
-            throw new IllegalArgumentException("ReputationLevelEntity with ID " + reputationLevelEntity.getLevelID() + " does not exist");
-        }
-        else {
-            return reputationLevelRepository.save(reputationLevelEntity);
-        }
-    }
-
-    @Override
-    public boolean deleteReputationLevelById(int levelID) {
-        if (!reputationLevelRepository.existsById(levelID)) {
-            throw new IllegalArgumentException("ReputationLevelEntity with ID " + levelID + " does not exist");
-        }
-        reputationLevelRepository.deleteById(levelID);
+    public boolean deleteReputationLevelById(int levelId) {
+        reputationLevelRepository.deleteById(levelId);
         return true;
     }
 
     @Override
-    public Optional<ReputationLevelEntity> getReputationLevelById(int levelID) {
-        if (!reputationLevelRepository.existsById(levelID)) {
-            throw new IllegalArgumentException("ReputationLevelEntity with ID " + levelID + " does not exist");
+    public Optional<ReputationLevelEntity> getReputationLevelById(int levelId) {
+        if (!reputationLevelRepository.existsById(levelId)) {
+            throw new IllegalArgumentException("ReputationLevelEntity with ID " + levelId + " does not exist");
         }
-        return reputationLevelRepository.findById(levelID);
+        return reputationLevelRepository.findById(levelId);
     }
 
     @Override
