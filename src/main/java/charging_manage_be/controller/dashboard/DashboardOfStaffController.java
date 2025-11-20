@@ -18,13 +18,13 @@ public class DashboardOfStaffController {
     private StaffDashboardService staffDashboardService;
 
     @GetMapping("/information/{userId}")
-    public ResponseEntity<DashboardOfStaff> getDashboardOfStaff(String userId) {
+    public ResponseEntity<DashboardOfStaff> getDashboardOfStaff(@PathVariable String userId) {
         DashboardOfStaff dashboardOfStaff = staffDashboardService.getDashboardOfStaff(userId);
         return ResponseEntity.ok(dashboardOfStaff);
     }
 
     @GetMapping("/all-sessions/{userId}")
-    public ResponseEntity<List<DashboardOfStaff>> getAllSessionOfStation(String userId) {
+    public ResponseEntity<List<DashboardOfStaff>> getAllSessionOfStation(@PathVariable String userId) {
         List<DashboardOfStaff> dashboardOfStaffList = staffDashboardService.getAllDashboardOfStaff(userId);
         return ResponseEntity.ok(dashboardOfStaffList);
     }
