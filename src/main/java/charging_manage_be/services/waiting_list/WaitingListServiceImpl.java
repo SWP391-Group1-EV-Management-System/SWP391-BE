@@ -266,6 +266,15 @@ public class WaitingListServiceImpl implements WaitingListService{
         for (int i = 0; i < queue.size(); i++) {
             String userId = queue.get(i);
             int position = i + 1;
+            if(position == 1 && bookingService.isPostIdleInBooking(postId)){
+                WaitingListEntity waiting = waitingListRepository.findFirstByUser_UserIDAndStatusOrderByCreatedAtDesc(userId, "WAITING");
+                if(waiting != null) {
+                    LocalDateTime time = chargingSessionService.getExpectedEndTime(postId);
+                    waiting.setExpectedWaitingTime(time);
+                    waitingListRepository.save(waiting);
+                    updateMaxWaitingTime(postId, userId, time);
+                }
+            }
             String message = "Bạn đang ở vị trí số " + position;
             String destination = "/queue/notifications/" + postId;
 
