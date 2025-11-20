@@ -67,7 +67,7 @@ public class UserEntity {
     @JsonManagedReference
     private List<UserReputationEntity> userReputations;
 
-    @OneToOne(mappedBy = "UserManager")
+    @OneToOne(mappedBy = "userManager")
     private ChargingStationEntity chargingStation;
 
     @OneToMany(mappedBy = "user")

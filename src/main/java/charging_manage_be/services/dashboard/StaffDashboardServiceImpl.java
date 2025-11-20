@@ -4,6 +4,7 @@ import charging_manage_be.model.dto.dashboard.DashboardOfStaff;
 import charging_manage_be.model.entity.charging.ChargingSessionEntity;
 import charging_manage_be.model.entity.charging.ChargingStationEntity;
 import charging_manage_be.services.charging_session.ChargingSessionService;
+import charging_manage_be.services.charging_station.ChargingStationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,21 +18,24 @@ import java.util.List;
 public class StaffDashboardServiceImpl implements StaffDashboardService {
     @Autowired
     private ChargingSessionService chargingSessionService;
+    @Autowired
+    private ChargingStationService chargingStationService;
 
     @Override
-    public DashboardOfStaff getDashboardOfStaff(String stationId) {
+    public DashboardOfStaff getDashboardOfStaff(String userId) {
         DashboardOfStaff dashboardOfStaff = new DashboardOfStaff();
-        dashboardOfStaff.setTotalSessionInStation(chargingSessionService.countSessionsByStationId(stationId));
-        dashboardOfStaff.setTotalSessionIsProcessingInStation(chargingSessionService.countSessionIsProgressByStationId(stationId));
-        dashboardOfStaff.setTotalSessionCompletedInStation(chargingSessionService.countSessionIsDoneByStationId(stationId));
-        dashboardOfStaff.setTotalRevenueInStation(chargingSessionService.getRevenueByStationId(stationId));
+        dashboardOfStaff.setTotalSessionInStation(chargingSessionService.countSessionsByStation(userId));
+        dashboardOfStaff.setTotalSessionIsProcessingInStation(chargingSessionService.countSessionIsProgressByStation(userId));
+        dashboardOfStaff.setTotalSessionCompletedInStation(chargingSessionService.countSessionIsDoneByStation(userId));
+        dashboardOfStaff.setTotalRevenueInStation(chargingSessionService.getRevenueByStation(userId));
         return dashboardOfStaff;
     }
 
     @Override
-    public List<DashboardOfStaff> getAllDashboardOfStaff(String stationId) {
+    public List<DashboardOfStaff> getAllDashboardOfStaff(String userId) {
 
-
+        ChargingStationEntity station = chargingStationService.getStationByUserId(userId);
+        String stationId = station.getIdChargingStation();
         List<ChargingSessionEntity> chargingSessionEntityList = chargingSessionService.getAllSessionsByStationId(stationId);
         List<DashboardOfStaff> dashboardOfStaffList = new ArrayList<>();
 

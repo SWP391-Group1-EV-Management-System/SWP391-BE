@@ -490,26 +490,26 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
     }
 
     @Override
-    public int countSessionsByStationId(String stationId) {
-        ChargingStationEntity station = stationService.getStationById(stationId);
+    public int countSessionsByStation(String userId) {
+        ChargingStationEntity station = stationService.getStationByUserId(userId);
         return chargingSession.countByStation(station);
     }
 
     @Override
-    public int countSessionIsProgressByStationId(String stationId) {
-        ChargingStationEntity station = stationService.getStationById(stationId);
+    public int countSessionIsProgressByStation(String userId) {
+        ChargingStationEntity station = stationService.getStationByUserId(userId);
         return chargingSession.countByStationAndIsDone(station, false);
     }
 
     @Override
-    public int countSessionIsDoneByStationId(String stationId) {
-        ChargingStationEntity station = stationService.getStationById(stationId);
+    public int countSessionIsDoneByStation(String userId) {
+        ChargingStationEntity station = stationService.getStationByUserId(userId);
         return chargingSession.countByStationAndIsDone(station, true);
     }
 
     @Override
-    public BigDecimal getRevenueByStationId(String stationId) {
-        ChargingStationEntity station = stationService.getStationById(stationId);
+    public BigDecimal getRevenueByStation(String userId) {
+        ChargingStationEntity station = stationService.getStationByUserId(userId);
         return chargingSession.sumTotalAmountByStationAndIsDone(station);
     }
 

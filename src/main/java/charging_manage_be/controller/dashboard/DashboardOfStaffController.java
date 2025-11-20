@@ -17,15 +17,15 @@ public class DashboardOfStaffController {
     @Autowired
     private StaffDashboardService staffDashboardService;
 
-    @GetMapping("/information/{stationId}")
-    public ResponseEntity<DashboardOfStaff> getDashboardOfStaff(String stationId) {
-        DashboardOfStaff dashboardOfStaff = staffDashboardService.getDashboardOfStaff(stationId);
+    @GetMapping("/information/{userId}")
+    public ResponseEntity<DashboardOfStaff> getDashboardOfStaff(String userId) {
+        DashboardOfStaff dashboardOfStaff = staffDashboardService.getDashboardOfStaff(userId);
         return ResponseEntity.ok(dashboardOfStaff);
     }
 
-    @GetMapping("/all-sessions/{stationId}")
-    public ResponseEntity<List<DashboardOfStaff>> getAllSessionOfStation(String stationId) {
-        List<DashboardOfStaff> dashboardOfStaffList = staffDashboardService.getAllDashboardOfStaff(stationId);
+    @GetMapping("/all-sessions/{userId}")
+    public ResponseEntity<List<DashboardOfStaff>> getAllSessionOfStation(String userId) {
+        List<DashboardOfStaff> dashboardOfStaffList = staffDashboardService.getAllDashboardOfStaff(userId);
         return ResponseEntity.ok(dashboardOfStaffList);
     }
 }

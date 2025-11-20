@@ -21,4 +21,6 @@ public interface ChargingStationService {
     double calculateDistance(double lat1, double lon1, double lat2, double lon2);
 
     long countTotalActiveStations();
+
+    ChargingStationEntity getStationByUserId(String userId);
 }

@@ -24,4 +24,6 @@ public interface ChargingStationRepository extends JpaRepository<ChargingStation
 
     long countByIsActiveTrue();
 
+    Optional<ChargingStationEntity> findByUserManager_UserID(String userId);
+
 }

@@ -211,4 +211,9 @@ public class ChargingStationServiceImpl implements  ChargingStationService {
         return chargingStationRepository.countByIsActiveTrue();
     }
 
+    @Override
+    public ChargingStationEntity getStationByUserId(String userId) {
+        return chargingStationRepository.findByUserManager_UserID(userId).orElse(null);
+    }
+
 }

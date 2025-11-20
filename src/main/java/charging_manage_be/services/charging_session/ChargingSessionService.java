@@ -41,9 +41,9 @@ public interface ChargingSessionService {
     BigDecimal getTotalKwhByUserId(String userId);
     int countSessionsByUserIdAndIsDone(String userId);
 
-    int countSessionsByStationId(String stationId);
-    int countSessionIsProgressByStationId(String stationId);
-    int countSessionIsDoneByStationId(String stationId);
-    BigDecimal getRevenueByStationId(String stationId);
+    int countSessionsByStation(String userId);
+    int countSessionIsProgressByStation(String userId);
+    int countSessionIsDoneByStation(String userId);
+    BigDecimal getRevenueByStation(String userId);
 
 }
