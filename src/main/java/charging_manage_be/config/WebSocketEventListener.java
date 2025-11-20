@@ -9,7 +9,7 @@ import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
 @Component
 public class WebSocketEventListener {
-
+    // class để debug
     @EventListener
     public void handleWebSocketConnect(SessionConnectEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());

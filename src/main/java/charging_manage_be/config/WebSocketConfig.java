@@ -18,7 +18,7 @@ import java.security.Principal;
 @Configuration
 @EnableWebSocketMessageBroker
 public class    WebSocketConfig implements WebSocketMessageBrokerConfigurer {
-
+    // cấu hình địa chỉ gửi và nhận
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
         // server gửi message tới /topic/* và /queue/* với một simple broker
@@ -27,10 +27,10 @@ public class    WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         config.enableSimpleBroker("/topic", "/queue");
         // client gửi message tới /app/*
         config.setApplicationDestinationPrefixes("/app");
-        // prefix cho user-specific destinations
+        // gửi message riêng cho từng user
         config.setUserDestinationPrefix("/user");
     }
-
+    // hàm tạo cổng kết nối cho FE
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // client connect tới ws://localhost:8080/ws
@@ -44,9 +44,10 @@ public class    WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     }
 
     // ✅ Set Principal từ STOMP header để Spring WebSocket biết user là ai
+    //ChannelRegistration
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(new ChannelInterceptor() {
+        registration.interceptors(new ChannelInterceptor() { // thêm interceptor check từng message được gửi từ FE về BE
             @Override
             public Message<?> preSend(Message<?> message, MessageChannel channel) {
                 StompHeaderAccessor accessor =
