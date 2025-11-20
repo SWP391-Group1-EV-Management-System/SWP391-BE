@@ -23,6 +23,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
+
 import static charging_manage_be.util.RandomId.generateRandomId;
 
 @Service
@@ -38,8 +40,6 @@ public class WaitingListServiceImpl implements WaitingListService{
     private final ChargingSessionService chargingSessionService;
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final ChargingPostStatusService chargingPostStatusService;
-
-    // ✅ THÊM BookingService với @Lazy để tránh circular dependency
     private final charging_manage_be.services.booking.BookingService bookingService;
 
     private int characterLength = 5;
@@ -103,29 +103,33 @@ public class WaitingListServiceImpl implements WaitingListService{
                     .orElseThrow(() -> new RuntimeException("Post not found"));
             ChargingStationEntity station = chargingStationRepository.findStationByChargingPostEntity(chargingPostId)
                     .orElseThrow(() -> new RuntimeException("Station not found"));
+            String key = redisKey(chargingPostId);
+            String firstUserId = redisTemplate.opsForList().index(key, 0);
+            // nếu driver này là người đầu tiên trong hàng đợi và phía trước trong bảng booking không có driver nào ở trước là CÒNFIRM bởi vì lúc này thời gian chưa biết rõ
+            if(bookingService.isPostIdleInBooking(chargingPostId) && Objects.equals(firstUserId, userId)) {
+                // ============ THÊM DEBUG ============
+                LocalDateTime currentTime = LocalDateTime.now();
+                System.out.println("\n=== 🕐 [WAITING TIME DEBUG] ===");
+                System.out.println("👤 User ID: " + userId);
+                System.out.println("📍 Post ID: " + chargingPostId);
+                System.out.println("⏰ Current Time: " + currentTime);
 
-            // ============ THÊM DEBUG ============
-            LocalDateTime currentTime = LocalDateTime.now();
-            System.out.println("\n=== 🕐 [WAITING TIME DEBUG] ===");
-            System.out.println("👤 User ID: " + userId);
-            System.out.println("📍 Post ID: " + chargingPostId);
-            System.out.println("⏰ Current Time: " + currentTime);
+                // xử lý trường hợp vô sau ( trụ đó có người cắm sạc và đã có expected end time trên session)
+                LocalDateTime timeEnd = chargingSessionService.getExpectedEndTime(chargingPostId);
 
-            // xử lý trường hợp vô sau ( trụ đó có người cắm sạc và đã có expected end time trên session)
-            LocalDateTime timeEnd = chargingSessionService.getExpectedEndTime(chargingPostId);
+                System.out.println("⏱️  Expected End Time (from session): " + timeEnd);
+                if (timeEnd != null) {
+                    long secondsRemaining = java.time.Duration.between(currentTime, timeEnd).getSeconds();
+                    String formattedTime = formatSeconds(secondsRemaining);
 
-            System.out.println("⏱️  Expected End Time (from session): " + timeEnd);
-            if (timeEnd != null) {
-                long secondsRemaining = java.time.Duration.between(currentTime, timeEnd).getSeconds();
-                String formattedTime = formatSeconds(secondsRemaining);
+                    System.out.println("⏳ Seconds Remaining: " + secondsRemaining);
+                    System.out.println("⏳ Time Remaining (HH:MM:SS): " + formattedTime);
+                }
+                System.out.println("=== END DEBUG ===\n");
+                // ============ END DEBUG ============
 
-                System.out.println("⏳ Seconds Remaining: " + secondsRemaining);
-                System.out.println("⏳ Time Remaining (HH:MM:SS): " + formattedTime);
+                waitingListEntity.setExpectedWaitingTime(timeEnd);
             }
-            System.out.println("=== END DEBUG ===\n");
-            // ============ END DEBUG ============
-
-            waitingListEntity.setExpectedWaitingTime(timeEnd);
             waitingListEntity.setUser(user);
             waitingListEntity.setCar(car);
             waitingListEntity.setChargingPost(post);

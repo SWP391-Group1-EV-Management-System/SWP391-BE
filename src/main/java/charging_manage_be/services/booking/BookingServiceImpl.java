@@ -452,5 +452,6 @@ public class BookingServiceImpl implements BookingService {
     public BookingEntity getNewBookingByUserId(String userId) {
         return bookingRepository.findFirstByUser_UserIDAndStatusOrderByCreatedAtDesc(userId, "CONFIRMED");
     }
+
 }
 

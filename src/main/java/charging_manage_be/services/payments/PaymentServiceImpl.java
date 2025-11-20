@@ -1,6 +1,7 @@
 package charging_manage_be.services.payments;
 
 import charging_manage_be.model.dto.service_package.PackageTransactionResponseDTO;
+import charging_manage_be.model.entity.charging.ChargingPostEntity;
 import charging_manage_be.model.entity.charging.ChargingSessionEntity;
 import charging_manage_be.model.entity.payments.PaymentEntity;
 import charging_manage_be.model.entity.payments.PaymentMethodEntity;
@@ -40,6 +41,8 @@ public class PaymentServiceImpl implements PaymentService {
     private ChargingSessionRepository chargingSessionRepository;
     @Autowired
     private PackageTransactionService packageTransactionService;
+    //@Autowired
+    //private Charging;
     //
     //@Autowired => private Pen pen;
     // no @Autowired =>private Pen  pen = new Pen;
@@ -82,7 +85,11 @@ public class PaymentServiceImpl implements PaymentService {
             payment.setPaymentMethod(paymentMethod);
             paymentRepository.save(payment);
         }
-
+        if("PMT_CASH".equalsIgnoreCase(paymentMethod.getIdPaymentMethod())){
+            payment.setPrice(finalPrice);
+            payment.setPaymentMethod(paymentMethod);
+            handlerWebsocketSendPaymentToStaff(payment);
+        }
         if ("PMT_PACKAGE".equalsIgnoreCase(paymentMethod.getIdPaymentMethod())) {
             PackageTransactionResponseDTO activePackage =
                     packageTransactionService.getLatestActivePackageByUserId(payment.getUser().getUserID());
@@ -118,7 +125,10 @@ public class PaymentServiceImpl implements PaymentService {
         }
         return true;
     }
+    public void handlerWebsocketSendPaymentToStaff(PaymentEntity payment){
+        ChargingPostEntity post = payment.getSession().getChargingPost();
 
+    }
 
     @Override
     public PaymentEntity getPaymentByPaymentId(String paymentId) {
@@ -195,6 +205,7 @@ public class PaymentServiceImpl implements PaymentService {
     public long totalByPaymentMethod(String paymentMethodId) {
         return paymentRepository.countByPaymentMethod_IdPaymentMethod(paymentMethodId);
     }
+
 
     /*
     public PaymentEntity createPayment(UserEntity userId, String chargingSessionId, BigDecimal price) {

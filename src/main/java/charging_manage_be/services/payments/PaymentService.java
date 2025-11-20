@@ -20,5 +20,6 @@ public interface PaymentService {
     BigDecimal totalPriceCurrentDay();
     BigDecimal totalPriceCurrentMonth();
     long totalByPaymentMethod(String paymentMethodId);
+
 }
 
