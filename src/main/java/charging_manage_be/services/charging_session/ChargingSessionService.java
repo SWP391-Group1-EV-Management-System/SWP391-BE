@@ -22,6 +22,7 @@ public interface ChargingSessionService {
      List<ChargingSessionEntity> getAllSessionInStationWithStatus(String stationId, boolean isDone);
      List<ChargingSessionEntity> getAllSessions();
      List<ChargingSessionEntity> getAllSessionsByUserId(String userId);
+     List<ChargingSessionEntity> getAllSessionsByStationId(String stationId);
 
     Map<Object, Object> getProgress(String sessionId);
     boolean isPostIdleBySession(String postId);
@@ -39,4 +40,10 @@ public interface ChargingSessionService {
 
     BigDecimal getTotalKwhByUserId(String userId);
     int countSessionsByUserIdAndIsDone(String userId);
+
+    int countSessionsByStationId(String stationId);
+    int countSessionIsProgressByStationId(String stationId);
+    int countSessionIsDoneByStationId(String stationId);
+    BigDecimal getRevenueByStationId(String stationId);
+
 }

@@ -1,6 +1,6 @@
-package charging_manage_be.services.admin;
+package charging_manage_be.services.dashboard;
 
-import charging_manage_be.model.dto.admin.DashboardAndHomeAdmin;
+import charging_manage_be.model.dto.dashboard.DashboardAndHomeAdmin;
 import charging_manage_be.services.charging_post.ChargingPostService;
 import charging_manage_be.services.charging_session.ChargingSessionService;
 import charging_manage_be.services.charging_station.ChargingStationService;

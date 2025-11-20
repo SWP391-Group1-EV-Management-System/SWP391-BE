@@ -1,6 +1,6 @@
-package charging_manage_be.services.drivers;
+package charging_manage_be.services.dashboard;
 
-import charging_manage_be.model.dto.driver.DashboardOfDriver;
+import charging_manage_be.model.dto.dashboard.DashboardOfDriver;
 import charging_manage_be.model.entity.reputations.UserReputationEntity;
 import charging_manage_be.services.charging_session.ChargingSessionService;
 import charging_manage_be.services.payments.PaymentService;
@@ -8,7 +8,6 @@ import charging_manage_be.services.user_reputations.UserReputationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.util.Optional;
 
 @Service

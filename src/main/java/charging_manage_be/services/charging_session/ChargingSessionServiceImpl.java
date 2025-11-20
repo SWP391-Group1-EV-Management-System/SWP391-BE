@@ -299,6 +299,12 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
         return chargingSession.findByUser(user);
     }
 
+    @Override
+    public List<ChargingSessionEntity> getAllSessionsByStationId(String stationId) {
+        ChargingStationEntity station = stationService.getStationById(stationId);
+        return chargingSession.findByStation(station);
+    }
+
 
     // Hàm cập nhật tiến trình sạc real-time (được gọi mỗi giây)
     @Scheduled(fixedRate = 1000)
@@ -481,6 +487,30 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
     public int countSessionsByUserIdAndIsDone(String userId) {
         UserEntity user = userService.getUserByID(userId).orElseThrow(() -> new RuntimeException("User not found"));
         return chargingSession.countByUserAndIsDone(user, true);
+    }
+
+    @Override
+    public int countSessionsByStationId(String stationId) {
+        ChargingStationEntity station = stationService.getStationById(stationId);
+        return chargingSession.countByStation(station);
+    }
+
+    @Override
+    public int countSessionIsProgressByStationId(String stationId) {
+        ChargingStationEntity station = stationService.getStationById(stationId);
+        return chargingSession.countByStationAndIsDone(station, false);
+    }
+
+    @Override
+    public int countSessionIsDoneByStationId(String stationId) {
+        ChargingStationEntity station = stationService.getStationById(stationId);
+        return chargingSession.countByStationAndIsDone(station, true);
+    }
+
+    @Override
+    public BigDecimal getRevenueByStationId(String stationId) {
+        ChargingStationEntity station = stationService.getStationById(stationId);
+        return chargingSession.sumTotalAmountByStationAndIsDone(station);
     }
 
     @Override

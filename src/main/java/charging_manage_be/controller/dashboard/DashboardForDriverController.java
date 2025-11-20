@@ -1,7 +1,7 @@
-package charging_manage_be.controller.driver;
+package charging_manage_be.controller.dashboard;
 
-import charging_manage_be.model.dto.driver.DashboardOfDriver;
-import charging_manage_be.services.drivers.DriverDashboardService;
+import charging_manage_be.model.dto.dashboard.DashboardOfDriver;
+import charging_manage_be.services.dashboard.DriverDashboardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

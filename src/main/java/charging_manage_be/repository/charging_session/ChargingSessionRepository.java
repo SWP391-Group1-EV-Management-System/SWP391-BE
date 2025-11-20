@@ -30,6 +30,8 @@ public interface ChargingSessionRepository extends JpaRepository<ChargingSession
 
     List<ChargingSessionEntity> findByUser(UserEntity user);
 
+    List <ChargingSessionEntity> findByStation(ChargingStationEntity station);
+
     Optional<ChargingSessionEntity> findTopByChargingPostAndIsDoneOrderByStartTimeDesc(
             ChargingPostEntity chargingPost,
             boolean isDone
@@ -55,4 +57,10 @@ public interface ChargingSessionRepository extends JpaRepository<ChargingSession
     BigDecimal sumFinishedKwhByUser(@Param("user") UserEntity user);
 
     int countByUserAndIsDone(UserEntity user, boolean isDone);
+
+    // Tổng phiên sạc theo trạm
+    int countByStation(ChargingStationEntity station);
+    int countByStationAndIsDone (ChargingStationEntity station, boolean isDone);
+    @Query("SELECT SUM(s.totalAmount) FROM ChargingSessionEntity s WHERE s.station = :station AND s.isDone = true")
+    BigDecimal sumTotalAmountByStationAndIsDone(ChargingStationEntity station);
 }
