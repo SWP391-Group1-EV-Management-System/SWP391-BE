@@ -36,4 +36,5 @@ public interface UserReputationService {
     // Tạo một hàm để trừ điểm theo việc đến trễ booking
     void handlerExpiredPenalty(BookingEntity bookingEntity);
 
+
 }

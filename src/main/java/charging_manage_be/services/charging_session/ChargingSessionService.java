@@ -36,4 +36,7 @@ public interface ChargingSessionService {
     Map<Object, Object> getPreferenceFromRedis(String preferenceKey);
 
     ChargingSessionEntity getNewSessionInPostId(String postId);
+
+    BigDecimal getTotalKwhByUserId(String userId);
+    int countSessionsByUserIdAndIsDone(String userId);
 }

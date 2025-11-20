@@ -26,4 +26,7 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, String> 
     BigDecimal sumPriceByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 
     long countByPaymentMethod_IdPaymentMethod(String paymentMethodId);
+
+    @Query("SELECT SUM(p.price) FROM PaymentEntity p WHERE p.user = :user AND p.isPaid = :isPaid")
+    BigDecimal sumPriceOfPaymentIsPaid(UserEntity user, boolean isPaid);
 }

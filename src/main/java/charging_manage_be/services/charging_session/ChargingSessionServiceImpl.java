@@ -472,6 +472,18 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
     }
 
     @Override
+    public BigDecimal getTotalKwhByUserId(String userId) {
+        UserEntity user = userService.getUserByID(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        return chargingSession.sumFinishedKwhByUser(user);
+    }
+
+    @Override
+    public int countSessionsByUserIdAndIsDone(String userId) {
+        UserEntity user = userService.getUserByID(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        return chargingSession.countByUserAndIsDone(user, true);
+    }
+
+    @Override
     public long countSessionsInCurrentMonth() {
         // Phải lấy theo thời gian HIỆN TẠI luôn
         LocalDateTime start = LocalDateTime.now().withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0); // Đầu tháng này
