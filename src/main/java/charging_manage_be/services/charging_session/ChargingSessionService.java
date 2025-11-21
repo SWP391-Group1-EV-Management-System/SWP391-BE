@@ -22,6 +22,7 @@ public interface ChargingSessionService {
      List<ChargingSessionEntity> getAllSessionInStationWithStatus(String stationId, boolean isDone);
      List<ChargingSessionEntity> getAllSessions();
      List<ChargingSessionEntity> getAllSessionsByUserId(String userId);
+     List<ChargingSessionEntity> getAllSessionsByStationId(String stationId);
 
     Map<Object, Object> getProgress(String sessionId);
     boolean isPostIdleBySession(String postId);
@@ -36,4 +37,13 @@ public interface ChargingSessionService {
     Map<Object, Object> getPreferenceFromRedis(String preferenceKey);
 
     ChargingSessionEntity getNewSessionInPostId(String postId);
+
+    BigDecimal getTotalKwhByUserId(String userId);
+    int countSessionsByUserIdAndIsDone(String userId);
+
+    int countSessionsByStation(String userId);
+    int countSessionIsProgressByStation(String userId);
+    int countSessionIsDoneByStation(String userId);
+    BigDecimal getRevenueByStation(String userId);
+
 }

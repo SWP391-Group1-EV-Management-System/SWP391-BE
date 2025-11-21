@@ -27,6 +27,9 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, String> 
 
     long countByPaymentMethod_IdPaymentMethod(String paymentMethodId);
 
+    @Query("SELECT SUM(p.price) FROM PaymentEntity p WHERE p.user = :user AND p.isPaid = :isPaid")
+    BigDecimal sumPriceOfPaymentIsPaid(UserEntity user, boolean isPaid);
+
 
     List<PaymentEntity> findAllByPaymentMethod_IdPaymentMethodAndIsPaidAndSession_ChargingPost_ChargingStation_IdChargingStation(String paymentMethodIdPaymentMethod, boolean isPaid, String sessionChargingPostChargingStationIdChargingStation);
 }

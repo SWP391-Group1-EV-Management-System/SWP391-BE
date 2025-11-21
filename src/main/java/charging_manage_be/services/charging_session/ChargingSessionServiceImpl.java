@@ -299,6 +299,12 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
         return chargingSession.findByUser(user);
     }
 
+    @Override
+    public List<ChargingSessionEntity> getAllSessionsByStationId(String stationId) {
+        ChargingStationEntity station = stationService.getStationById(stationId);
+        return chargingSession.findByStation(station);
+    }
+
 
     // Hàm cập nhật tiến trình sạc real-time (được gọi mỗi giây)
     @Scheduled(fixedRate = 1000)
@@ -469,6 +475,42 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
     @Override
     public ChargingSessionEntity getNewSessionInPostId(String postId) {
         return chargingSession.findFirstByChargingPost_IdChargingPostAndIsDoneOrderByStartTimeDesc(postId, false);
+    }
+
+    @Override
+    public BigDecimal getTotalKwhByUserId(String userId) {
+        UserEntity user = userService.getUserByID(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        return chargingSession.sumFinishedKwhByUser(user);
+    }
+
+    @Override
+    public int countSessionsByUserIdAndIsDone(String userId) {
+        UserEntity user = userService.getUserByID(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        return chargingSession.countByUserAndIsDone(user, true);
+    }
+
+    @Override
+    public int countSessionsByStation(String userId) {
+        ChargingStationEntity station = stationService.getStationByUserId(userId);
+        return chargingSession.countByStation(station);
+    }
+
+    @Override
+    public int countSessionIsProgressByStation(String userId) {
+        ChargingStationEntity station = stationService.getStationByUserId(userId);
+        return chargingSession.countByStationAndIsDone(station, false);
+    }
+
+    @Override
+    public int countSessionIsDoneByStation(String userId) {
+        ChargingStationEntity station = stationService.getStationByUserId(userId);
+        return chargingSession.countByStationAndIsDone(station, true);
+    }
+
+    @Override
+    public BigDecimal getRevenueByStation(String userId) {
+        ChargingStationEntity station = stationService.getStationByUserId(userId);
+        return chargingSession.sumTotalAmountByStationAndIsDone(station);
     }
 
     @Override

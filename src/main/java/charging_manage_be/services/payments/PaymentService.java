@@ -21,5 +21,7 @@ public interface PaymentService {
     BigDecimal totalPriceCurrentMonth();
     long totalByPaymentMethod(String paymentMethodId);
     List<PaymentEntity> getListPaymentPaymentCashByStationId(String  stationId);
+
+    BigDecimal totalPriceIsPaid(String userId);
 }
 

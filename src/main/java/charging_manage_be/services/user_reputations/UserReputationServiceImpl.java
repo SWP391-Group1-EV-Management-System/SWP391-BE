@@ -206,7 +206,6 @@ public class UserReputationServiceImpl implements UserReputationService{
         }
     }
 
-
     @Override
     public List<UserReputationEntity> getAllUserReputations() {
         return userReputationRepository.findAll();

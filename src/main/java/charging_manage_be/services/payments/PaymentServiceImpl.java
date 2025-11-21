@@ -226,6 +226,12 @@ public class PaymentServiceImpl implements PaymentService {
         return paymentRepository.findAllByPaymentMethod_IdPaymentMethodAndIsPaidAndSession_ChargingPost_ChargingStation_IdChargingStation("PMT_CASH", false, stationId);
     }
 
+    @Override
+    public BigDecimal totalPriceIsPaid(String userId) {
+        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        return paymentRepository.sumPriceOfPaymentIsPaid(user, true);
+    }
+
 
     /*
     public PaymentEntity createPayment(UserEntity userId, String chargingSessionId, BigDecimal price) {

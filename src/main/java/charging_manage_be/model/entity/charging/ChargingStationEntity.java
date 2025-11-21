@@ -52,7 +52,7 @@ public class ChargingStationEntity {
 
     @OneToOne
     @JoinColumn(name = "id_user_manager")
-    private UserEntity UserManager;
+    private UserEntity userManager;
     // Khóa ngoại bảng user
     @PrePersist
     protected void onCreate() {

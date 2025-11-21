@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +29,8 @@ public interface ChargingSessionRepository extends JpaRepository<ChargingSession
     List<ChargingSessionEntity> findByStationAndIsDone(ChargingStationEntity station, boolean isDone);
 
     List<ChargingSessionEntity> findByUser(UserEntity user);
+
+    List <ChargingSessionEntity> findByStation(ChargingStationEntity station);
 
     Optional<ChargingSessionEntity> findTopByChargingPostAndIsDoneOrderByStartTimeDesc(
             ChargingPostEntity chargingPost,
@@ -49,4 +52,15 @@ public interface ChargingSessionRepository extends JpaRepository<ChargingSession
     ChargingSessionEntity findFirstByChargingPost_IdChargingPostOrderByStartTimeDesc(String chargingPostIdChargingPost);
 
     ChargingSessionEntity findFirstByChargingPost_IdChargingPostAndIsDoneOrderByStartTimeDesc(String chargingPostIdChargingPost, boolean isDone);
+
+    @Query("SELECT SUM(s.kWh) FROM ChargingSessionEntity s WHERE s.user = :user AND s.isDone = true")
+    BigDecimal sumFinishedKwhByUser(@Param("user") UserEntity user);
+
+    int countByUserAndIsDone(UserEntity user, boolean isDone);
+
+    // Tổng phiên sạc theo trạm
+    int countByStation(ChargingStationEntity station);
+    int countByStationAndIsDone (ChargingStationEntity station, boolean isDone);
+    @Query("SELECT SUM(s.totalAmount) FROM ChargingSessionEntity s WHERE s.station = :station AND s.isDone = true")
+    BigDecimal sumTotalAmountByStationAndIsDone(ChargingStationEntity station);
 }

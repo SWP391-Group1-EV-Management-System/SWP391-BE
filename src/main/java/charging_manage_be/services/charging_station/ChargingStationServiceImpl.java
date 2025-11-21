@@ -216,4 +216,9 @@ public class ChargingStationServiceImpl implements  ChargingStationService {
         return chargingStationRepository.findStationByChargingPostEntity(chargingPost.getIdChargingPost()).orElse(null);
     }
 
+    @Override
+    public ChargingStationEntity getStationByUserId(String userId) {
+        return chargingStationRepository.findByUserManager_UserID(userId).orElse(null);
+    }
+
 }
