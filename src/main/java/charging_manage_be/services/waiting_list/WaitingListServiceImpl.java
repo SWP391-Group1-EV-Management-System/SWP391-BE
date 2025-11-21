@@ -10,6 +10,7 @@ import charging_manage_be.repository.charging_post.ChargingPostRepository;
 import charging_manage_be.repository.charging_station.ChargingStationRepository;
 import charging_manage_be.repository.users.UserRepository;
 import charging_manage_be.repository.waiting_list.WaitingListRepository;
+import charging_manage_be.services.booking.BookingService;
 import charging_manage_be.services.charging_post.ChargingPostStatusService;
 import charging_manage_be.services.charging_session.ChargingSessionService;
 import charging_manage_be.services.users.UserService;
@@ -40,7 +41,7 @@ public class WaitingListServiceImpl implements WaitingListService{
     private final ChargingSessionService chargingSessionService;
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final ChargingPostStatusService chargingPostStatusService;
-    private final charging_manage_be.services.booking.BookingService bookingService;
+    private final BookingService bookingService;
 
     private int characterLength = 5;
     private int numberLength = 5;

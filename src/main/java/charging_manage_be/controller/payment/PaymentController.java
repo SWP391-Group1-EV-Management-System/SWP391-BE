@@ -26,6 +26,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -175,20 +176,6 @@ public class PaymentController {
             throw new RuntimeException(e);
         }
     }
-    @PostMapping(value = "/staffConfirmPayment") // Staff gọi thanh toán khi driver trã bằng tiền mặt
-    public ResponseEntity<String> staffConfirmPayment(@RequestBody String paymentId) {
-        if(paymentService.getPaymentByPaymentId(paymentId) == null) {
-            return ResponseEntity.status(500).body("Payment not found");
-        }
-        boolean isCompleted = paymentService.invoicePayment(paymentId);
-        if (isCompleted) {
-            return ResponseEntity.ok("Success");
-        }
-        else{
-            return ResponseEntity.status(500).body("Failed to complete payment");
-        }
-    }
-    //@PostMapping
 
     @PostMapping(value = "/completedPayment") // Hàm này dùng để Momo gọi lại khi có thay đổi trạng thái thanh toán
     public ResponseEntity<String> completedPayment(@RequestBody CreateMomoRequestDTO requestData) {

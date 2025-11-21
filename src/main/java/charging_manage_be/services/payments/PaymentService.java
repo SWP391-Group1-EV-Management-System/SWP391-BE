@@ -20,6 +20,6 @@ public interface PaymentService {
     BigDecimal totalPriceCurrentDay();
     BigDecimal totalPriceCurrentMonth();
     long totalByPaymentMethod(String paymentMethodId);
-
+    List<PaymentEntity> getListPaymentPaymentCashByStationId(String  stationId);
 }
 

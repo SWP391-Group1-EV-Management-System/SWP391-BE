@@ -3,6 +3,7 @@ package charging_manage_be.services.payments;
 import charging_manage_be.model.dto.service_package.PackageTransactionResponseDTO;
 import charging_manage_be.model.entity.charging.ChargingPostEntity;
 import charging_manage_be.model.entity.charging.ChargingSessionEntity;
+import charging_manage_be.model.entity.charging.ChargingStationEntity;
 import charging_manage_be.model.entity.payments.PaymentEntity;
 import charging_manage_be.model.entity.payments.PaymentMethodEntity;
 import charging_manage_be.model.entity.service_package.PackageTransactionEntity;
@@ -12,9 +13,11 @@ import charging_manage_be.repository.payments.PaymentMethodRepository;
 import charging_manage_be.repository.payments.PaymentRepository;
 import charging_manage_be.repository.users.UserRepository;
 import charging_manage_be.services.charging_session.ChargingSessionService;
+import charging_manage_be.services.charging_station.ChargingStationService;
 import charging_manage_be.services.service_package.PackageTransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -41,6 +44,10 @@ public class PaymentServiceImpl implements PaymentService {
     private ChargingSessionRepository chargingSessionRepository;
     @Autowired
     private PackageTransactionService packageTransactionService;
+    @Autowired
+    private ChargingStationService  chargingStationService;
+    @Autowired
+    private SimpMessagingTemplate simpMessagingTemplate;
     //@Autowired
     //private Charging;
     //
@@ -88,7 +95,8 @@ public class PaymentServiceImpl implements PaymentService {
         if("PMT_CASH".equalsIgnoreCase(paymentMethod.getIdPaymentMethod())){
             payment.setPrice(finalPrice);
             payment.setPaymentMethod(paymentMethod);
-            handlerWebsocketSendPaymentToStaff(payment);
+            paymentRepository.save(payment);
+ //           handlerWebsocketSendPaymentToStaff(payment);
         }
         if ("PMT_PACKAGE".equalsIgnoreCase(paymentMethod.getIdPaymentMethod())) {
             PackageTransactionResponseDTO activePackage =
@@ -125,10 +133,17 @@ public class PaymentServiceImpl implements PaymentService {
         }
         return true;
     }
-    public void handlerWebsocketSendPaymentToStaff(PaymentEntity payment){
-        ChargingPostEntity post = payment.getSession().getChargingPost();
-
-    }
+//    public void handlerWebsocketSendPaymentToStaff(PaymentEntity payment){
+//        ChargingPostEntity post = payment.getSession().getChargingPost();
+//        ChargingStationEntity station = chargingStationService.getStationByChargingPost(post);
+//        String message = "PaymentId request to cash: " + payment.getPaymentId();
+//        String userId = station.getUserManager().getUserID();
+//        String destination = "/staff/notifications/" + userId;
+//        simpMessagingTemplate.convertAndSendToUser(userId, destination, message);
+//
+//        System.out.println("✅ [WebSocket] Sent"+ message + " to " + userId);
+//
+//    }
 
     @Override
     public PaymentEntity getPaymentByPaymentId(String paymentId) {
@@ -204,6 +219,11 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public long totalByPaymentMethod(String paymentMethodId) {
         return paymentRepository.countByPaymentMethod_IdPaymentMethod(paymentMethodId);
+    }
+
+    @Override
+    public List<PaymentEntity> getListPaymentPaymentCashByStationId(String stationId) {
+        return paymentRepository.findAllByPaymentMethod_IdPaymentMethodAndIsPaidAndSession_ChargingPost_ChargingStation_IdChargingStation("PMT_CASH", false, stationId);
     }
 
 

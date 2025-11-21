@@ -26,4 +26,7 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, String> 
     BigDecimal sumPriceByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 
     long countByPaymentMethod_IdPaymentMethod(String paymentMethodId);
+
+
+    List<PaymentEntity> findAllByPaymentMethod_IdPaymentMethodAndIsPaidAndSession_ChargingPost_ChargingStation_IdChargingStation(String paymentMethodIdPaymentMethod, boolean isPaid, String sessionChargingPostChargingStationIdChargingStation);
 }
