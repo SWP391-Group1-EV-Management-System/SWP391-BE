@@ -23,4 +23,5 @@ public interface ChargingStationService {
     long countTotalActiveStations();
 
     ChargingStationEntity getStationByUserId(String userId);
+    ChargingStationEntity getStationByChargingPost(ChargingPostEntity chargingPost);
 }

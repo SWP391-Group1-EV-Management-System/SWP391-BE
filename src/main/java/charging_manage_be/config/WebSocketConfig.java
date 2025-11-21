@@ -50,10 +50,8 @@ public class    WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registration.interceptors(new ChannelInterceptor() { // thêm interceptor check từng message được gửi từ FE về BE
             @Override
             public Message<?> preSend(Message<?> message, MessageChannel channel) {
-                StompHeaderAccessor accessor =
-                        MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
-
-                if (StompCommand.CONNECT.equals(accessor.getCommand())) {
+                StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class); // công cụ để đọc thông tin của message
+                if (StompCommand.CONNECT.equals(accessor.getCommand())) { // check chỉ kết nối user khi họ khởi tạo lần đầu đến sever tức lệnh CONNECT, không cần lấy các lệnh chat hoặc subcribe gây dư thừa
                     // Lấy user-name từ STOMP header (Frontend gửi lên)
                     String username = accessor.getFirstNativeHeader("user-name");
 
@@ -66,7 +64,7 @@ public class    WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                             public String getName() {
                                 return username;
                             }
-                        };
+                        }; // tạo Principal để
 
                         accessor.setUser(principal);
                     } else {
