@@ -145,57 +145,45 @@ public class  DataInitializer  implements CommandLineRunner {
         driverC.setStatus(false);
         userRepository.save(driverC);
 
-        UserEntity manager = new UserEntity();
-        manager.setUserID("MGR001");
-        manager.setFirstName("Manager");
-        manager.setLastName("Test");
-        manager.setBirthDate(new Date());
-        manager.setGender(true);
-        manager.setRole("MANAGER");
-        manager.setEmail("manager@test.com");
-        manager.setPassword("password");
-        manager.setPhoneNumber("0987654321");
-        manager.setStatus(true);
-        userRepository.save(manager);
+        UserEntity staff1 = new UserEntity();
+        staff1.setUserID("STF001");
+        staff1.setFirstName("Staff1");
+        staff1.setLastName("Test");
+        staff1.setBirthDate(new Date());
+        staff1.setGender(true);
+        staff1.setRole("STAFF");
+        staff1.setEmail("staff1@test.com");
+        staff1.setPassword("password");
+        staff1.setPhoneNumber("0987654321");
+        staff1.setStatus(true);
+        userRepository.save(staff1);
 
-        UserEntity manager2 = new UserEntity();
-        manager2.setUserID("MGR002");
-        manager2.setFirstName("Manager2");
-        manager2.setLastName("Test");
-        manager2.setBirthDate(new Date());
-        manager2.setGender(true);
-        manager2.setRole("MANAGER");
-        manager2.setEmail("manager2@test.com");
-        manager2.setPassword("password");
-        manager2.setPhoneNumber("0987654321");
-        manager2.setStatus(true);
-        userRepository.save(manager2);
+        UserEntity staff2 = new UserEntity();
+        staff2.setUserID("STF002");
+        staff2.setFirstName("Staff2");
+        staff2.setLastName("Test");
+        staff2.setBirthDate(new Date());
+        staff2.setGender(true);
+        staff2.setRole("STAFF");
+        staff2.setEmail("staff2@test.com");
+        staff2.setPassword("password");
+        staff2.setPhoneNumber("0987654321");
+        staff2.setStatus(true);
+        userRepository.save(staff2);
 
-        UserEntity manager3 = new UserEntity();
-        manager3.setUserID("MGR003");
-        manager3.setFirstName("Manager3");
-        manager3.setLastName("Test");
-        manager3.setBirthDate(new Date());
-        manager3.setGender(true);
-        manager3.setRole("MANAGER");
-        manager3.setEmail("manager3@test.com");
-        manager3.setPassword("password");
-        manager3.setPhoneNumber("0987654321");
-        manager3.setStatus(true);
-        userRepository.save(manager3);
+        UserEntity staff3 = new UserEntity();
+        staff3.setUserID("STF003");
+        staff3.setFirstName("Staff3");
+        staff3.setLastName("Test");
+        staff3.setBirthDate(new Date());
+        staff3.setGender(true);
+        staff3.setRole("STAFF");
+        staff3.setEmail("staff3@test.com");
+        staff3.setPassword("password");
+        staff3.setPhoneNumber("0987654321");
+        staff3.setStatus(true);
+        userRepository.save(staff3);
 
-        UserEntity staff = new UserEntity();
-        staff.setUserID("STF001");
-        staff.setFirstName("Staff");
-        staff.setLastName("Test");
-        staff.setBirthDate(new Date());
-        staff.setGender(true);
-        staff.setRole("STAFF");
-        staff.setEmail("staff@test.com");
-        staff.setPassword("password");
-        staff.setPhoneNumber("0123498765");
-        staff.setStatus(true);
-        userRepository.save(staff);
 
         UserEntity admin = new UserEntity();
         admin.setUserID("ADM001");
@@ -263,7 +251,7 @@ public class  DataInitializer  implements CommandLineRunner {
         car3.setCarID("CAR003");
         car3.setLicensePlate("59A-99999");
         car3.setUser(driverB);
-        car3.setTypeCar("Posche");
+        car3.setTypeCar("Poscher");
         car3.setChassisNumber("CHASSIS123921");
         car3.setChargingType(chademo);
         carRepository.save(car3);
@@ -275,7 +263,7 @@ public class  DataInitializer  implements CommandLineRunner {
         stationA1.setAddress("Ho Chi Minh city University of Technology, Binh Duong province, Vietnam");
         stationA1.setLatitude(10.884256);
         stationA1.setLongitude(106.810764);
-        stationA1.setUserManager(manager);
+        stationA1.setUserManager(staff1);
         stationA1.setNumberOfPosts(3);
         stationA1.setActive(true);
         chargingStationRepository.save(stationA1);
@@ -320,7 +308,7 @@ public class  DataInitializer  implements CommandLineRunner {
         stationA2.setAddress("FPT University, Hanoi, Vietnam");
         stationA2.setLatitude(21.016471);
         stationA2.setLongitude(105.529897);
-        stationA2.setUserManager(manager2);
+        stationA2.setUserManager(staff2);
         stationA2.setNumberOfPosts(4);
         stationA2.setActive(true);
         chargingStationRepository.save(stationA2);
@@ -331,7 +319,7 @@ public class  DataInitializer  implements CommandLineRunner {
         stationA3.setAddress("Vietnam National University HCMC, Binh Duong province, Vietnam");
         stationA3.setLatitude(10.879875);
         stationA3.setLongitude(106.807133);
-        stationA3.setUserManager(manager3);
+        stationA3.setUserManager(staff3);
         stationA3.setNumberOfPosts(0);
         stationA3.setActive(false);
         chargingStationRepository.save(stationA3);
@@ -562,7 +550,7 @@ public class  DataInitializer  implements CommandLineRunner {
         s1.setChargingPost(post1);
         s1.setStation(stationA1);
         s1.setUser(driverA);
-        s1.setUserManage(staff);
+        s1.setUserManage(staff1);
         s1.setExpectedEndTime(LocalDateTime.now().plusMinutes(30));
         s1.setKWh(new BigDecimal("20.5"));
         s1.setTotalAmount(new BigDecimal("2050"));
@@ -570,6 +558,9 @@ public class  DataInitializer  implements CommandLineRunner {
         s1.setEndTime(LocalDateTime.now());
         s1.setDone(true);
         ChargingSessionEntity savedS1 = chargingSessionRepository.save(s1);
+        s1.setDone(true);
+        chargingSessionRepository.save(s1);
+
 
         PaymentEntity p1 = new PaymentEntity();
         p1.setPaymentId("PAYMENT001");
@@ -589,7 +580,7 @@ public class  DataInitializer  implements CommandLineRunner {
         s2.setChargingPost(post4);
         s2.setStation(stationA2);
         s2.setUser(driverB);
-        s2.setUserManage(staff);
+        s2.setUserManage(staff2);
         s2.setExpectedEndTime(LocalDateTime.now().plusMinutes(40));
         s2.setKWh(new BigDecimal("15.0"));
         s2.setTotalAmount(new BigDecimal("1500"));
@@ -597,6 +588,8 @@ public class  DataInitializer  implements CommandLineRunner {
         s2.setEndTime(LocalDateTime.now());
         s2.setDone(true);
         ChargingSessionEntity savedS2 = chargingSessionRepository.save(s2);
+        s2.setDone(true);
+        chargingSessionRepository.save(s2);
 
         PaymentEntity p2 = new PaymentEntity();
         p2.setPaymentId("PAYMENT001");
@@ -615,16 +608,16 @@ public class  DataInitializer  implements CommandLineRunner {
         s3.setChargingPost(post6);
         s3.setStation(stationA2);
         s3.setUser(driverB);
-        s3.setUserManage(staff);
+        s3.setUserManage(staff2);
         s3.setExpectedEndTime(LocalDateTime.now().minusMinutes(5));
         s3.setKWh(new BigDecimal("12.0"));
         s3.setTotalAmount(new BigDecimal("1200"));
-        s3.setEndTime(LocalDateTime.now());
-        s3.setDone(true);
         s3.setStartTime(LocalDateTime.now());
         s3.setEndTime(LocalDateTime.now());
         s3.setDone(true);
         ChargingSessionEntity savedS3 = chargingSessionRepository.save(s3);
+        s3.setDone(true);
+        chargingSessionRepository.save(s3);
 
         ChargingSessionEntity s4 = new ChargingSessionEntity();
         s4.setChargingSessionId("SESSION004");
@@ -632,16 +625,16 @@ public class  DataInitializer  implements CommandLineRunner {
         s4.setChargingPost(post6);
         s4.setStation(stationA2);
         s4.setUser(driverB);
-        s4.setUserManage(staff);
+        s4.setUserManage(staff2);
         s4.setExpectedEndTime(LocalDateTime.now().minusMinutes(5));
         s4.setKWh(new BigDecimal("12.0"));
         s4.setTotalAmount(new BigDecimal("1500"));
-        s4.setEndTime(LocalDateTime.now());
-        s4.setDone(true);
         s4.setStartTime(LocalDateTime.now());
         s4.setEndTime(LocalDateTime.now());
         s4.setDone(true);
         ChargingSessionEntity savedS4 = chargingSessionRepository.save(s4);
+        s4.setDone(true);
+        chargingSessionRepository.save(s4);
 
         PaymentEntity p3 = new PaymentEntity();
         p3.setPaymentId("PAYMENT001");
