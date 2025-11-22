@@ -210,10 +210,18 @@ public class  DataInitializer  implements CommandLineRunner {
         UserReputationEntity driverBRep = new UserReputationEntity();
         driverBRep.setUserReputationID("REP002");
         driverBRep.setUser(driverB);
-        driverBRep.setReputationLevel(bad);
-        driverBRep.setCurrentScore(99);
+        driverBRep.setReputationLevel(good);
+        driverBRep.setCurrentScore(100);
         driverBRep.setNotes("Initial reputation");
         userReputationRepository.save(driverBRep);
+
+        UserReputationEntity driverCRep = new UserReputationEntity();
+        driverCRep.setUserReputationID("REP003");
+        driverCRep.setUser(driverC);
+        driverCRep.setReputationLevel(good);
+        driverCRep.setCurrentScore(100);
+        driverCRep.setNotes("Initial reputation");
+        userReputationRepository.save(driverCRep);
 
         // Initialize Charging Types
         ChargingTypeEntity ccs = new ChargingTypeEntity();
@@ -368,7 +376,7 @@ public class  DataInitializer  implements CommandLineRunner {
         basicPkg.setPackageName("Basic Package");
         basicPkg.setDescription("Basic monthly package");
         basicPkg.setBillingCycle(2); // 1 month
-        basicPkg.setPrice(new BigDecimal("299"));
+        basicPkg.setPrice(new BigDecimal("299999"));
         basicPkg.setUnit("MONTH");
         basicPkg.setQuota(1000);
         servicePackageRepository.save(basicPkg);
@@ -378,7 +386,7 @@ public class  DataInitializer  implements CommandLineRunner {
         plsPkg.setPackageName("Plus Package");
         plsPkg.setDescription("Plus monthly package");
         plsPkg.setBillingCycle(5); // 1 month
-        plsPkg.setPrice(new BigDecimal("599"));
+        plsPkg.setPrice(new BigDecimal("599999"));
         plsPkg.setUnit("MONTH");
         plsPkg.setQuota(2500);
         servicePackageRepository.save(plsPkg);
@@ -388,7 +396,7 @@ public class  DataInitializer  implements CommandLineRunner {
         proPkg.setPackageName("Pro Package");
         proPkg.setDescription("Pro monthly package");
         proPkg.setBillingCycle(10); // 1 month
-        proPkg.setPrice(new BigDecimal("999"));
+        proPkg.setPrice(new BigDecimal("999999"));
         proPkg.setUnit("MONTH");
         proPkg.setQuota(5000);
         servicePackageRepository.save(proPkg);
@@ -403,6 +411,12 @@ public class  DataInitializer  implements CommandLineRunner {
         packet.setIdPaymentMethod("PMT_PACKAGE");
         packet.setNamePaymentMethod("Package");
         paymentMethodRepository.save(packet);
+
+        PaymentMethodEntity cash = new PaymentMethodEntity();
+        cash.setIdPaymentMethod("PMT_CASH");
+        cash.setNamePaymentMethod("Cash");
+        paymentMethodRepository.save(cash);
+
         // PACKAGE TRANSACTION AND PaymentServicePackageEntity
         PaymentServicePackageEntity psp1 = new PaymentServicePackageEntity();
         psp1.setPaymentServicePackageId("ABCDEE");
