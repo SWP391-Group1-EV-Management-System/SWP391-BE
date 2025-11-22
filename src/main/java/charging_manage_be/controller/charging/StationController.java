@@ -176,5 +176,15 @@ public class StationController {
 
         return ResponseEntity.ok(stationDTOs);
     }
+
+    @DeleteMapping("/deactivate/{stationId}")
+    public ResponseEntity<String> deactivateStation(@PathVariable String stationId) {
+        boolean result = chargingStationService.deactivateStation(stationId);
+        if (result) {
+            return ResponseEntity.ok("Station deactivated successfully.");
+        } else {
+            return ResponseEntity.badRequest().body("Failed to deactivate station. Station may not exist.");
+        }
+    }
 }
 
