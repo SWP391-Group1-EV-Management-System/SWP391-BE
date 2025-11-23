@@ -2,6 +2,7 @@ package charging_manage_be.config;
 
 import charging_manage_be.model.entity.booking.BookingEntity;
 import charging_manage_be.model.entity.booking.WaitingListEntity;
+import charging_manage_be.model.entity.cars.CarDataEntity;
 import charging_manage_be.model.entity.cars.CarEntity;
 import charging_manage_be.model.entity.charging.ChargingPostEntity;
 import charging_manage_be.model.entity.charging.ChargingSessionEntity;
@@ -30,6 +31,7 @@ import charging_manage_be.repository.service_package.ServicePackageRepository;
 import charging_manage_be.repository.user_reputations.UserReputationRepository;
 import charging_manage_be.repository.users.UserRepository;
 import charging_manage_be.repository.waiting_list.WaitingListRepository;
+import charging_manage_be.services.car.CarDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -71,6 +73,8 @@ public class  DataInitializer  implements CommandLineRunner {
     private ChargingSessionRepository chargingSessionRepository;
     @Autowired
     private PaymentRepository paymentRepository;
+    @Autowired
+    private CarDataService carDataService;
 
 
     @Override
@@ -79,6 +83,24 @@ public class  DataInitializer  implements CommandLineRunner {
         if(reputationLevelRepository.count() > 0) {
             return; // Dữ liệu đã được khởi tạo, không cần thêm nữa
         }
+        // VinFast (CCS)
+        carDataService.addCarData(new CarDataEntity( "VinFast VF3", "CCS"));
+        carDataService.addCarData(new CarDataEntity( "VinFast VF5", "CCS"));
+        carDataService.addCarData(new CarDataEntity( "VinFast VF6", "CCS"));
+        carDataService.addCarData(new CarDataEntity( "VinFast VF7", "CCS"));
+        carDataService.addCarData(new CarDataEntity( "VinFast VF8", "CCS"));
+        carDataService.addCarData(new CarDataEntity( "VinFast VF9", "CCS"));
+
+        // Tesla sử dụng CCS
+        carDataService.addCarData(new CarDataEntity( "Tesla Model 3", "CCS"));
+        carDataService.addCarData(new CarDataEntity( "Tesla Model Y", "CCS"));
+
+        // Tesla sử dụng NACS
+        carDataService.addCarData(new CarDataEntity( "Tesla Model S", "NACS"));
+        carDataService.addCarData(new CarDataEntity( "Tesla Model X", "NACS"));
+        carDataService.addCarData(new CarDataEntity( "Tesla Cybertruck", "NACS"));
+        carDataService.addCarData(new CarDataEntity( "Tesla Roadster", "NACS"));
+        carDataService.addCarData(new CarDataEntity( "Tesla Semi", "NACS"));
         ReputationLevelEntity good = new ReputationLevelEntity();
         good.setLevelId(1);
         good.setLevelName("Tốt");

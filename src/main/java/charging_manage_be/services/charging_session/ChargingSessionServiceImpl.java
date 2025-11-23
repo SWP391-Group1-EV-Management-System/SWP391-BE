@@ -322,7 +322,6 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
 
             double power = session.getChargingPost().getMaxPower().doubleValue();
             double energyCharged = (power * elapsedSeconds) / 3600.0;
-
             int currentPin;
             int targetPin;
             int maxSeconds;
@@ -398,7 +397,6 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
                 shouldStop = true;
                 stopReason = "Time limit reached";
             }
-
             // Cập nhật progress vào Redis (bao gồm secondRemaining)
             updateProgress(session.getChargingSessionId(), energyCharged, elapsedSeconds,
                           calculatedCurrentPin, targetPin, secondRemaining, maxSeconds);
