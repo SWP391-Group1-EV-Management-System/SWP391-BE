@@ -232,6 +232,12 @@ public class PaymentServiceImpl implements PaymentService {
         return paymentRepository.sumPriceOfPaymentIsPaid(user, true);
     }
 
+    @Override
+    public BigDecimal totalPriceUnPaid(String userId) {
+        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        return paymentRepository.sumPriceOfPaymentIsPaid(user, false);
+    }
+
 
     /*
     public PaymentEntity createPayment(UserEntity userId, String chargingSessionId, BigDecimal price) {

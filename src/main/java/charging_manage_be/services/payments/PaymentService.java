@@ -23,5 +23,6 @@ public interface PaymentService {
     List<PaymentEntity> getListPaymentPaymentCashByStationId(String  stationId);
 
     BigDecimal totalPriceIsPaid(String userId);
+    BigDecimal  totalPriceUnPaid(String userId);
 }
 

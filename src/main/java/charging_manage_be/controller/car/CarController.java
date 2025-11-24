@@ -20,11 +20,13 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/car")
 public class CarController {
+    // cố định 1 xe dung lượng từ 1 đến 100 là 92kW
+    // trạm sạc cố định là 250KW
+    // vậy với trạm 250kW thì từ 0 đến 100 sẽ mất 22p -> 13 giây sẽ sạc đuọc 1% pin
+    //13.25 là đang gán cứng cho xe 92kw, 1% xe thì phải sạc 13.25s
 
     @Autowired
     private CarService carService;
-    @Autowired
-    private CarRepository carRepository;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -108,16 +110,18 @@ public class CarController {
         return ResponseEntity.ok().body("success");
     }
     @GetMapping("/random_pin")
-    public ResponseEntity<?> randomPin(@RequestParam String userId) {
+    public ResponseEntity<?> randomPin(@RequestBody Map<String, String> request) {
+        String userId = request.get("userId");
+        String postId = request.get("postId");
         int currentPin = carService.pinRandom();
-        int minuteMax = carService.maxMinutes(currentPin);
+        long maxSecond = carService.maxSecond(currentPin, postId);
 
         // Lưu PIN hiện tại vào Redis
         carService.storeCurrentPin(userId, currentPin);
 
         Map<String, Object> response = new HashMap<>();
         response.put("currentPin", currentPin);
-        response.put("minuteMax", minuteMax);
+        response.put("maxSecond", maxSecond);
         return ResponseEntity.ok(response);
     }
 }

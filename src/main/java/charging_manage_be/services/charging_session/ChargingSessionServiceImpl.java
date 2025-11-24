@@ -376,7 +376,10 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
             }
 
             // Tính pin hiện tại dựa trên thời gian đã trôi qua (tăng mỗi 13.25 giây = 1%)
-            int pinIncrements = (int) (elapsedSeconds / 13.25);
+            double maxPower = session.getChargingPost().getMaxPower().doubleValue();
+            // hard code số giây 1% pin nhảy tiếp sang 2%
+            double time = (92.0 / maxPower) * 3600.0 / 100.0;
+            int pinIncrements = (int) (elapsedSeconds / time);
             int calculatedCurrentPin = Math.min(currentPin + pinIncrements, targetPin);
 
             // Tính thời gian còn lại (giảm dần)
@@ -391,7 +394,10 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
                 shouldStop = true;
                 stopReason = "Target PIN reached";
             }
-
+            if(session.isDone())
+            {
+                shouldStop = true;
+            }
             // Điều kiện 2: Hết thời gian (secondRemaining = 0)
             if (secondRemaining <= 0) {
                 shouldStop = true;
@@ -403,6 +409,8 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
 
             // Tự động kết thúc session nếu đạt điều kiện
             if (shouldStop) {
+                String key = "charging:session:" + session.getChargingSessionId();
+                redisTemplate.delete(key);
                 System.out.println("🔴 [AUTO END] Session " + session.getChargingSessionId() +
                     " - Reason: " + stopReason +
                     " - PIN: " + calculatedCurrentPin + "/" + targetPin +
