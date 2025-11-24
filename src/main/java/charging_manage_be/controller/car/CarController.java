@@ -109,7 +109,7 @@ public class CarController {
         }
         return ResponseEntity.ok().body("success");
     }
-    @GetMapping("/random_pin")
+    @PostMapping("/random_pin")
     public ResponseEntity<?> randomPin(@RequestBody Map<String, String> request) {
         String userId = request.get("userId");
         String postId = request.get("postId");
