@@ -19,4 +19,6 @@ public class DashboardAndHomeAdmin {
     private long totalSessionsInMonth;
     private long totalSessions;
     private long totalActiveUsers;
+
+    private int totalReports;
 }

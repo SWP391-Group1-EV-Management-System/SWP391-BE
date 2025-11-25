@@ -5,6 +5,7 @@ import charging_manage_be.services.charging_post.ChargingPostService;
 import charging_manage_be.services.charging_session.ChargingSessionService;
 import charging_manage_be.services.charging_station.ChargingStationService;
 import charging_manage_be.services.payments.PaymentService;
+import charging_manage_be.services.report.ReportService;
 import charging_manage_be.services.users.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,8 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
     UserService userService;
     @Autowired
     ChargingSessionService chargingSessionService;
+    @Autowired
+    ReportService reportService;
 
     @Override
     public DashboardAndHomeAdmin getAdminDashboard() {
@@ -36,6 +39,7 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
         dashboardAndHomeAdmin.setTotalSessionsInMonth(chargingSessionService.countSessionsInCurrentMonth());
         dashboardAndHomeAdmin.setTotalSessions(chargingSessionService.countTotalSessions());
         dashboardAndHomeAdmin.setTotalActiveUsers(userService.countTotalActiveUsers());
+        dashboardAndHomeAdmin.setTotalReports(reportService.countAllReports());
         return dashboardAndHomeAdmin;
     }
 }
