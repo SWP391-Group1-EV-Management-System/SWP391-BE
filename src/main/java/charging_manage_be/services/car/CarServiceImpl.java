@@ -11,11 +11,13 @@ import charging_manage_be.repository.cars.CarRepository;
 import charging_manage_be.repository.charging_type.ChargingTypeRepository;
 import charging_manage_be.repository.payments.PaymentMethodRepository;
 import charging_manage_be.repository.users.UserRepository;
+import charging_manage_be.services.charging_post.ChargingPostService;
 import charging_manage_be.services.users.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +38,8 @@ public class CarServiceImpl implements CarService {
     private ChargingTypeRepository chargingTypeRepository;
     @Autowired
     private StringRedisTemplate redisTemplate;
+    @Autowired
+    private ChargingPostService  chargingPostService;
 
     private int characterLength = 5;
     private int numberLength = 5;
@@ -194,8 +198,11 @@ public class CarServiceImpl implements CarService {
         return java.util.concurrent.ThreadLocalRandom.current().nextInt(1, 41);
     }
     @Override
-    public int maxMinutes(int pinRandom) {
-        return (int) Math.ceil(((100 - pinRandom) * 13.25) / 60.0);
+    public long maxSecond(int pinRandom, String postId) {
+        double maxPower = chargingPostService.getChargingPostById(postId).getMaxPower().doubleValue();
+        // hard code số giây 1% pin nhảy tiếp sang 2%
+        double time = (92.0 / maxPower) * 3600.0 / 100.0;
+        return (long) Math.ceil(((100 - pinRandom) * time));
     }
 
     @Override

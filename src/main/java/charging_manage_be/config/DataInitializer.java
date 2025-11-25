@@ -102,6 +102,17 @@ public class  DataInitializer  implements CommandLineRunner {
         carDataService.addCarData(new CarDataEntity( "Tesla Roadster", "NACS"));
         carDataService.addCarData(new CarDataEntity( "Tesla Semi", "NACS"));
 
+        carDataService.addCarData(new CarDataEntity("Nissan Leaf", "AC"));
+        carDataService.addCarData(new CarDataEntity("Renault Zoe", "AC"));
+        carDataService.addCarData(new CarDataEntity("Chevrolet Bolt", "AC"));
+        carDataService.addCarData(new CarDataEntity("Jaguar I‑Pace", "AC"));
+
+        carDataService.addCarData(new CarDataEntity("Mitsubishi i‑MiEV", "CHAdeMO"));
+        carDataService.addCarData(new CarDataEntity("Mitsubishi Outlander PHEV", "CHAdeMO"));
+        carDataService.addCarData(new CarDataEntity("Kia Soul EV", "CHAdeMO"));
+        carDataService.addCarData(new CarDataEntity("Lexus UX 300e", "CHAdeMO"));
+
+
         ReputationLevelEntity good = new ReputationLevelEntity();
         good.setLevelId(1);
         good.setLevelName("Tốt");

@@ -17,7 +17,7 @@ public interface CarService {
     CarEntity getCarByCarID(String carID);
     List<CarEntity> findAllCar();
     int pinRandom();
-    int maxMinutes(int pinRandom);
+    long maxSecond(int pinRandom, String postId);
     void storeCurrentPin(String userId, int currentPin);
     int calculateMaxSeconds(int currentPin, int targetPin);
 

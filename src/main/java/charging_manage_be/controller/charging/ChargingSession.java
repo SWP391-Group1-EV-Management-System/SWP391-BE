@@ -16,6 +16,7 @@ import charging_manage_be.services.charging_post.ChargingPostService;
 import charging_manage_be.services.charging_post.ChargingPostStatusService;
 import charging_manage_be.services.charging_session.ChargingSessionService;
 import charging_manage_be.services.charging_station.ChargingStationService;
+import charging_manage_be.services.payments.PaymentService;
 import charging_manage_be.services.status_service.UserStatusService;
 import charging_manage_be.services.user_reputations.UserReputationService;
 import charging_manage_be.services.waiting_list.WaitingListService;
@@ -54,6 +55,8 @@ public class ChargingSession {
     private ChargingPostService chargingPostService;
     @Autowired
     private ChargingPostStatusService chargingPostStatusService;
+    @Autowired
+    private PaymentService paymentService;
 
     private final String STATUS_SESSION = "session";
     private final String STATUS_PAYMENT = "payment";
@@ -84,6 +87,14 @@ public class ChargingSession {
         // check driver nếu có waiting thì không được vào sạc
         String status = null;
         String sessionId = null;
+        BigDecimal resultAmout =  paymentService.totalPriceUnPaid(createSession.getBooking().getUser());
+        resultAmout = (resultAmout == null) ? BigDecimal.ZERO : resultAmout;
+        if (resultAmout.compareTo(new BigDecimal("100000")) >= 0) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "user is overpaying");
+            response.put("sessionId", "overpaying");
+            return ResponseEntity.ok(response);
+        }
         String postId = bookingService.getPostIdByNewBookingOfUserId(createSession.getBooking().getUser());
         WaitingListEntity waitingE = waitingService.getNewWaitingListByUserId(createSession.getBooking().getUser());
         BookingEntity bookingE = bookingService.getNewBookingByUserId(createSession.getBooking().getUser());
