@@ -11,5 +11,10 @@ import java.util.List;
 @Repository
 public interface CarRepository extends JpaRepository<CarEntity, String> {
     List<CarEntity> findByUser(UserEntity user);
+    List<CarEntity> findByLicensePlateAndIsActiveTrue(String licensePlate);
+    List<CarEntity> findByChassisNumberAndIsActiveTrue(String chassisNumber);
+    List<CarEntity> findByIsActiveTrueAndUser(UserEntity user);
 
+    CarEntity findByChassisNumberAndUserAndIsActiveTrue(String chassisNumber, UserEntity user);
+    CarEntity findByLicensePlateAndUserAndIsActiveTrue(String licensePlate, UserEntity user);
 }

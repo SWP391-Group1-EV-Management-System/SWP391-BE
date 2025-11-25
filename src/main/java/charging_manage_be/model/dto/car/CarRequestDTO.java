@@ -15,4 +15,5 @@ public class CarRequestDTO {
     private String typeCar;
     private String chassisNumber;
     private int chargingType;
+    private boolean isActive;
 }

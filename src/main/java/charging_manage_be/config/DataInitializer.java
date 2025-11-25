@@ -101,32 +101,15 @@ public class  DataInitializer  implements CommandLineRunner {
         carDataService.addCarData(new CarDataEntity( "Tesla Cybertruck", "NACS"));
         carDataService.addCarData(new CarDataEntity( "Tesla Roadster", "NACS"));
         carDataService.addCarData(new CarDataEntity( "Tesla Semi", "NACS"));
+
         ReputationLevelEntity good = new ReputationLevelEntity();
         good.setLevelId(1);
         good.setLevelName("Tốt");
         good.setMaxWaitMinutes(30);
-        good.setMinScore(71);
+        good.setMinScore(0);
         good.setMaxScore(100);
         good.setDescription("Người dùng có uy tín tốt");
         reputationLevelRepository.save(good);
-
-        ReputationLevelEntity medium = new ReputationLevelEntity();
-        medium.setLevelId(2);
-        medium.setLevelName("Khá");
-        medium.setMaxWaitMinutes(20);
-        medium.setMinScore(31);
-        medium.setMaxScore(70);
-        medium.setDescription("Người dùng có uy tín khá");
-        reputationLevelRepository.save(medium);
-
-        ReputationLevelEntity bad = new ReputationLevelEntity();
-        bad.setLevelId(3);
-        bad.setLevelName("Xấu");
-        bad.setMaxWaitMinutes(10);
-        bad.setMinScore(0);
-        bad.setMaxScore(30);
-        bad.setDescription("Người dùng có uy tín xấu");
-        reputationLevelRepository.save(bad);
 
         // Initialize Users
         UserEntity driverA = new UserEntity();
@@ -232,8 +215,8 @@ public class  DataInitializer  implements CommandLineRunner {
         UserReputationEntity driverBRep = new UserReputationEntity();
         driverBRep.setUserReputationID("REP002");
         driverBRep.setUser(driverB);
-        driverBRep.setReputationLevel(bad);
-        driverBRep.setCurrentScore(99);
+        driverBRep.setReputationLevel(good);
+        driverBRep.setCurrentScore(100);
         driverBRep.setNotes("Initial reputation");
         userReputationRepository.save(driverBRep);
 
@@ -247,6 +230,7 @@ public class  DataInitializer  implements CommandLineRunner {
         chademo.setIdChargingType(2);
         chademo.setNameChargingType("CHAdeMO");
         chargingTypeRepository.save(chademo);
+
         ChargingTypeEntity ac = new ChargingTypeEntity();
         ac.setIdChargingType(3);
         ac.setNameChargingType("AC");
@@ -257,25 +241,30 @@ public class  DataInitializer  implements CommandLineRunner {
         car.setCarID("CAR001");
         car.setLicensePlate("29A-12345");
         car.setUser(driverA);
-        car.setTypeCar("Sedan");
+        car.setTypeCar("VinFast VF3");
         car.setChassisNumber("CHASSIS001");
         car.setChargingType(ccs);
+        car.setIsActive(true);
         carRepository.save(car);
+
         CarEntity car1 = new CarEntity();
         car1.setCarID("CAR002");
         car1.setLicensePlate("59A-12345");
         car1.setUser(driverB);
-        car1.setTypeCar("Sedan");
+        car1.setTypeCar("VinFast VF6");
         car1.setChassisNumber("CHASSIS123");
         car1.setChargingType(ac);
+        car1.setIsActive(true);
         carRepository.save(car1);
+
         CarEntity car3 = new CarEntity();
         car3.setCarID("CAR003");
         car3.setLicensePlate("59A-99999");
         car3.setUser(driverB);
-        car3.setTypeCar("Poscher");
+        car3.setTypeCar("Tesla Model S");
         car3.setChassisNumber("CHASSIS123921");
         car3.setChargingType(chademo);
+        car3.setIsActive(true);
         carRepository.save(car3);
 
         // Initialize Charging Station
@@ -532,7 +521,7 @@ public class  DataInitializer  implements CommandLineRunner {
         b4.setChargingStation(stationA2);
         b4.setChargingPost(post6);
         b4.setCar(car3);
-        b4.setMaxWaitingTime(20);
+        b4.setMaxWaitingTime(30);
         b4.setStatus("CANCEL");
         b4.setCreatedAt(LocalDateTime.now());
         bookingRepository.save(b4);
@@ -545,7 +534,7 @@ public class  DataInitializer  implements CommandLineRunner {
         b3.setChargingStation(stationA2);
         b3.setChargingPost(post6);
         b3.setCar(car3);
-        b3.setMaxWaitingTime(20);
+        b3.setMaxWaitingTime(30);
         b3.setStatus("COMPLETE");
         b3.setArrivalTime(LocalDateTime.now().plusMinutes(10));
         b3.setCreatedAt(LocalDateTime.now());

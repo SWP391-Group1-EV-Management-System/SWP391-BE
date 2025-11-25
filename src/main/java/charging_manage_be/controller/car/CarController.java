@@ -30,17 +30,20 @@ public class CarController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/add")
-    public ResponseEntity<String> addCar(@RequestBody CarRequestDTO carRequestDTO) {
+    @PostMapping("/addForUser")
+    public ResponseEntity<String> addCarForUser(@RequestBody CarRequestDTO carRequestDTO) {
         if (carRequestDTO == null) {
             return ResponseEntity.badRequest().body("Invalid car data");
         }
-        carService.insertCar(carRequestDTO);
+        boolean check = carService.insertCarByUser(carRequestDTO);
+        if (!check) {
+            return ResponseEntity.badRequest().body("Car with the same license plate or chassis number already exists");
+        }
         return ResponseEntity.ok().body("success");
     }
 
-    @PutMapping("/update/{carId}")
-    public ResponseEntity<String> updateCar(@PathVariable String carId, @RequestBody CarRequestDTO carRequestDTO) {
+    @PutMapping("user/update/{carId}")
+    public ResponseEntity<String> updateCarForUser(@PathVariable String carId, @RequestBody CarRequestDTO carRequestDTO) {
         CarEntity carEntity = carService.getCarByCarID(carId);
         if (carEntity == null) {
             return ResponseEntity.badRequest().body("Car not found");
@@ -49,12 +52,32 @@ public class CarController {
         if (userEntity == null) {
             return ResponseEntity.badRequest().body("User not found");
         }
-        carService.updateCar(carId, carRequestDTO);
+        boolean check =  carService.updateCarByUser(carId, carRequestDTO);
+        if(check == false){
+            return ResponseEntity.badRequest().body("Update failed");
+        }
         return ResponseEntity.ok().body("success");
     }
 
-    @GetMapping("/all/{userId}")
-    public ResponseEntity<List<CarResponseDTO>> getAllCarByUserId(@PathVariable String userId) {
+//    @PutMapping("admin/update/{carId}")
+//    public ResponseEntity<String> updateCarForAdmin(@PathVariable String carId, @RequestBody CarRequestDTO carRequestDTO) {
+//        CarEntity carEntity = carService.getCarByCarID(carId);
+//        if (carEntity == null) {
+//            return ResponseEntity.badRequest().body("Car not found");
+//        }
+//        UserEntity userEntity = userRepository.findById(carEntity.getUser().getUserID()).orElse(null);
+//        if (userEntity == null) {
+//            return ResponseEntity.badRequest().body("User not found");
+//        }
+//        boolean check = carService.updateCarByAdmin(carId, carRequestDTO);
+//        if(check == false){
+//            return ResponseEntity.badRequest().body("Update failed");
+//        }
+//        return ResponseEntity.ok().body("success");
+//    }
+
+    @GetMapping("/allForUser/{userId}")
+    public ResponseEntity<List<CarResponseDTO>> getAllActiveCarByUserId(@PathVariable String userId) {
         String userIdAfterCheck = userId;
         if(userId.contains("@"))
         {
@@ -63,7 +86,7 @@ public class CarController {
                 userIdAfterCheck = user.getUserID();
             }
         }
-       List<CarResponseDTO> carResponseDTO = carService.findAllCarByUserID(userIdAfterCheck).stream().map(CarEntity -> {
+       List<CarResponseDTO> carResponseDTO = carService.findAllActiveCarsByUserID(userIdAfterCheck).stream().map(CarEntity -> {
            CarResponseDTO carDTO = new CarResponseDTO();
            carDTO.setCarID(CarEntity.getCarID());
            carDTO.setLicensePlate(CarEntity.getLicensePlate());
@@ -71,6 +94,7 @@ public class CarController {
            carDTO.setTypeCar(CarEntity.getTypeCar());
            carDTO.setChassisNumber(CarEntity.getChassisNumber());
            carDTO.setChargingType(CarEntity.getChargingType().getIdChargingType());
+           carDTO.setActive(CarEntity.getIsActive());
            carDTO.setWaitingList(CarEntity.getWaitingList().stream().map(WaitingListEntity::getWaitingListId).toList());
            carDTO.setBookingList(CarEntity.getBookingList().stream().map(BookingEntity::getBookingId).toList());
            return carDTO;
@@ -78,7 +102,26 @@ public class CarController {
          return ResponseEntity.ok(carResponseDTO);
     }
 
-    @GetMapping("/{carId}")
+    @GetMapping("/allForAdmin")
+    public ResponseEntity<List<CarResponseDTO>> getAllCars() {
+        List<CarEntity> list = carService.findAllCar();
+        List<CarResponseDTO> carResponseDTO = list.stream().map(CarEntity -> {
+            CarResponseDTO carDTO = new CarResponseDTO();
+            carDTO.setCarID(CarEntity.getCarID());
+            carDTO.setLicensePlate(CarEntity.getLicensePlate());
+            carDTO.setUser(CarEntity.getUser().getUserID());
+            carDTO.setTypeCar(CarEntity.getTypeCar());
+            carDTO.setChassisNumber(CarEntity.getChassisNumber());
+            carDTO.setChargingType(CarEntity.getChargingType().getIdChargingType());
+            carDTO.setActive(CarEntity.getIsActive());
+            carDTO.setWaitingList(CarEntity.getWaitingList().stream().map(WaitingListEntity::getWaitingListId).toList());
+            carDTO.setBookingList(CarEntity.getBookingList().stream().map(BookingEntity::getBookingId).toList());
+            return carDTO;
+        }).toList();
+        return ResponseEntity.ok(carResponseDTO);
+    }
+
+    @GetMapping("/carId/{carId}")
     public ResponseEntity<CarResponseDTO> getCarById(@PathVariable String carId) {
         CarEntity carEntity = carService.getCarByCarID(carId);
         if (carEntity == null) {
@@ -91,9 +134,50 @@ public class CarController {
         carDTO.setTypeCar(carEntity.getTypeCar());
         carDTO.setChassisNumber(carEntity.getChassisNumber());
         carDTO.setChargingType(carEntity.getChargingType().getIdChargingType());
+        carDTO.setActive(carEntity.getIsActive());
         carDTO.setWaitingList(carEntity.getWaitingList().stream().map(WaitingListEntity::getWaitingListId).toList());
         carDTO.setBookingList(carEntity.getBookingList().stream().map(BookingEntity::getBookingId).toList());
         return ResponseEntity.ok(carDTO);
+    }
+
+    @GetMapping("/license_plate/{licensePlate}")
+    public ResponseEntity<List<CarResponseDTO>> getCarByLicensePlate(@PathVariable String licensePlate){
+        List<CarEntity> carEntity = carService.findByLicensePlate(licensePlate);
+        List<CarResponseDTO> carDTOs = new ArrayList<>();
+        for (CarEntity car : carEntity) {
+            CarResponseDTO carDTO = new CarResponseDTO();
+            carDTO.setCarID(car.getCarID());
+            carDTO.setLicensePlate(car.getLicensePlate());
+            carDTO.setUser(car.getUser().getUserID());
+            carDTO.setTypeCar(car.getTypeCar());
+            carDTO.setChassisNumber(car.getChassisNumber());
+            carDTO.setChargingType(car.getChargingType().getIdChargingType());
+            carDTO.setActive(car.getIsActive());
+            carDTO.setWaitingList(car.getWaitingList().stream().map(WaitingListEntity::getWaitingListId).toList());
+            carDTO.setBookingList(car.getBookingList().stream().map(BookingEntity::getBookingId).toList());
+            carDTOs.add(carDTO);
+        }
+        return ResponseEntity.ok().body(carDTOs);
+    }
+
+    @GetMapping("/chassis_number/{chassisNumber}")
+    public ResponseEntity<List<CarResponseDTO>> getCarByChassisNumber(@PathVariable String chassisNumber){
+        List<CarEntity> carEntity = carService.findByChassisNumber(chassisNumber);
+        List<CarResponseDTO> carDTOs = new ArrayList<>();
+        for (CarEntity car : carEntity) {
+            CarResponseDTO carDTO = new CarResponseDTO();
+            carDTO.setCarID(car.getCarID());
+            carDTO.setLicensePlate(car.getLicensePlate());
+            carDTO.setUser(car.getUser().getUserID());
+            carDTO.setTypeCar(car.getTypeCar());
+            carDTO.setChassisNumber(car.getChassisNumber());
+            carDTO.setChargingType(car.getChargingType().getIdChargingType());
+            carDTO.setActive(car.getIsActive());
+            carDTO.setWaitingList(car.getWaitingList().stream().map(WaitingListEntity::getWaitingListId).toList());
+            carDTO.setBookingList(car.getBookingList().stream().map(BookingEntity::getBookingId).toList());
+            carDTOs.add(carDTO);
+        }
+        return ResponseEntity.ok().body(carDTOs);
     }
 
     @DeleteMapping("/delete/{carId}")

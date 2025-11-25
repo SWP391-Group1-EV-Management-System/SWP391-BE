@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -49,7 +50,35 @@ public class CarServiceImpl implements CarService {
 
 
     @Override
-    public boolean insertCar(CarRequestDTO carRequestDTO) {
+    public boolean insertCarByUser(CarRequestDTO carRequestDTO) {
+        UserEntity user = userRepository.findById(carRequestDTO.getUser()).orElse(null);
+        ChargingTypeEntity chargingType = chargingTypeRepository.findById(carRequestDTO.getChargingType()).orElse(null);
+        List<CarEntity> carsByPlate =
+                carRepository.findByLicensePlateAndIsActiveTrue(carRequestDTO.getLicensePlate());
+
+        List<CarEntity> carsByChassis =
+                carRepository.findByChassisNumberAndIsActiveTrue(carRequestDTO.getChassisNumber());
+
+        // Nếu có ít nhất 1 xe active trùng → không cho add
+        if (!carsByPlate.isEmpty() || !carsByChassis.isEmpty()) {
+            return false;
+        }
+
+        CarEntity newCar = new CarEntity();
+        newCar.setCarID(generateUniqueId());
+        newCar.setLicensePlate(carRequestDTO.getLicensePlate());
+        newCar.setUser(user);
+        newCar.setTypeCar(carRequestDTO.getTypeCar());
+        newCar.setChassisNumber(carRequestDTO.getChassisNumber());
+        newCar.setChargingType(chargingType);
+        newCar.setIsActive(true);
+        carRepository.save(newCar);
+
+        return true;
+    }
+
+    @Override
+    public boolean insertCarByAdmin(CarRequestDTO carRequestDTO) {
         UserEntity user = userRepository.findById(carRequestDTO.getUser()).orElse(null);
         ChargingTypeEntity chargingType = chargingTypeRepository.findById(carRequestDTO.getChargingType()).orElse(null);
 
@@ -60,37 +89,92 @@ public class CarServiceImpl implements CarService {
         newCar.setTypeCar(carRequestDTO.getTypeCar());
         newCar.setChassisNumber(carRequestDTO.getChassisNumber());
         newCar.setChargingType(chargingType);
+        newCar.setIsActive(true);
         carRepository.save(newCar);
 
         return true;
     }
 
     @Override
-    public boolean updateCar(String carId, CarRequestDTO carEntity) {
+    public boolean updateCarByUser(String carId, CarRequestDTO carEntity) {
+
         CarEntity updatedCar = carRepository.findById(carId).orElse(null);
-        if (updatedCar != null) {
-            UserEntity user = userRepository.findById(carEntity.getUser()).orElse(null);
-            ChargingTypeEntity chargingType = chargingTypeRepository.findById(carEntity.getChargingType()).orElse(null);
-            updatedCar.setLicensePlate(carEntity.getLicensePlate());
-            updatedCar.setUser(user);
-            updatedCar.setTypeCar(carEntity.getTypeCar());
-            updatedCar.setChassisNumber(carEntity.getChassisNumber());
-            updatedCar.setChargingType(chargingType);
-            carRepository.save(updatedCar);
-            return true;
-        } else {
+        if (updatedCar == null) {
             return false;
         }
+
+        // Check trùng biển số
+        List<CarEntity> carByPlate = carRepository.findByLicensePlateAndIsActiveTrue(carEntity.getLicensePlate());
+
+        if(carByPlate.size() > 1 ||
+                (carByPlate.size() == 1 && !carByPlate.get(0).getCarID().equals(carId))) {
+            return false;
+        }
+
+        // Check trùng số khung
+        List<CarEntity> carByChassis = carRepository.findByChassisNumberAndIsActiveTrue(carEntity.getChassisNumber());
+
+        if(carByChassis.size() > 1 ||
+                (carByChassis.size() == 1 && !carByChassis.get(0).getCarID().equals(carId))) {
+            return false;
+        }
+
+        UserEntity user = userRepository.findById(carEntity.getUser()).orElse(null);
+        ChargingTypeEntity chargingType =
+                chargingTypeRepository.findById(carEntity.getChargingType()).orElse(null);
+
+        updatedCar.setLicensePlate(carEntity.getLicensePlate());
+        updatedCar.setUser(user);
+        updatedCar.setTypeCar(carEntity.getTypeCar());
+        updatedCar.setChassisNumber(carEntity.getChassisNumber());
+        updatedCar.setChargingType(chargingType);
+
+        carRepository.save(updatedCar);
+        return true;
     }
+
+
+
+//    @Override
+//    public boolean updateCarByAdmin(String carId, CarRequestDTO carEntity) {
+//
+//        CarEntity updatedCar = carRepository.findById(carId).orElse(null);
+//        if (updatedCar == null) {
+//            return false;
+//        }
+//
+//        CarEntity carByPlate = carRepository.findByLicensePlateAndIsActiveTrue(carEntity.getLicensePlate());
+//        if (carByPlate != null && !carByPlate.getCarID().equals(carId)) {
+//            return false;
+//        }
+//
+//        CarEntity carByChassis = carRepository.findByChassisNumberAndIsActiveTrue(carEntity.getChassisNumber());
+//        if (carByChassis != null && !carByChassis.getCarID().equals(carId)) {
+//            return false;
+//        }
+//
+//        UserEntity user = userRepository.findById(carEntity.getUser()).orElse(null);
+//        ChargingTypeEntity chargingType =
+//                chargingTypeRepository.findById(carEntity.getChargingType()).orElse(null);
+//
+//        updatedCar.setLicensePlate(carEntity.getLicensePlate());
+//        updatedCar.setUser(user);
+//        updatedCar.setTypeCar(carEntity.getTypeCar());
+//        updatedCar.setChassisNumber(carEntity.getChassisNumber());
+//        updatedCar.setChargingType(chargingType);
+//        updatedCar.setIsActive(carEntity.isActive());
+//
+//        carRepository.save(updatedCar);
+//        return true;
+//    }
+
 
     @Override
     public boolean deleteCarByCarID(String carID) {
-        if (carRepository.findById(carID).isPresent()) {
-            carRepository.deleteById(carID);
-        }
-        else{
-            return false;
-        }
+        CarEntity carEntity = carRepository.findById(carID).orElse(null);
+        assert carEntity != null;
+        carEntity.setIsActive(false);
+        carRepository.save(carEntity);
         return true;
     }
 
@@ -101,9 +185,8 @@ public class CarServiceImpl implements CarService {
 
 
     @Override
-    public List<CarEntity> findAllCarByUserID(String userID) {
-        UserEntity user = userService.getUserByID(userID).orElse(null);
-        return carRepository.findByUser(user);
+    public List<CarEntity> findAllCar() {
+        return carRepository.findAll();
     }
 
     @Override
@@ -130,6 +213,29 @@ public class CarServiceImpl implements CarService {
         // Mỗi 1% pin cần 13.25 giây
         return (int) Math.ceil(pinDifference * 13.25);
     }
+
+    @Override
+    public List<CarEntity> findAllActiveCarsByUserID(String userID) {
+        UserEntity user = userService.getUserByID(userID).orElse(null);
+        return carRepository.findByIsActiveTrueAndUser(user);
+    }
+
+    @Override
+    public List<CarEntity> findByLicensePlate(String licensePlate) {
+        return carRepository.findByLicensePlateAndIsActiveTrue(licensePlate);
+    }
+
+    @Override
+    public List<CarEntity> findByChassisNumber(String chassisNumber) {
+        return carRepository.findByChassisNumberAndIsActiveTrue(chassisNumber);
+    }
+
+    @Override
+    public CarEntity findByChassisNumberAndUserIDAndActive(String chassisNumber, String userID) {
+        UserEntity user = userService.getUserByID(userID).orElse(null);
+        return carRepository.findByChassisNumberAndUserAndIsActiveTrue(chassisNumber, user);
+    }
+
 
     // cố định 1 xe dung lượng từ 1 đến 100 là 92kW
     // trạm sạc cố định là 250KW

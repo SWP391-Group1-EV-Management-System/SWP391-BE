@@ -16,6 +16,7 @@ public class CarResponseDTO {
     private String typeCar;
     private String chassisNumber;
     private int chargingType;
+    private boolean isActive;
     private List<String> waitingList;
     private List<String> bookingList;
 }

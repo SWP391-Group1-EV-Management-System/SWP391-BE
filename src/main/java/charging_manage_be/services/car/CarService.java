@@ -9,13 +9,20 @@ import java.util.Optional;
 
 public interface CarService {
 
-    boolean insertCar(CarRequestDTO carRequestDTO);
-    boolean updateCar(String carId, CarRequestDTO carRequestDTO);
+    boolean insertCarByUser(CarRequestDTO carRequestDTO);
+    boolean insertCarByAdmin(CarRequestDTO carRequestDTO);
+    boolean updateCarByUser(String carId, CarRequestDTO carRequestDTO);
+//    boolean updateCarByAdmin(String carId, CarRequestDTO carRequestDTO);
     boolean deleteCarByCarID(String carID);
     CarEntity getCarByCarID(String carID);
-    List<CarEntity> findAllCarByUserID(String userID);
+    List<CarEntity> findAllCar();
     int pinRandom();
     int maxMinutes(int pinRandom);
     void storeCurrentPin(String userId, int currentPin);
     int calculateMaxSeconds(int currentPin, int targetPin);
+
+    List<CarEntity> findAllActiveCarsByUserID(String userID);
+    List<CarEntity> findByLicensePlate(String licensePlate);
+    List<CarEntity> findByChassisNumber(String chassisNumber);
+    CarEntity findByChassisNumberAndUserIDAndActive(String chassisNumber, String userID);
 }

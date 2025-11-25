@@ -3,6 +3,7 @@ package charging_manage_be.model.entity.cars;
 import charging_manage_be.model.entity.booking.BookingEntity;
 import charging_manage_be.model.entity.booking.WaitingListEntity;
 import charging_manage_be.model.entity.charging.ChargingTypeEntity;
+import charging_manage_be.model.entity.report.ReportEntity;
 import charging_manage_be.model.entity.users.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -34,6 +35,9 @@ public class CarEntity {
     @Column(name = "chassis_number", nullable = false, length = 50)
     private String chassisNumber; // Số khung xe
 
+    @Column(name = "is_active", nullable = false)
+    private Boolean isActive; // Trạng thái hoạt động của xe
+
     @ManyToOne
     @JoinColumn(name = "charging_type_id", nullable = false)
     private ChargingTypeEntity chargingType; // Loại sạc
@@ -43,4 +47,7 @@ public class CarEntity {
 
     @OneToMany(mappedBy = "car" )
     private List<BookingEntity> bookingList;
+
+    @OneToMany(mappedBy = "car")
+    private List<ReportEntity> reportList;
 }
