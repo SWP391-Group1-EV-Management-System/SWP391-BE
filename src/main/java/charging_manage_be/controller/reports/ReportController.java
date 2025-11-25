@@ -6,10 +6,9 @@ import charging_manage_be.model.entity.report.ReportEntity;
 import charging_manage_be.services.report.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/reports")
@@ -26,5 +25,27 @@ public class ReportController {
         } else {
             return ResponseEntity.badRequest().body("Failed to create report. Please check the provided information.");
         }
+    }
+
+    @GetMapping("/{reportId}")
+    public ResponseEntity<ReportEntity> getReportById(@PathVariable String reportId) {
+        ReportEntity report = reportService.getReportById(reportId);
+        if (report != null) {
+            return ResponseEntity.ok(report);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<ReportEntity>> getAllReports() {
+        List<ReportEntity> reports = reportService.getAllReports();
+        return ResponseEntity.ok(reports);
+    }
+
+    @GetMapping("/count")
+    public ResponseEntity<Integer> countAllReports() {
+        int count = reportService.countAllReports();
+        return ResponseEntity.ok(count);
     }
 }

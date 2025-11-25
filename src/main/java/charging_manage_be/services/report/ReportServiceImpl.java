@@ -95,11 +95,16 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public ReportEntity getReportById(String reportId) {
-        return null;
+        return reportRepository.findById(reportId).orElse(null);
     }
 
     @Override
     public List<ReportEntity> getAllReports() {
-        return List.of();
+        return reportRepository.findAll();
+    }
+
+    @Override
+    public int countAllReports() {
+        return (int) reportRepository.count();
     }
 }

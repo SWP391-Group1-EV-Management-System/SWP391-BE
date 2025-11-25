@@ -9,5 +9,5 @@ public interface ReportService {
     boolean createReport(ReportRequestDTO reportRequestDTO);
     ReportEntity getReportById(String reportId);
     List<ReportEntity> getAllReports();
-
+    int countAllReports();
 }
