@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -51,9 +52,24 @@ public class ReportController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<ReportEntity>> getAllReports() {
+    public ResponseEntity<List<ReportResponseDTO>> getAllReports() {
         List<ReportEntity> reports = reportService.getAllReports();
-        return ResponseEntity.ok(reports);
+        List<ReportResponseDTO> reportResponseDTOs = new ArrayList<>();
+        for (ReportEntity report : reports) {
+            ReportResponseDTO dto = new ReportResponseDTO();
+            dto.setReportId(report.getReportId());
+            dto.setOlderOwnerId(report.getOlderOwnerId());
+            dto.setNewerOwnerId(report.getNewerOwnerId());
+            dto.setTitle(report.getTitle());
+            dto.setContent(report.getContent());
+            CarEntity car = report.getCar();
+            dto.setLicensePlate(car.getLicensePlate());
+            dto.setTypeCar(car.getTypeCar());
+            dto.setChassisNumber(car.getChassisNumber());
+            dto.setChargeType(car.getChargingType().getIdChargingType());
+            reportResponseDTOs.add(dto);
+        }
+        return ResponseEntity.ok(reportResponseDTOs);
     }
 
 }
