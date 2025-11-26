@@ -24,7 +24,7 @@ public class PackageTransactionController {
     @PutMapping("/update/status/{packageTransactionId}")
     ResponseEntity<String> updateStatusByPackageTransaction(@PathVariable String packageTransactionId) {
         PackageTransactionResponseDTO packageTransactionResponseDTO = packageTransactionService.getPackageTransactionByPackageTransactionId(packageTransactionId);
-        if (packageTransactionResponseDTO == null){
+        if (packageTransactionResponseDTO == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Package Transaction not found");
         }
         packageTransactionService.updateStatusPackageTransaction(packageTransactionId);
@@ -34,7 +34,7 @@ public class PackageTransactionController {
     @GetMapping("/user/{userId}")
     ResponseEntity<List<PackageTransactionResponseDTO>> listPackageTransactionByUserId(@PathVariable String userId) {
         List<PackageTransactionResponseDTO> packageTransactionResponseDTOList = packageTransactionService.getPackageTransactionByUserId(userId);
-        if(packageTransactionResponseDTOList.isEmpty()){
+        if (packageTransactionResponseDTOList.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Package Transaction not found");
         }
         return ResponseEntity.ok().body(packageTransactionResponseDTOList);
@@ -43,7 +43,7 @@ public class PackageTransactionController {
     @GetMapping("/user/current/{userId}")
     ResponseEntity<PackageTransactionResponseDTO> listPackageTransactionByUserIdCurrent(@PathVariable String userId) {
         PackageTransactionResponseDTO packageTransactionResponseDTOList = packageTransactionService.getLatestActivePackageByUserId(userId);
-        if(packageTransactionResponseDTOList == null){
+        if (packageTransactionResponseDTOList == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Package Transaction not found");
         }
         return ResponseEntity.ok().body(packageTransactionResponseDTOList);
@@ -51,8 +51,8 @@ public class PackageTransactionController {
 
     @GetMapping("/{packageTransactionId}")
     ResponseEntity<PackageTransactionResponseDTO> getPackageTransactionByPackageTransactionId(@PathVariable String packageTransactionId) {
-        PackageTransactionResponseDTO  packageTransactionResponseDTO = packageTransactionService.getPackageTransactionByPackageTransactionId(packageTransactionId);
-        if(packageTransactionResponseDTO == null){
+        PackageTransactionResponseDTO packageTransactionResponseDTO = packageTransactionService.getPackageTransactionByPackageTransactionId(packageTransactionId);
+        if (packageTransactionResponseDTO == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Package Transaction not found");
         }
         return ResponseEntity.ok().body(packageTransactionResponseDTO);
@@ -60,20 +60,16 @@ public class PackageTransactionController {
 
 
     @DeleteMapping("/cancel/{packageTransactionId}")
-    ResponseEntity<String> cancelPackageTransactionById(@PathVariable String packageTransactionId) {
-        PackageTransactionResponseDTO packageTransactionResponseDTO = packageTransactionService.getPackageTransactionByPackageTransactionId(packageTransactionId);
-        if (packageTransactionResponseDTO == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Package Transaction not found");
+    public ResponseEntity<Void> cancelPackageTransactionById(@PathVariable String packageTransactionId) {
+
+        if (packageTransactionService.getPackageTransactionByPackageTransactionId(packageTransactionId) == null) {
+            return ResponseEntity.badRequest().build();
+        } else {
+            packageTransactionService.deletePackageTransactionById(packageTransactionId);
+            return ResponseEntity.ok().build();
         }
-        boolean isDeleted = packageTransactionService.deletePackageTransactionById(packageTransactionId);
-        if (!isDeleted) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to cancel Package Transaction");
-        }
-        return ResponseEntity.ok().body("Package Transaction cancelled successfully");
+
     }
-
-
-
 
 
 }

@@ -1,5 +1,6 @@
 package charging_manage_be.services.users;
 
+import charging_manage_be.model.dto.user.ProfileRequest;
 import charging_manage_be.model.dto.user.UserRequest;
 import charging_manage_be.model.entity.users.UserEntity;
 import java.util.List;
@@ -14,6 +15,8 @@ public interface UserService {
 
     UserEntity saveUser(UserEntity user); // Phải là kiểu UserEntity vì hàm save trả về entity đã lưu
     boolean updateUser(String userId, UserRequest userRequest);
+    boolean updateProfileUser(String userId, ProfileRequest profileRequest);
+    boolean updatePasswordUser(String userId, String oldPassword , String newPassword);
     boolean softDeleteUser(String userID);
     Optional<UserEntity> getUserByID(String userID);
     List<UserEntity> getAllUsers();
