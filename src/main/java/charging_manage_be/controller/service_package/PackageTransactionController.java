@@ -31,7 +31,6 @@ public class PackageTransactionController {
         return ResponseEntity.ok().body("success");
     }
 
-
     @GetMapping("/user/{userId}")
     ResponseEntity<List<PackageTransactionResponseDTO>> listPackageTransactionByUserId(@PathVariable String userId) {
         List<PackageTransactionResponseDTO> packageTransactionResponseDTOList = packageTransactionService.getPackageTransactionByUserId(userId);
@@ -59,6 +58,19 @@ public class PackageTransactionController {
         return ResponseEntity.ok().body(packageTransactionResponseDTO);
     }
 
+
+    @DeleteMapping("/cancel/{packageTransactionId}")
+    ResponseEntity<String> cancelPackageTransactionById(@PathVariable String packageTransactionId) {
+        PackageTransactionResponseDTO packageTransactionResponseDTO = packageTransactionService.getPackageTransactionByPackageTransactionId(packageTransactionId);
+        if (packageTransactionResponseDTO == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Package Transaction not found");
+        }
+        boolean isDeleted = packageTransactionService.deletePackageTransactionById(packageTransactionId);
+        if (!isDeleted) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to cancel Package Transaction");
+        }
+        return ResponseEntity.ok().body("Package Transaction cancelled successfully");
+    }
 
 
 

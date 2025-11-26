@@ -29,6 +29,9 @@ public class PackageTransactionServiceImpl implements PackageTransactionService 
 
     @Autowired
     private PackageTransactionRepository packageTransactionRepository;
+
+
+
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -114,6 +117,16 @@ public class PackageTransactionServiceImpl implements PackageTransactionService 
         }
 
         packageTransactionRepository.save(packageTransaction);
+        return true;
+    }
+
+    @Override
+    public boolean deletePackageTransactionById(String packageTransactionId) {
+        PackageTransactionEntity packageTransaction = packageTransactionRepository.findById(packageTransactionId).orElse(null);
+        if (packageTransaction == null) {
+            return false;
+        }
+        packageTransactionRepository.delete(packageTransaction);
         return true;
     }
 

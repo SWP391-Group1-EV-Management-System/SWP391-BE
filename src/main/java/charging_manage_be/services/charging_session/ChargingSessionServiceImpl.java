@@ -153,8 +153,10 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
     @Override
     public BigDecimal calculateAmount(ChargingSessionEntity session) {
         // lấy giá của trụ sạc và thời gian sạc để tính tiền
+        ChargingSessionEntity existingSession = getSessionById(session.getChargingSessionId());
+        BigDecimal pricePerKWh = existingSession.getChargingPost().getChargingFeePerKWh();
         var rate = session.getKWh();
-        return BigDecimal.valueOf(3858).multiply(rate);
+        return pricePerKWh.multiply(rate);
     }
 
     @Override
