@@ -23,10 +23,7 @@ public class ChargingPostStatusServiceImpl implements  ChargingPostStatusService
     private final ChargingPostRepository chargingPostRepository;
     private final SimpMessagingTemplate simpMessagingTemplate;
 
-    /**
-     * Broadcast trạng thái của một trụ sạc đến tất cả client đang lắng nghe
-     * FE subscribe: /topic/post/{postId}/status
-     */
+
     public void broadcastPostStatus(String postId) {
         Map<String, Object> status = getPostStatus(postId);
 
@@ -40,14 +37,11 @@ public class ChargingPostStatusServiceImpl implements  ChargingPostStatusService
         );
     }
 
-    /**
-     * Lấy trạng thái chi tiết của một trụ sạc
-     * ✅ Ưu tiên: Session (đang sạc) > Booking (đã đặt) > Available (rảnh)
-     */
+
     public Map<String, Object> getPostStatus(String postId) {
         Map<String, Object> status = new HashMap<>();
 
-        // 1. ✅ ƯU TIÊN CAO NHẤT: Kiểm tra có session đang chạy không (isDone=false)
+        // 1. ƯU TIÊN CAO NHẤT: Kiểm tra có session đang chạy không (isDone=false)
         var post = chargingPostRepository.findById(postId).orElse(null);
         List<ChargingSessionEntity> activeSessions = post != null ?
                 chargingSessionRepository.findTopByChargingPostAndIsDoneOrderByStartTimeDesc(post, false)
@@ -68,10 +62,10 @@ public class ChargingPostStatusServiceImpl implements  ChargingPostStatusService
         String subStatus = null;
         Map<String, Object> details = new HashMap<>();
 
-        // ✅ CASE 1: Có session đang chạy (isDone=false) → Trạng thái quan trọng nhất
+        //  CASE 1: Có session đang chạy (isDone=false) → Trạng thái quan trọng nhất
         if (!activeSessions.isEmpty()) {
             ChargingSessionEntity session = activeSessions.get(0);
-            mainStatus = "CHARGING";  // ✅ Gửi trạng thái CHARGING khi có session đang chạy
+            mainStatus = "CHARGING";  //  Gửi trạng thái CHARGING khi có session đang chạy
             subStatus = "IN_PROGRESS";
             details.put("sessionId", session.getChargingSessionId());
             details.put("userId", session.getUser().getUserID());
@@ -84,7 +78,7 @@ public class ChargingPostStatusServiceImpl implements  ChargingPostStatusService
                 details.put("bookingId", session.getBooking().getBookingId());
             }
         }
-        // ✅ CASE 2: Có booking nhưng chưa có session (đã đặt, chờ đến)
+        //  CASE 2: Có booking nhưng chưa có session (đã đặt, chờ đến)
         else if (!activeBookings.isEmpty()) {
             BookingEntity booking = activeBookings.get(0);
             mainStatus = "BOOKED";
@@ -100,14 +94,14 @@ public class ChargingPostStatusServiceImpl implements  ChargingPostStatusService
                 subStatus = "WAITING_FOR_ARRIVAL";
             }
         }
-        // ✅ CASE 3: Không có session, không có booking nhưng có người đang chờ → Trạng thái WAITING
+        // CASE 3: Không có session, không có booking nhưng có người đang chờ → Trạng thái WAITING
         else if (waitingCount > 0) {
             mainStatus = "WAITING";
             subStatus = "HAS_QUEUE";
             details.put("message", "Có " + waitingCount + " người đang chờ");
             details.put("queueCount", waitingCount);
         }
-        // ✅ CASE 4: Không có gì cả → Trụ rảnh
+        // CASE 4: Không có gì cả → Trụ rảnh
         else {
             mainStatus = "AVAILABLE";
         }
@@ -124,9 +118,7 @@ public class ChargingPostStatusServiceImpl implements  ChargingPostStatusService
         return status;
     }
 
-    /**
-     * Broadcast trạng thái của tất cả các trụ trong một trạm
-     */
+
     public void broadcastStationStatus(String stationId) {
         var posts = chargingPostRepository.findByChargingStation_IdChargingStation(stationId);
 

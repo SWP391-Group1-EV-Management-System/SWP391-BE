@@ -32,6 +32,7 @@ import charging_manage_be.repository.user_reputations.UserReputationRepository;
 import charging_manage_be.repository.users.UserRepository;
 import charging_manage_be.repository.waiting_list.WaitingListRepository;
 import charging_manage_be.services.car.CarDataService;
+import charging_manage_be.services.charging_post.ChargingPostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -75,6 +76,8 @@ public class  DataInitializer  implements CommandLineRunner {
     private PaymentRepository paymentRepository;
     @Autowired
     private CarDataService carDataService;
+    @Autowired
+    private ChargingPostService chargingPostService;
 
 
     @Override
@@ -253,35 +256,35 @@ public class  DataInitializer  implements CommandLineRunner {
         chargingTypeRepository.save(nacs);
 
         // Initialize Car
-        CarEntity car = new CarEntity();
-        car.setCarID("CAR001");
-        car.setLicensePlate("29A-12345");
-        car.setUser(driverA);
-        car.setTypeCar("VinFast VF3");
-        car.setChassisNumber("CHASSIS001");
-        car.setChargingType(ccs);
-        car.setIsActive(true);
-        carRepository.save(car);
-
-        CarEntity car1 = new CarEntity();
-        car1.setCarID("CAR002");
-        car1.setLicensePlate("59A-12345");
-        car1.setUser(driverB);
-        car1.setTypeCar("VinFast VF6");
-        car1.setChassisNumber("CHASSIS123");
-        car1.setChargingType(ac);
-        car1.setIsActive(true);
-        carRepository.save(car1);
-
-        CarEntity car3 = new CarEntity();
-        car3.setCarID("CAR003");
-        car3.setLicensePlate("59A-99999");
-        car3.setUser(driverB);
-        car3.setTypeCar("Tesla Model S");
-        car3.setChassisNumber("CHASSIS123921");
-        car3.setChargingType(chademo);
-        car3.setIsActive(true);
-        carRepository.save(car3);
+//        CarEntity car = new CarEntity();
+//        car.setCarID("CAR001");
+//        car.setLicensePlate("29A-12345");
+//        car.setUser(driverA);
+//        car.setTypeCar("VinFast VF3");
+//        car.setChassisNumber("CHASSIS001");
+//        car.setChargingType(ccs);
+//        car.setIsActive(true);
+//        carRepository.save(car);
+//
+//        CarEntity car1 = new CarEntity();
+//        car1.setCarID("CAR002");
+//        car1.setLicensePlate("59A-12345");
+//        car1.setUser(driverB);
+//        car1.setTypeCar("VinFast VF6");
+//        car1.setChassisNumber("CHASSIS123");
+//        car1.setChargingType(ac);
+//        car1.setIsActive(true);
+//        carRepository.save(car1);
+//
+//        CarEntity car3 = new CarEntity();
+//        car3.setCarID("CAR003");
+//        car3.setLicensePlate("59A-99999");
+//        car3.setUser(driverB);
+//        car3.setTypeCar("Tesla Model S");
+//        car3.setChassisNumber("CHASSIS123921");
+//        car3.setChargingType(chademo);
+//        car3.setIsActive(true);
+//        carRepository.save(car3);
 
         // Initialize Charging Station
         ChargingStationEntity stationA1 = new ChargingStationEntity();
@@ -305,7 +308,7 @@ public class  DataInitializer  implements CommandLineRunner {
 
 
         ChargingPostEntity post1 = new ChargingPostEntity();
-        post1.setIdChargingPost("POST001");
+        post1.setIdChargingPost(chargingPostService.generateUniqueId());
         post1.setChargingStation(stationA1);
         post1.setChargingType(Arrays.asList(type1, type2,type3));
         post1.setChargingFeePerKWh(new BigDecimal("100"));
@@ -314,7 +317,7 @@ public class  DataInitializer  implements CommandLineRunner {
         chargingPostRepository.save(post1);
 
         ChargingPostEntity post2 = new ChargingPostEntity();
-        post2.setIdChargingPost("POST002");
+        post2.setIdChargingPost(chargingPostService.generateUniqueId());
         post2.setChargingStation(stationA1);
         post2.setChargingType(Arrays.asList(type1, type2,type3));
         post2.setChargingFeePerKWh(new BigDecimal("100"));
@@ -323,7 +326,7 @@ public class  DataInitializer  implements CommandLineRunner {
         chargingPostRepository.save(post2);
 
         ChargingPostEntity post3 = new ChargingPostEntity();
-        post3.setIdChargingPost("POST003");
+        post3.setIdChargingPost(chargingPostService.generateUniqueId());
         post3.setChargingStation(stationA1);
         post3.setChargingType(Arrays.asList(type1, type2,type3, type4));
         post3.setChargingFeePerKWh(new BigDecimal("100"));
@@ -357,7 +360,7 @@ public class  DataInitializer  implements CommandLineRunner {
 
         // Lấy các ChargingTypeEntity từ DB
         ChargingPostEntity post4 = new ChargingPostEntity();
-        post4.setIdChargingPost("POST004");
+        post4.setIdChargingPost(chargingPostService.generateUniqueId());
         post4.setChargingStation(stationA2);
         post4.setChargingType(Arrays.asList(type1, type3));
         post4.setChargingFeePerKWh(new BigDecimal("100"));
@@ -366,7 +369,7 @@ public class  DataInitializer  implements CommandLineRunner {
         chargingPostRepository.save(post4);
 
         ChargingPostEntity post5 = new ChargingPostEntity();
-        post5.setIdChargingPost("POST005");
+        post5.setIdChargingPost(chargingPostService.generateUniqueId());
         post5.setChargingStation(stationA2);
         post5.setChargingType(Arrays.asList(type2,type3));
         post5.setChargingFeePerKWh(new BigDecimal("100"));
@@ -375,7 +378,7 @@ public class  DataInitializer  implements CommandLineRunner {
         chargingPostRepository.save(post5);
 
         ChargingPostEntity post6 = new ChargingPostEntity();
-        post6.setIdChargingPost("POST006");
+        post6.setIdChargingPost(chargingPostService.generateUniqueId());
         post6.setChargingStation(stationA2);
         post6.setChargingType(Arrays.asList(type1, type2,type3));
         post6.setChargingFeePerKWh(new BigDecimal("100"));
@@ -383,7 +386,7 @@ public class  DataInitializer  implements CommandLineRunner {
         post6.setActive(true);
         chargingPostRepository.save(post6);
         ChargingPostEntity post7 = new ChargingPostEntity();
-        post7.setIdChargingPost("POST007");
+        post7.setIdChargingPost(chargingPostService.generateUniqueId());
         post7.setChargingStation(stationA2);
         post7.setChargingType(Arrays.asList(type1, type2));
         post7.setChargingFeePerKWh(new BigDecimal("100"));
@@ -398,7 +401,7 @@ public class  DataInitializer  implements CommandLineRunner {
         basicPkg.setPackageName("Basic Package");
         basicPkg.setDescription("Basic monthly package");
         basicPkg.setBillingCycle(2); // 1 month
-        basicPkg.setPrice(new BigDecimal("299"));
+        basicPkg.setPrice(new BigDecimal("2500000"));
         basicPkg.setUnit("MONTH");
         basicPkg.setQuota(1000);
         servicePackageRepository.save(basicPkg);
@@ -408,7 +411,7 @@ public class  DataInitializer  implements CommandLineRunner {
         plsPkg.setPackageName("Plus Package");
         plsPkg.setDescription("Plus monthly package");
         plsPkg.setBillingCycle(5); // 1 month
-        plsPkg.setPrice(new BigDecimal("599"));
+        plsPkg.setPrice(new BigDecimal("6500000"));
         plsPkg.setUnit("MONTH");
         plsPkg.setQuota(2500);
         servicePackageRepository.save(plsPkg);
@@ -418,7 +421,7 @@ public class  DataInitializer  implements CommandLineRunner {
         proPkg.setPackageName("Pro Package");
         proPkg.setDescription("Pro monthly package");
         proPkg.setBillingCycle(10); // 1 month
-        proPkg.setPrice(new BigDecimal("999"));
+        proPkg.setPrice(new BigDecimal("12000000"));
         proPkg.setUnit("MONTH");
         proPkg.setQuota(5000);
         servicePackageRepository.save(proPkg);
@@ -433,259 +436,264 @@ public class  DataInitializer  implements CommandLineRunner {
         packet.setIdPaymentMethod("PMT_PACKAGE");
         packet.setNamePaymentMethod("Package");
         paymentMethodRepository.save(packet);
+        PaymentMethodEntity cash = new PaymentMethodEntity();
+        packet.setIdPaymentMethod("PMT_CASH");
+        packet.setNamePaymentMethod("Cash");
+        paymentMethodRepository.save(packet);
         // PACKAGE TRANSACTION AND PaymentServicePackageEntity
-        PaymentServicePackageEntity psp1 = new PaymentServicePackageEntity();
-        psp1.setPaymentServicePackageId("ABCDEE");
-        psp1.setServicePackage(basicPkg);
-        psp1.setPaymentMethod(card);
-        psp1.setUser(driverA);
-        psp1.setPaidAt(LocalDateTime.now());
-        psp1.setPaid(true);
-        psp1.setPrice(basicPkg.getPrice());
-        PaymentServicePackageEntity savedPsp1 = paymentServicePackageRepository.save(psp1);
-
-        PackageTransactionEntity tx1 = new PackageTransactionEntity();
-        tx1.setPackageTransactionId("ABC123UUU");
-        tx1.setUser(driverA);
-        tx1.setServicePackage(basicPkg);
-        tx1.setPaymentServicePackage(savedPsp1);
-        tx1.setRemainingQuota(BigDecimal.valueOf(basicPkg.getQuota()));
-        tx1.setStatus("ACTIVE");
-        tx1.setSignPackageAt(LocalDateTime.now());
-        tx1.setExpirePackageAt(LocalDateTime.now().plusMonths(basicPkg.getBillingCycle()));
-        packageTransactionRepository.save(tx1);
-
-        // Create second payment + transaction (example unpaid)
-        PaymentServicePackageEntity psp2 = new PaymentServicePackageEntity();
-        psp2.setPaymentServicePackageId("ABC123ABC");
-        psp2.setServicePackage(proPkg);
-        psp2.setPaymentMethod(card);
-        psp2.setUser(driverB);
-        psp2.setPaidAt(LocalDateTime.now());
-        psp2.setPaid(true);
-        psp2.setPrice(proPkg.getPrice());
-        PaymentServicePackageEntity savedPsp2 = paymentServicePackageRepository.save(psp2);
-
-        PackageTransactionEntity tx2 = new PackageTransactionEntity();
-        tx2.setPackageTransactionId("ABC123DEF");
-        tx2.setUser(driverB);
-        tx2.setServicePackage(proPkg);
-        tx2.setPaymentServicePackage(savedPsp2);
-        tx2.setRemainingQuota(BigDecimal.valueOf(proPkg.getQuota()));
-        tx2.setStatus("ACTIVE");
-        tx2.setSignPackageAt(LocalDateTime.now());
-        tx2.setExpirePackageAt(LocalDateTime.now().plusMonths(proPkg.getBillingCycle()));
-        packageTransactionRepository.save(tx2);
-
-        // BOOKING AND WAITINGLIST
-
-        // Waiting list for driverA
-        WaitingListEntity wl1 = new WaitingListEntity();
-        wl1.setWaitingListId("WL001");
-        wl1.setUser(driverA);
-        wl1.setChargingStation(stationA1);
-        wl1.setChargingPost(post1);
-        wl1.setCar(car);
-        wl1.setExpectedWaitingTime(LocalDateTime.now().plusMinutes(15));
-        wl1.setStatus("BOOKING");
-        wl1.setCreatedAt(LocalDateTime.now());
-        wl1.setOutedAt(LocalDateTime.now());
-        waitingListRepository.save(wl1);
-
-        // Booking linked to wl1 (driverA)
-        BookingEntity b1 = new BookingEntity();
-        b1.setBookingId("BKG001");
-        b1.setWaitingList(wl1);
-        b1.setUser(driverA);
-        b1.setChargingStation(stationA1);
-        b1.setChargingPost(post1);
-        b1.setCar(car);
-        b1.setMaxWaitingTime(15);
-        b1.setStatus("COMPLETE");
-        b1.setArrivalTime(LocalDateTime.now().plusMinutes(10));
-        b1.setCreatedAt(LocalDateTime.now());
-        bookingRepository.save(b1);
-
-        // Direct booking for driverB (no waiting list)
-        BookingEntity b2 = new BookingEntity();
-        b2.setBookingId("BKG002");
-        b2.setWaitingList(null);
-        b2.setUser(driverB);
-        b2.setChargingStation(stationA2);
-        b2.setChargingPost(post4);
-        b2.setCar(car1);
-        b2.setMaxWaitingTime(10);
-        b2.setStatus("COMPLETE");
-        b2.setArrivalTime(LocalDateTime.now().plusMinutes(10));
-        b2.setCreatedAt(LocalDateTime.now());
-        bookingRepository.save(b2);
-
-        // Waiting list for driverB's other car
-        WaitingListEntity wl2 = new WaitingListEntity();
-        wl2.setWaitingListId("WL002");
-        wl2.setUser(driverB);
-        wl2.setChargingStation(stationA2);
-        wl2.setChargingPost(post6);
-        wl2.setCar(car3);
-        wl2.setExpectedWaitingTime(LocalDateTime.now().plusMinutes(20));
-        wl2.setStatus("BOOKING");
-        wl2.setCreatedAt(LocalDateTime.now());
-        wl2.setOutedAt(LocalDateTime.now());
-        waitingListRepository.save(wl2);
-
-        BookingEntity b4 = new BookingEntity();
-        b4.setBookingId("BKG004");
-        b4.setWaitingList(null);
-        b4.setUser(driverB);
-        b4.setChargingStation(stationA2);
-        b4.setChargingPost(post6);
-        b4.setCar(car3);
-        b4.setMaxWaitingTime(30);
-        b4.setStatus("CANCEL");
-        b4.setCreatedAt(LocalDateTime.now());
-        bookingRepository.save(b4);
-
-        // Booking linked to wl2 (driverB)
-        BookingEntity b3 = new BookingEntity();
-        b3.setBookingId("BKG003");
-        b3.setWaitingList(wl2);
-        b3.setUser(driverB);
-        b3.setChargingStation(stationA2);
-        b3.setChargingPost(post6);
-        b3.setCar(car3);
-        b3.setMaxWaitingTime(30);
-        b3.setStatus("COMPLETE");
-        b3.setArrivalTime(LocalDateTime.now().plusMinutes(10));
-        b3.setCreatedAt(LocalDateTime.now());
-        bookingRepository.save(b3);
-
-        WaitingListEntity wl3 = new WaitingListEntity();
-        wl3.setWaitingListId("WL002");
-        wl3.setUser(driverB);
-        wl3.setChargingStation(stationA2);
-        wl3.setChargingPost(post5);
-        wl3.setCar(car3);
-        wl3.setExpectedWaitingTime(LocalDateTime.now().plusMinutes(20));
-        wl3.setStatus("CANCEL");
-        wl3.setCreatedAt(LocalDateTime.now());
-        wl3.setOutedAt(LocalDateTime.now());
-        waitingListRepository.save(wl3);
-
-        //PAYMENT AND SESSION
-
-        // Session + payment for BKG001 (driverA)
-        ChargingSessionEntity s1 = new ChargingSessionEntity();
-        s1.setChargingSessionId("SESSION001");
-        s1.setBooking(b1); // BKG001
-        s1.setChargingPost(post1);
-        s1.setStation(stationA1);
-        s1.setUser(driverA);
-        s1.setUserManage(staff1);
-        s1.setExpectedEndTime(LocalDateTime.now().plusMinutes(30));
-        s1.setKWh(new BigDecimal("20.5"));
-        s1.setTotalAmount(new BigDecimal("2050"));
-        s1.setStartTime(LocalDateTime.now());
-        s1.setEndTime(LocalDateTime.now());
-        s1.setDone(true);
-        ChargingSessionEntity savedS1 = chargingSessionRepository.save(s1);
-        s1.setDone(true);
-        chargingSessionRepository.save(s1);
-
-
-        PaymentEntity p1 = new PaymentEntity();
-        p1.setPaymentId("PAYMENT001");
-        p1.setUser(driverA);
-        p1.setPaymentMethod(card);
-        p1.setPrice(savedS1.getTotalAmount());
-        p1.setSession(savedS1);
-        p1.setPaid(true);
-        p1.setPaidAt(LocalDateTime.now());
-        p1.setCreatedAt(LocalDateTime.now());
-        paymentRepository.save(p1);
-
-        // Session + unpaid payment for BKG002 (driverB)
-        ChargingSessionEntity s2 = new ChargingSessionEntity();
-        s2.setChargingSessionId("SESSION002");
-        s2.setBooking(b2); // BKG002
-        s2.setChargingPost(post4);
-        s2.setStation(stationA2);
-        s2.setUser(driverB);
-        s2.setUserManage(staff2);
-        s2.setExpectedEndTime(LocalDateTime.now().plusMinutes(40));
-        s2.setKWh(new BigDecimal("15.0"));
-        s2.setTotalAmount(new BigDecimal("1500"));
-        s2.setStartTime(LocalDateTime.now());
-        s2.setEndTime(LocalDateTime.now());
-        s2.setDone(true);
-        ChargingSessionEntity savedS2 = chargingSessionRepository.save(s2);
-        s2.setDone(true);
-        chargingSessionRepository.save(s2);
-
-        PaymentEntity p2 = new PaymentEntity();
-        p2.setPaymentId("PAYMENT001");
-        p2.setUser(driverB);
-        p2.setPaymentMethod(card);
-        p2.setPrice(savedS2.getTotalAmount());
-        p2.setSession(savedS2);
-        p2.setCreatedAt(LocalDateTime.now());
-        // leave isPaid false (PrePersist will set createdAt/isPaid)
-        paymentRepository.save(p2);
-
-        // Session + payment for BKG003 (driverB, completed)
-        ChargingSessionEntity s3 = new ChargingSessionEntity();
-        s3.setChargingSessionId("SESSION003");
-        s3.setBooking(b3); // BKG003
-        s3.setChargingPost(post6);
-        s3.setStation(stationA2);
-        s3.setUser(driverB);
-        s3.setUserManage(staff2);
-        s3.setExpectedEndTime(LocalDateTime.now().minusMinutes(5));
-        s3.setKWh(new BigDecimal("12.0"));
-        s3.setTotalAmount(new BigDecimal("1200"));
-        s3.setStartTime(LocalDateTime.now());
-        s3.setEndTime(LocalDateTime.now());
-        s3.setDone(true);
-        ChargingSessionEntity savedS3 = chargingSessionRepository.save(s3);
-        s3.setDone(true);
-        chargingSessionRepository.save(s3);
-
-        ChargingSessionEntity s4 = new ChargingSessionEntity();
-        s4.setChargingSessionId("SESSION004");
-        //s4.setBooking(b3); // BKG003
-        s4.setChargingPost(post6);
-        s4.setStation(stationA2);
-        s4.setUser(driverB);
-        s4.setUserManage(staff2);
-        s4.setExpectedEndTime(LocalDateTime.now().minusMinutes(5));
-        s4.setKWh(new BigDecimal("12.0"));
-        s4.setTotalAmount(new BigDecimal("1500"));
-        s4.setStartTime(LocalDateTime.now());
-        s4.setEndTime(LocalDateTime.now());
-        s4.setDone(true);
-        ChargingSessionEntity savedS4 = chargingSessionRepository.save(s4);
-        s4.setDone(true);
-        chargingSessionRepository.save(s4);
-
-        PaymentEntity p3 = new PaymentEntity();
-        p3.setPaymentId("PAYMENT001");
-        p3.setUser(driverB);
-        p3.setPaymentMethod(packet);
-        p3.setPrice(savedS3.getTotalAmount());
-        p3.setSession(savedS3);
-        p3.setPaid(true);
-        p3.setPaidAt(LocalDateTime.now());
-        p3.setCreatedAt(LocalDateTime.now());
-        paymentRepository.save(p3);
-
-        PaymentEntity p4 = new PaymentEntity();
-        p4.setPaymentId("PAYMENT002");
-        p4.setUser(driverB);
-        p4.setPaymentMethod(packet);
-        p4.setPrice(savedS4.getTotalAmount());
-        p4.setSession(savedS4);
-        p4.setPaid(true);
-        p4.setPaidAt(LocalDateTime.now());
-        p4.setCreatedAt(LocalDateTime.now());
-        paymentRepository.save(p4);
+//        PaymentServicePackageEntity psp1 = new PaymentServicePackageEntity();
+//        psp1.setPaymentServicePackageId("ABCDEE");
+//        psp1.setServicePackage(basicPkg);
+//        psp1.setPaymentMethod(card);
+//        psp1.setUser(driverA);
+//        psp1.setPaidAt(LocalDateTime.now());
+//        psp1.setPaid(true);
+//        psp1.setPrice(basicPkg.getPrice());
+//        PaymentServicePackageEntity savedPsp1 = paymentServicePackageRepository.save(psp1);
+//
+//        PackageTransactionEntity tx1 = new PackageTransactionEntity();
+//        tx1.setPackageTransactionId("ABC123UUU");
+//        tx1.setUser(driverA);
+//        tx1.setServicePackage(basicPkg);
+//        tx1.setPaymentServicePackage(savedPsp1);
+//        tx1.setRemainingQuota(BigDecimal.valueOf(basicPkg.getQuota()));
+//        tx1.setStatus("ACTIVE");
+//        tx1.setSignPackageAt(LocalDateTime.now());
+//        tx1.setExpirePackageAt(LocalDateTime.now().plusMonths(basicPkg.getBillingCycle()));
+//        packageTransactionRepository.save(tx1);
+//
+//        // Create second payment + transaction (example unpaid)
+//        PaymentServicePackageEntity psp2 = new PaymentServicePackageEntity();
+//        psp2.setPaymentServicePackageId("ABC123ABC");
+//        psp2.setServicePackage(proPkg);
+//        psp2.setPaymentMethod(card);
+//        psp2.setUser(driverB);
+//        psp2.setPaidAt(LocalDateTime.now());
+//        psp2.setPaid(true);
+//        psp2.setPrice(proPkg.getPrice());
+//        PaymentServicePackageEntity savedPsp2 = paymentServicePackageRepository.save(psp2);
+//
+//        PackageTransactionEntity tx2 = new PackageTransactionEntity();
+//        tx2.setPackageTransactionId("ABC123DEF");
+//        tx2.setUser(driverB);
+//        tx2.setServicePackage(proPkg);
+//        tx2.setPaymentServicePackage(savedPsp2);
+//        tx2.setRemainingQuota(BigDecimal.valueOf(proPkg.getQuota()));
+//        tx2.setStatus("ACTIVE");
+//        tx2.setSignPackageAt(LocalDateTime.now());
+//        tx2.setExpirePackageAt(LocalDateTime.now().plusMonths(proPkg.getBillingCycle()));
+//        packageTransactionRepository.save(tx2);
+//
+//        // BOOKING AND WAITINGLIST
+//
+//        // Waiting list for driverA
+//        WaitingListEntity wl1 = new WaitingListEntity();
+//        wl1.setWaitingListId("WL001");
+//        wl1.setUser(driverA);
+//        wl1.setChargingStation(stationA1);
+//        wl1.setChargingPost(post1);
+//        wl1.setCar(car);
+//        wl1.setExpectedWaitingTime(LocalDateTime.now().plusMinutes(15));
+//        wl1.setStatus("BOOKING");
+//        wl1.setCreatedAt(LocalDateTime.now());
+//        wl1.setOutedAt(LocalDateTime.now());
+//        waitingListRepository.save(wl1);
+//
+//        // Booking linked to wl1 (driverA)
+//        BookingEntity b1 = new BookingEntity();
+//        b1.setBookingId("BKG001");
+//        b1.setWaitingList(wl1);
+//        b1.setUser(driverA);
+//        b1.setChargingStation(stationA1);
+//        b1.setChargingPost(post1);
+//        b1.setCar(car);
+//        b1.setMaxWaitingTime(15);
+//        b1.setStatus("COMPLETE");
+//        b1.setArrivalTime(LocalDateTime.now().plusMinutes(10));
+//        b1.setCreatedAt(LocalDateTime.now());
+//        bookingRepository.save(b1);
+//
+//        // Direct booking for driverB (no waiting list)
+//        BookingEntity b2 = new BookingEntity();
+//        b2.setBookingId("BKG002");
+//        b2.setWaitingList(null);
+//        b2.setUser(driverB);
+//        b2.setChargingStation(stationA2);
+//        b2.setChargingPost(post4);
+//        b2.setCar(car1);
+//        b2.setMaxWaitingTime(10);
+//        b2.setStatus("COMPLETE");
+//        b2.setArrivalTime(LocalDateTime.now().plusMinutes(10));
+//        b2.setCreatedAt(LocalDateTime.now());
+//        bookingRepository.save(b2);
+//
+//        // Waiting list for driverB's other car
+//        WaitingListEntity wl2 = new WaitingListEntity();
+//        wl2.setWaitingListId("WL002");
+//        wl2.setUser(driverB);
+//        wl2.setChargingStation(stationA2);
+//        wl2.setChargingPost(post6);
+//        wl2.setCar(car3);
+//        wl2.setExpectedWaitingTime(LocalDateTime.now().plusMinutes(20));
+//        wl2.setStatus("BOOKING");
+//        wl2.setCreatedAt(LocalDateTime.now());
+//        wl2.setOutedAt(LocalDateTime.now());
+//        waitingListRepository.save(wl2);
+//
+//        BookingEntity b4 = new BookingEntity();
+//        b4.setBookingId("BKG004");
+//        b4.setWaitingList(null);
+//        b4.setUser(driverB);
+//        b4.setChargingStation(stationA2);
+//        b4.setChargingPost(post6);
+//        b4.setCar(car3);
+//        b4.setMaxWaitingTime(30);
+//        b4.setStatus("CANCEL");
+//        b4.setCreatedAt(LocalDateTime.now());
+//        bookingRepository.save(b4);
+//
+//        // Booking linked to wl2 (driverB)
+//        BookingEntity b3 = new BookingEntity();
+//        b3.setBookingId("BKG003");
+//        b3.setWaitingList(wl2);
+//        b3.setUser(driverB);
+//        b3.setChargingStation(stationA2);
+//        b3.setChargingPost(post6);
+//        b3.setCar(car3);
+//        b3.setMaxWaitingTime(30);
+//        b3.setStatus("COMPLETE");
+//        b3.setArrivalTime(LocalDateTime.now().plusMinutes(10));
+//        b3.setCreatedAt(LocalDateTime.now());
+//        bookingRepository.save(b3);
+//
+//        WaitingListEntity wl3 = new WaitingListEntity();
+//        wl3.setWaitingListId("WL002");
+//        wl3.setUser(driverB);
+//        wl3.setChargingStation(stationA2);
+//        wl3.setChargingPost(post5);
+//        wl3.setCar(car3);
+//        wl3.setExpectedWaitingTime(LocalDateTime.now().plusMinutes(20));
+//        wl3.setStatus("CANCEL");
+//        wl3.setCreatedAt(LocalDateTime.now());
+//        wl3.setOutedAt(LocalDateTime.now());
+//        waitingListRepository.save(wl3);
+//
+//        //PAYMENT AND SESSION
+//
+//        // Session + payment for BKG001 (driverA)
+//        ChargingSessionEntity s1 = new ChargingSessionEntity();
+//        s1.setChargingSessionId("SESSION001");
+//        s1.setBooking(b1); // BKG001
+//        s1.setChargingPost(post1);
+//        s1.setStation(stationA1);
+//        s1.setUser(driverA);
+//        s1.setUserManage(staff1);
+//        s1.setExpectedEndTime(LocalDateTime.now().plusMinutes(30));
+//        s1.setKWh(new BigDecimal("20.5"));
+//        s1.setTotalAmount(new BigDecimal("2050"));
+//        s1.setStartTime(LocalDateTime.now());
+//        s1.setEndTime(LocalDateTime.now());
+//        s1.setDone(true);
+//        ChargingSessionEntity savedS1 = chargingSessionRepository.save(s1);
+//        s1.setDone(true);
+//        chargingSessionRepository.save(s1);
+//
+//
+//        PaymentEntity p1 = new PaymentEntity();
+//        p1.setPaymentId("PAYMENT001");
+//        p1.setUser(driverA);
+//        p1.setPaymentMethod(card);
+//        p1.setPrice(savedS1.getTotalAmount());
+//        p1.setSession(savedS1);
+//        p1.setPaid(true);
+//        p1.setPaidAt(LocalDateTime.now());
+//        p1.setCreatedAt(LocalDateTime.now());
+//        paymentRepository.save(p1);
+//
+//        // Session + unpaid payment for BKG002 (driverB)
+//        ChargingSessionEntity s2 = new ChargingSessionEntity();
+//        s2.setChargingSessionId("SESSION002");
+//        s2.setBooking(b2); // BKG002
+//        s2.setChargingPost(post4);
+//        s2.setStation(stationA2);
+//        s2.setUser(driverB);
+//        s2.setUserManage(staff2);
+//        s2.setExpectedEndTime(LocalDateTime.now().plusMinutes(40));
+//        s2.setKWh(new BigDecimal("15.0"));
+//        s2.setTotalAmount(new BigDecimal("1500"));
+//        s2.setStartTime(LocalDateTime.now());
+//        s2.setEndTime(LocalDateTime.now());
+//        s2.setDone(true);
+//        ChargingSessionEntity savedS2 = chargingSessionRepository.save(s2);
+//        s2.setDone(true);
+//        chargingSessionRepository.save(s2);
+//
+//        PaymentEntity p2 = new PaymentEntity();
+//        p2.setPaymentId("PAYMENT001");
+//        p2.setUser(driverB);
+//        p2.setPaymentMethod(card);
+//        p2.setPrice(savedS2.getTotalAmount());
+//        p2.setSession(savedS2);
+//        p2.setCreatedAt(LocalDateTime.now());
+//        // leave isPaid false (PrePersist will set createdAt/isPaid)
+//        paymentRepository.save(p2);
+//
+//        // Session + payment for BKG003 (driverB, completed)
+//        ChargingSessionEntity s3 = new ChargingSessionEntity();
+//        s3.setChargingSessionId("SESSION003");
+//        s3.setBooking(b3); // BKG003
+//        s3.setChargingPost(post6);
+//        s3.setStation(stationA2);
+//        s3.setUser(driverB);
+//        s3.setUserManage(staff2);
+//        s3.setExpectedEndTime(LocalDateTime.now().minusMinutes(5));
+//        s3.setKWh(new BigDecimal("12.0"));
+//        s3.setTotalAmount(new BigDecimal("1200"));
+//        s3.setStartTime(LocalDateTime.now());
+//        s3.setEndTime(LocalDateTime.now());
+//        s3.setDone(true);
+//        ChargingSessionEntity savedS3 = chargingSessionRepository.save(s3);
+//        s3.setDone(true);
+//        chargingSessionRepository.save(s3);
+//
+//        ChargingSessionEntity s4 = new ChargingSessionEntity();
+//        s4.setChargingSessionId("SESSION004");
+//        //s4.setBooking(b3); // BKG003
+//        s4.setChargingPost(post6);
+//        s4.setStation(stationA2);
+//        s4.setUser(driverB);
+//        s4.setUserManage(staff2);
+//        s4.setExpectedEndTime(LocalDateTime.now().minusMinutes(5));
+//        s4.setKWh(new BigDecimal("12.0"));
+//        s4.setTotalAmount(new BigDecimal("1500"));
+//        s4.setStartTime(LocalDateTime.now());
+//        s4.setEndTime(LocalDateTime.now());
+//        s4.setDone(true);
+//        ChargingSessionEntity savedS4 = chargingSessionRepository.save(s4);
+//        s4.setDone(true);
+//        chargingSessionRepository.save(s4);
+//
+//        PaymentEntity p3 = new PaymentEntity();
+//        p3.setPaymentId("PAYMENT001");
+//        p3.setUser(driverB);
+//        p3.setPaymentMethod(packet);
+//        p3.setPrice(savedS3.getTotalAmount());
+//        p3.setSession(savedS3);
+//        p3.setPaid(true);
+//        p3.setPaidAt(LocalDateTime.now());
+//        p3.setCreatedAt(LocalDateTime.now());
+//        paymentRepository.save(p3);
+//
+//        PaymentEntity p4 = new PaymentEntity();
+//        p4.setPaymentId("PAYMENT002");
+//        p4.setUser(driverB);
+//        p4.setPaymentMethod(packet);
+//        p4.setPrice(savedS4.getTotalAmount());
+//        p4.setSession(savedS4);
+//        p4.setPaid(true);
+//        p4.setPaidAt(LocalDateTime.now());
+//        p4.setCreatedAt(LocalDateTime.now());
+//        paymentRepository.save(p4);
+//
     }
 }

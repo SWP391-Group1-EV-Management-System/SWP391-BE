@@ -40,7 +40,7 @@ public class ChargingPostServiceImpl implements ChargingPostService {
     private BookingService bookingService;
 
     // ChargingPostServiceImpl postService = context.getBean(ChargingPostServiceImpl.class); gọi trong main
-    private String generateUniqueId() {
+    public String generateUniqueId() {
         String newId;
         do {
             newId = generateRandomId(characterLength, numberLength);
