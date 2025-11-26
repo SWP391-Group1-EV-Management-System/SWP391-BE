@@ -6,7 +6,9 @@ import charging_manage_be.model.entity.booking.BookingEntity;
 import charging_manage_be.model.entity.booking.WaitingListEntity;
 import charging_manage_be.model.entity.reputations.UserReputationEntity;
 import charging_manage_be.model.entity.users.UserEntity;
+import charging_manage_be.repository.payments.PaymentRepository;
 import charging_manage_be.services.booking.BookingService;
+import charging_manage_be.services.charging_post.ChargingPostService;
 import charging_manage_be.services.payments.PaymentService;
 import charging_manage_be.services.status_service.UserStatusService;
 import charging_manage_be.services.user_reputations.UserReputationService;
@@ -43,6 +45,8 @@ public class BookingController {
     private UserService  userService;
     @Autowired
     private PaymentService paymentService;
+    @Autowired
+    private ChargingPostService  chargingPostService;
     // lỗi B đang trong hàng chờ đặt booking trạm khác vẫn được
 // cơ chế tự pop từ waiting list sang hàng đợi bị lỗi
     private final String STATUS_BOOKING = "booking";
@@ -50,6 +54,14 @@ public class BookingController {
     @PostMapping("/create")
     public ResponseEntity<Map<String, Object>> processBooking(@RequestBody BookingRequestDTO booking) { // ? có nghĩa là có thể là Booking hoặc WaitingList
         // điều kiện này để chuyển đổi email từ AI agent gọi về thành userId
+        if(!chargingPostService.getChargingPostById(booking.getChargingPost()).isActive())
+        {
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "Post are not available");
+            response.put("rank", "null");
+            response.put("idAction", "Post are not available");
+            return ResponseEntity.ok(response);
+        }
         if(booking.getUser().contains("@"))
         {
             UserEntity user =  userService.findByEmail(booking.getUser()).orElse(null);

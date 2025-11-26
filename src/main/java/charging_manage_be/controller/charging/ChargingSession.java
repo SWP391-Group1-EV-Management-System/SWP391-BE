@@ -87,6 +87,13 @@ public class ChargingSession {
         // check driver nếu có waiting thì không được vào sạc
         String status = null;
         String sessionId = null;
+        if(!chargingPostService.getChargingPostById(createSession.getBooking().getChargingPost()).isActive())
+        {
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "post is not available");
+            response.put("sessionId", "post is not available");
+            return ResponseEntity.ok(response);
+        }
         BigDecimal resultAmout =  paymentService.totalPriceUnPaid(createSession.getBooking().getUser());
         resultAmout = (resultAmout == null) ? BigDecimal.ZERO : resultAmout;
         if (resultAmout.compareTo(new BigDecimal("100000")) >= 0) {

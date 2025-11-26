@@ -73,8 +73,9 @@ public class LoginController {
                     .header(HttpHeaders.SET_COOKIE, cookie1.toString())
                     .body("Đăng nhập thành công!");
         }
-        return ResponseEntity.ok()
-                .body("Đăng nhập không thành công!");
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body("Tài khoản đã bị vô hiệu hóa");
     }
 
     @GetMapping("/test")
