@@ -42,7 +42,16 @@ public class LoginController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         UserEntity user = userService.login(request.getEmail(), request.getPassword());
-        if(user != null && user.isStatus()){
+        if(user == null ){
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body("Tài khoản hoặc mật khẩu không đúng");
+        }
+        if(!user.isStatus()) {
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body("Tài khoản đã bị vô hiệu hóa");
+        }
             try {
                 Authentication auth = authManager.authenticate(
                         new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
@@ -72,10 +81,7 @@ public class LoginController {
                     .header(HttpHeaders.SET_COOKIE, cookie.toString())
                     .header(HttpHeaders.SET_COOKIE, cookie1.toString())
                     .body("Đăng nhập thành công!");
-        }
-        return ResponseEntity
-                .status(HttpStatus.FORBIDDEN)
-                .body("Tài khoản đã bị vô hiệu hóa");
+
     }
 
     @GetMapping("/test")
