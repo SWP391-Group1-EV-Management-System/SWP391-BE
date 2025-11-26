@@ -390,9 +390,14 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
             String stopReason = "";
 
             // Điều kiện 1: Đã đạt target PIN
-            if (calculatedCurrentPin >= targetPin) {
+//            if (calculatedCurrentPin >= targetPin) {
+//                shouldStop = true;
+//                stopReason = "Target PIN reached";
+//            }
+            if(session.isDone())
+            {
                 shouldStop = true;
-                stopReason = "Target PIN reached";
+                stopReason = "session stop";
             }
             // Điều kiện 2: Hết thời gian (secondRemaining = 0)
             if (secondRemaining <= 0) {
@@ -400,6 +405,10 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
                 stopReason = "Time limit reached";
             }
             // Cập nhật progress vào Redis (bao gồm secondRemaining)
+            if(calculatedCurrentPin > 100)
+            {
+                calculatedCurrentPin = 100;
+            }
             updateProgress(session.getChargingSessionId(), energyCharged, elapsedSeconds,
                           calculatedCurrentPin, targetPin, secondRemaining, maxSeconds);
 
