@@ -13,7 +13,7 @@ import java.util.List;
 
 @Repository
 public interface PaymentRepository extends JpaRepository<PaymentEntity, String> {
-   // public boolean addPayment(PaymentEntity payment);
+    // public boolean addPayment(PaymentEntity payment);
     //public boolean existId(String id);
     public List<PaymentEntity> findAll();
 
@@ -21,6 +21,8 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, String> 
     List<PaymentEntity> findByUserAndIsPaid(UserEntity user, boolean isPaid);
 
     PaymentEntity findBySession(ChargingSessionEntity session);
+
+    PaymentEntity findByMomoOrderId(String momoOrderId);
 
     @Query("SELECT SUM(p.price) FROM PaymentEntity p WHERE p.createdAt BETWEEN :start AND :end AND p.isPaid = true")
     BigDecimal sumPriceByCreatedAtBetween(LocalDateTime start, LocalDateTime end);

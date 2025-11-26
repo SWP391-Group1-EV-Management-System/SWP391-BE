@@ -10,6 +10,8 @@ public interface PaymentService {
     boolean addPayment(String sessionId, PaymentMethodEntity paymentMethod);
     boolean updatePaymentWithMethod(String paymentId,String paymentMethodId);
     PaymentEntity getPaymentByPaymentId(String paymentId);
+    PaymentEntity getPaymentByMomoOrderId(String momoOrderId);
+    boolean setMomoOrderId(String paymentId, String momoOrderId);
     List<PaymentEntity> getPaymentByUserID(String userID);
     boolean invoicePayment (String paymentId);
     List<PaymentEntity> findAllPayment();
@@ -25,4 +27,3 @@ public interface PaymentService {
     BigDecimal totalPriceIsPaid(String userId);
     BigDecimal  totalPriceUnPaid(String userId);
 }
-

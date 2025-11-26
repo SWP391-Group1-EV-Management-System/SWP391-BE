@@ -41,6 +41,9 @@ public class PaymentEntity {
     @JoinColumn(name = "session_id")
     private ChargingSessionEntity session;
 
+    @Column(name = "momo_order_id", nullable = true)
+    private String momoOrderId;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();

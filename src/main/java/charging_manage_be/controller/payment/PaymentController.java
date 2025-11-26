@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/payment")
@@ -95,9 +96,13 @@ public class PaymentController {
                 }
             }
             else{
-                requestData.setOrderId(payment.getPaymentId());
+                // generate a unique Momo order id for this attempt so retries don't reuse the same orderId
+                String momoOrderId = payment.getPaymentId() + "-" + UUID.randomUUID().toString();
+                requestData.setOrderId(momoOrderId);
                 requestData.setAmount(payment.getPrice().longValue());
                 requestData.setOrderInfo(requestData.getOrderInfo());
+                // persist mapping from momoOrderId -> internal paymentId to be used by IPN
+                paymentService.setMomoOrderId(payment.getPaymentId(), momoOrderId);
             }
 
             CreateMomoResponseDTO response = momoService.createPayment(requestData);
@@ -121,10 +126,16 @@ public class PaymentController {
             JsonNode root = objectMapper.readTree(ipnData);
             String orderId = root.get("orderId").asText();
             int resultCode = root.path("resultCode").asInt();
+            // Try to find payment by internal paymentId first, then by momoOrderId
             PaymentEntity payment = paymentService.getPaymentByPaymentId(orderId);
-            //PaymentServicePackageEntity paymentPackage = paymentPackageService.getPaymentServicePackageById(orderId);
-            if(payment == null) {
-                packagePayment =(String) redisTemplate.opsForHash().get("userPackage:" + orderId, "paymentPackageService");
+            String internalPaymentId = orderId;
+            if (payment == null) {
+                payment = paymentService.getPaymentByMomoOrderId(orderId);
+                if (payment != null) {
+                    internalPaymentId = payment.getPaymentId();
+                } else {
+                    packagePayment = (String) redisTemplate.opsForHash().get("userPackage:" + orderId, "paymentPackageService");
+                }
             }
 
             if (resultCode == 0) {
@@ -148,7 +159,7 @@ public class PaymentController {
 
 
 
-                boolean isPaid = paymentService.invoicePayment(orderId);
+                boolean isPaid = paymentService.invoicePayment(internalPaymentId);
                 if (isPaid) {
 //                    assert payment != null;
 //                    if (payment.getPaymentMethod().getIdPaymentMethod().equals("PMT_PACKAGE")){
@@ -292,7 +303,5 @@ public class PaymentController {
             return ResponseEntity.notFound().build();
         }
     }
-
-
 
 }

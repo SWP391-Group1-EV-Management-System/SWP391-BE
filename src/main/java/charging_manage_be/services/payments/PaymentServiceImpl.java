@@ -96,7 +96,7 @@ public class PaymentServiceImpl implements PaymentService {
             payment.setPrice(finalPrice);
             payment.setPaymentMethod(paymentMethod);
             paymentRepository.save(payment);
- //           handlerWebsocketSendPaymentToStaff(payment);
+            //           handlerWebsocketSendPaymentToStaff(payment);
         }
         if ("PMT_PACKAGE".equalsIgnoreCase(paymentMethod.getIdPaymentMethod())) {
             PackageTransactionResponseDTO activePackage =
@@ -155,6 +155,21 @@ public class PaymentServiceImpl implements PaymentService {
         }
     }
 
+    @Override
+    public PaymentEntity getPaymentByMomoOrderId(String momoOrderId) {
+        if (momoOrderId == null) return null;
+        return paymentRepository.findByMomoOrderId(momoOrderId);
+    }
+
+    @Override
+    public boolean setMomoOrderId(String paymentId, String momoOrderId) {
+        if (paymentId == null || momoOrderId == null) return false;
+        PaymentEntity payment = paymentRepository.findById(paymentId).orElse(null);
+        if (payment == null) return false;
+        payment.setMomoOrderId(momoOrderId);
+        paymentRepository.save(payment);
+        return true;
+    }
     @Override
     public List<PaymentEntity> getPaymentByUserID(String userID) {
         if (!userRepository.existsById(userID)){
@@ -249,7 +264,7 @@ public class PaymentServiceImpl implements PaymentService {
         // Lưu payment vào database
         if (paymentRepository.addPayment(payment)) {
             return payment;
-        }
+}
         return null;
     }
     public boolean invoicePayment(String paymentId, String paymentMethod)
@@ -266,4 +281,3 @@ public class PaymentServiceImpl implements PaymentService {
     */
 
 }
-
