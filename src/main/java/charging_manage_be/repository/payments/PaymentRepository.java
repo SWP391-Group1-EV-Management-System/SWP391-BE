@@ -22,7 +22,7 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, String> 
 
     PaymentEntity findBySession(ChargingSessionEntity session);
 
-    @Query("SELECT SUM(p.price) FROM PaymentEntity p WHERE p.createdAt BETWEEN :start AND :end")
+    @Query("SELECT SUM(p.price) FROM PaymentEntity p WHERE p.createdAt BETWEEN :start AND :end AND p.isPaid = true")
     BigDecimal sumPriceByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 
     long countByPaymentMethod_IdPaymentMethod(String paymentMethodId);

@@ -85,7 +85,7 @@ public class PaymentServiceImpl implements PaymentService {
         PaymentMethodEntity paymentMethod = paymentMethodRepository.findById(paymentMethodId).orElseThrow(() -> new RuntimeException("Payment method not found"));
         PaymentEntity payment = paymentRepository.findById(paymentId).orElseThrow(() -> new RuntimeException("Payment not found"));
 
-        BigDecimal finalPrice = payment.getSession().getTotalAmount();
+        BigDecimal finalPrice = payment.getPrice();
 
         if ("PMT_MOMO".equalsIgnoreCase(paymentMethod.getIdPaymentMethod())){
             payment.setPrice(finalPrice);

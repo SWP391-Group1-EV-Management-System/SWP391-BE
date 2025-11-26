@@ -12,6 +12,8 @@ public interface PackageTransactionService {
 
     boolean updateQuotationPackageTransaction(String packageTransactionId, String chargingSessionId);
 
+    boolean deletePackageTransactionById(String packageTransactionId);
+
     List<PackageTransactionResponseDTO> getPackageTransactionByUserId(String userId);
 
     PackageTransactionResponseDTO getLatestActivePackageByUserId(String userId);
