@@ -111,8 +111,31 @@ public class RegisterController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to verify OTP: " + ex.getMessage());
         }
     }
+    @PostMapping("/create-staff")
+    ResponseEntity<?> createStaff(@RequestBody Map<String, String> request) throws ParseException {
+        String email = request.get("email");
+        // Kiểm tra nếu email đã tồn tại
+        if (userService.findByEmail(email).isPresent()) { // Nếu email đã tồn tại
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email is already registered.");
+        } else {
+            try {
+                UserEntity newUser = new UserEntity();
+                newUser.setEmail(email);
+                newUser.setFirstName(request.get("firstName"));
+                newUser.setLastName(request.get("lastName"));
+                newUser.setBirthDate(new SimpleDateFormat("yyyy-MM-dd").parse(request.get("birthDate")));
+                newUser.setGender(Boolean.parseBoolean(request.get("gender")));
+                newUser.setPhoneNumber(request.get("phoneNumber"));
+                newUser.setPassword(request.get("password"));
 
-
+                userService.createStaff(newUser);
+            }
+            catch (Exception ex) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to process registration: " + ex.getMessage());
+            }
+        }
+        return ResponseEntity.ok().body("Staff has been created successfully.");
+    }
     @PostMapping("/resend-otp")
     ResponseEntity<String> resendOtp(@RequestBody Map<String, String> request) {
         try {

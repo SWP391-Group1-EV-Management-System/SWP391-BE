@@ -8,8 +8,10 @@ import charging_manage_be.model.entity.charging.ChargingStationEntity;
 import charging_manage_be.model.entity.users.UserEntity;
 import charging_manage_be.repository.charging_station.ChargingStationRepository;
 import charging_manage_be.repository.users.UserRepository;
+import charging_manage_be.services.charging_post.ChargingPostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -41,6 +43,9 @@ public class ChargingStationServiceImpl implements  ChargingStationService {
     @Value("${opencage.api.key}")
     private String apiKey;
     private static final String OPENCAGE_GEOCODING_URL = "https://api.opencagedata.com/geocode/v1/json";
+    @Lazy
+    @Autowired
+    private ChargingPostService chargingPostService;
 
     @Override
     public ChargingStationEntity updateNumberOfPosts(ChargingStationEntity station) {
@@ -101,6 +106,10 @@ public class ChargingStationServiceImpl implements  ChargingStationService {
         chargingStation.setUserManager(manager);
         chargingStation.setAddress(stationRequestDTO.getAddress());
         chargingStation.setActive(stationRequestDTO.isActive());
+        if(!stationRequestDTO.isActive())
+        {
+            chargingPostService.setPostFromStationUnactive(chargingStation.getIdChargingStation());
+        }
         chargingStation.setNameChargingStation(stationRequestDTO.getNameChargingStation());
         chargingStation.setNumberOfPosts(stationRequestDTO.getNumberOfPosts());
         chargingStationRepository.save(chargingStation);

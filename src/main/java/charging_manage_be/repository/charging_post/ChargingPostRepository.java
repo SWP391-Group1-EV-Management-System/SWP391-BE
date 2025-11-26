@@ -13,4 +13,6 @@ import java.util.List;
 public interface ChargingPostRepository extends JpaRepository<ChargingPostEntity, String> {
     List<ChargingPostEntity> findByChargingStation_IdChargingStation(String stationId);
     long countByIsActiveTrue();
+
+    List<ChargingPostEntity> findAllByChargingStation_IdChargingStation(String chargingStationIdChargingStation);
 }
