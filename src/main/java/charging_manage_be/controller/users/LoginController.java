@@ -41,35 +41,40 @@ public class LoginController {
     private UserService userService;
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        try {
-            Authentication auth = authManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-            );
-        } catch (BadCredentialsException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Sai tài khoản hoặc mật khẩu");
-        }
+        UserEntity user = userService.login(request.getEmail(), request.getPassword());
+        if(user != null && user.isStatus()){
+            try {
+                Authentication auth = authManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+                );
+            } catch (BadCredentialsException e) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Sai tài khoản hoặc mật khẩu");
+            }
 
-        final UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
-        final String jwt = jwtUtil.generateToken(userDetails);
-        final String refresh = jwtUtil.generateRefreshToken(userDetails);
-        ResponseCookie cookie = ResponseCookie.from("jwt", jwt)
-                .httpOnly(true) // không cho JS đọc tránh XXS
-                .secure(true) // chỉ gửi qua HTTPS
-                .path("/")
-                .maxAge(24 * 60 * 60) // 1 ngày
-                .build();
-        ResponseCookie cookie1 = ResponseCookie.from("refresh", refresh)
-                .httpOnly(true) // không cho JS đọc tránh XXS
-                .secure(true) // chỉ gửi qua HTTPS
-                .path("/")
-                .maxAge(7 * 24 * 60 * 60) // 7 ngày
-                .build();
-        String userId = userService.getUserEmail(request.getEmail()).getUserID();
-        redisTemplate.opsForHash().put("user:" + userId, "refresh_token", refresh);
+            final UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
+            final String jwt = jwtUtil.generateToken(userDetails);
+            final String refresh = jwtUtil.generateRefreshToken(userDetails);
+            ResponseCookie cookie = ResponseCookie.from("jwt", jwt)
+                    .httpOnly(true) // không cho JS đọc tránh XXS
+                    .secure(true) // chỉ gửi qua HTTPS
+                    .path("/")
+                    .maxAge(24 * 60 * 60) // 1 ngày
+                    .build();
+            ResponseCookie cookie1 = ResponseCookie.from("refresh", refresh)
+                    .httpOnly(true) // không cho JS đọc tránh XXS
+                    .secure(true) // chỉ gửi qua HTTPS
+                    .path("/")
+                    .maxAge(7 * 24 * 60 * 60) // 7 ngày
+                    .build();
+            String userId = userService.getUserEmail(request.getEmail()).getUserID();
+            redisTemplate.opsForHash().put("user:" + userId, "refresh_token", refresh);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                    .header(HttpHeaders.SET_COOKIE, cookie1.toString())
+                    .body("Đăng nhập thành công!");
+        }
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .header(HttpHeaders.SET_COOKIE, cookie1.toString())
-                .body("Đăng nhập thành công!");
+                .body("Đăng nhập không thành công!");
     }
 
     @GetMapping("/test")

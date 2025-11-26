@@ -394,10 +394,6 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
                 shouldStop = true;
                 stopReason = "Target PIN reached";
             }
-            if(session.isDone())
-            {
-                shouldStop = true;
-            }
             // Điều kiện 2: Hết thời gian (secondRemaining = 0)
             if (secondRemaining <= 0) {
                 shouldStop = true;
@@ -409,8 +405,6 @@ public class ChargingSessionServiceImpl  implements ChargingSessionService {
 
             // Tự động kết thúc session nếu đạt điều kiện
             if (shouldStop) {
-                String key = "charging:session:" + session.getChargingSessionId();
-                redisTemplate.delete(key);
                 System.out.println("🔴 [AUTO END] Session " + session.getChargingSessionId() +
                     " - Reason: " + stopReason +
                     " - PIN: " + calculatedCurrentPin + "/" + targetPin +

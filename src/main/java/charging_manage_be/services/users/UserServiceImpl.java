@@ -205,8 +205,38 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserEntity login(String email, String password) {
+        return userRepository.findByEmailAndPassword(email,password);
+    }
+
+    @Override
     public long countTotalActiveUsers() {
         return userRepository.countByStatusTrue();
+    }
+    @Override
+    public UserEntity createStaff(UserEntity userEntity) {
+        Optional<UserEntity> optionalUser = userRepository.findByEmail(userEntity.getEmail());
+        if (optionalUser.isPresent()) {
+            throw  new IllegalArgumentException("User already exists");
+        }
+        ReputationLevelEntity levelEntities = reputationLevelRepository.findByLevelName("Tốt");
+        if (levelEntities == null) {
+            throw new IllegalArgumentException("Reputation levels are not set up");
+        }
+        UserEntity newUser = new UserEntity();
+        newUser.setUserID(generateUniqueId());
+        newUser.setEmail(userEntity.getEmail());
+        newUser.setPassword(userEntity.getPassword());
+        newUser.setFirstName(userEntity.getFirstName());
+        newUser.setLastName(userEntity.getLastName());
+        newUser.setBirthDate(userEntity.getBirthDate());
+        newUser.setGender(userEntity.isGender());
+        newUser.setPhoneNumber(userEntity.getPhoneNumber());
+        newUser.setCreatedAt(LocalDateTime.now());
+        newUser.setRole("STAFF");
+        newUser.setStatus(true);
+        UserEntity saveUser = userRepository.save(newUser);
+        return saveUser;
     }
 
 

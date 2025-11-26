@@ -20,4 +20,5 @@ public interface ChargingPostService {
     Map<String, Boolean> getPostAvailabilityMap(List<ChargingPostEntity> posts);
     String generateUniqueId();
     long countActivePosts();
+    boolean setPostFromStationUnactive(String chargingStation);
 }

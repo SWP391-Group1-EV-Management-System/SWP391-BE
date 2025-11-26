@@ -24,9 +24,9 @@ import static charging_manage_be.util.RandomId.generateRandomId;
 public class ChargingPostServiceImpl implements ChargingPostService {
     private final int characterLength = 2;
     private final int numberLength = 1;
+    @Lazy
     @Autowired // vì sử dụng bản spring boot khá cao nên không cần @Autowired vẫn chạy được
-
-    private ChargingPostRepository ChargingPostRepository;
+    private ChargingPostRepository chargingPostRepository;
     @Autowired
     private ChargingTypeRepository chargingTypeRepository;
     @Autowired
@@ -50,20 +50,23 @@ public class ChargingPostServiceImpl implements ChargingPostService {
 
     @Override
     public ChargingPostEntity getChargingPostById(String id) {
-        if (!ChargingPostRepository.existsById(id)) {
+        if (!chargingPostRepository.existsById(id)) {
             return null;
         }
-        return ChargingPostRepository.findById(id).get();
+        return chargingPostRepository.findById(id).get();
     }
 
     public boolean isPaymentIdExists(String id) {
-        return ChargingPostRepository.existsById(id);
+        return chargingPostRepository.existsById(id);
     }
 
     @Override
     public boolean addPost(String stationId, boolean isActive, List<Integer> listType, BigDecimal maxPower, BigDecimal chargingFeePerKWh) {
         var post = new ChargingPostEntity();
         post.setIdChargingPost(generateUniqueId());
+        if(!stationService.getStationById(stationId).isActive()) {
+            isActive  = false;
+        }
         post.setActive(isActive);
         List<ChargingTypeEntity> listChargingType = new ArrayList<>();
         for (int i : listType) {
@@ -80,22 +83,25 @@ public class ChargingPostServiceImpl implements ChargingPostService {
             return false;
         }
         post.setChargingStation(station);
-        ChargingPostRepository.save(post);
+        chargingPostRepository.save(post);
         return true;
     }
 
     @Override
     public boolean updatePost(ChargingPostEntity post) {
-        if (post == null || !ChargingPostRepository.existsById(post.getIdChargingPost())) {
+        if (post == null || !chargingPostRepository.existsById(post.getIdChargingPost())) {
             return false;
         }
-        ChargingPostRepository.save(post);
+        if(!stationService.getStationById(post.getChargingStation().getIdChargingStation()).isActive()) {
+            post.setActive(false);
+        }
+        chargingPostRepository.save(post);
         return true;
     }
 
     @Override
     public List<ChargingPostEntity> getAllPosts() {
-        return ChargingPostRepository.findAll();
+        return chargingPostRepository.findAll();
     }
 
     @Override
@@ -115,7 +121,17 @@ public class ChargingPostServiceImpl implements ChargingPostService {
 
     @Override
     public long countActivePosts() {
-        return ChargingPostRepository.countByIsActiveTrue();
+        return chargingPostRepository.countByIsActiveTrue();
+    }
+
+    @Override
+    public boolean setPostFromStationUnactive(String chargingStation) {
+        List<ChargingPostEntity> list =  chargingPostRepository.findAllByChargingStation_IdChargingStation(chargingStation);
+        for(ChargingPostEntity post : list){
+            post.setActive(false);
+            chargingPostRepository.save(post);
+        }
+        return true;
     }
 
     @Override
