@@ -247,6 +247,11 @@ public class  DataInitializer  implements CommandLineRunner {
         ac.setNameChargingType("AC");
         chargingTypeRepository.save(ac);
 
+        ChargingTypeEntity nacs = new ChargingTypeEntity();
+        nacs.setIdChargingType(4);
+        nacs.setNameChargingType("NACS");
+        chargingTypeRepository.save(nacs);
+
         // Initialize Car
         CarEntity car = new CarEntity();
         car.setCarID("CAR001");
@@ -296,6 +301,9 @@ public class  DataInitializer  implements CommandLineRunner {
         ChargingTypeEntity type1 = chargingTypeRepository.findById(1).get();
         ChargingTypeEntity type2 = chargingTypeRepository.findById(2).get();
         ChargingTypeEntity type3 = chargingTypeRepository.findById(3).get();
+        ChargingTypeEntity type4 = chargingTypeRepository.findById(4).get();
+
+
         ChargingPostEntity post1 = new ChargingPostEntity();
         post1.setIdChargingPost("POST001");
         post1.setChargingStation(stationA1);
@@ -317,7 +325,7 @@ public class  DataInitializer  implements CommandLineRunner {
         ChargingPostEntity post3 = new ChargingPostEntity();
         post3.setIdChargingPost("POST003");
         post3.setChargingStation(stationA1);
-        post3.setChargingType(Arrays.asList(type1, type2,type3));
+        post3.setChargingType(Arrays.asList(type1, type2,type3, type4));
         post3.setChargingFeePerKWh(new BigDecimal("100"));
         post3.setMaxPower(new BigDecimal("10000"));
         post3.setActive(true);
