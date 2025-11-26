@@ -79,11 +79,22 @@ public class ChargingStationServiceImpl implements  ChargingStationService {
         newStation.setUserManager(manager);
         newStation.setNumberOfPosts(station.getNumberOfPosts());
 
-        // Lấy tọa độ từ địa chỉ và set vào station
-        double[] coordinates = getCoordinatesFromAddress(station.getAddress());
-        if (coordinates != null) {
-            newStation.setLatitude(coordinates[0]);
-            newStation.setLongitude(coordinates[1]);
+        // ⭐ ƯU TIÊN: Dùng latitude/longitude từ frontend nếu có
+        if (station.getLatitude() > 0 && station.getLongitude() > 0) {
+            newStation.setLatitude(station.getLatitude());
+            newStation.setLongitude(station.getLongitude());
+            System.out.println("✅ Using coordinates from frontend: " + station.getLatitude() + ", " + station.getLongitude());
+        } else {
+            // Fallback: Nếu không có tọa độ, lấy từ địa chỉ qua OpenCage API
+            System.out.println("⚠️ No coordinates provided, fetching from address...");
+            double[] coordinates = getCoordinatesFromAddress(station.getAddress());
+            if (coordinates != null) {
+                newStation.setLatitude(coordinates[0]);
+                newStation.setLongitude(coordinates[1]);
+                System.out.println("✅ Fetched coordinates from OpenCage: " + coordinates[0] + ", " + coordinates[1]);
+            } else {
+                System.out.println("❌ Failed to fetch coordinates from address");
+            }
         }
 
         chargingStationRepository.save(newStation);
@@ -106,12 +117,21 @@ public class ChargingStationServiceImpl implements  ChargingStationService {
         chargingStation.setUserManager(manager);
         chargingStation.setAddress(stationRequestDTO.getAddress());
         chargingStation.setActive(stationRequestDTO.isActive());
-        if(!stationRequestDTO.isActive())
-        {
+
+        if(!stationRequestDTO.isActive()) {
             chargingPostService.setPostFromStationUnactive(chargingStation.getIdChargingStation());
         }
+
         chargingStation.setNameChargingStation(stationRequestDTO.getNameChargingStation());
         chargingStation.setNumberOfPosts(stationRequestDTO.getNumberOfPosts());
+
+        // ⭐ CẬP NHẬT tọa độ nếu có từ frontend
+        if (stationRequestDTO.getLatitude() > 0 && stationRequestDTO.getLongitude() > 0) {
+            chargingStation.setLatitude(stationRequestDTO.getLatitude());
+            chargingStation.setLongitude(stationRequestDTO.getLongitude());
+            System.out.println("✅ Updated coordinates: " + stationRequestDTO.getLatitude() + ", " + stationRequestDTO.getLongitude());
+        }
+
         chargingStationRepository.save(chargingStation);
         return true;
     }

@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChargingStationRequestDTO {
+    private double latitude;
+    private double longitude;
     private String nameChargingStation;
     private String address;
     private boolean isActive;
