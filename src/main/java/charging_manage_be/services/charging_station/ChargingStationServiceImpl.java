@@ -217,6 +217,17 @@ public class ChargingStationServiceImpl implements  ChargingStationService {
     }
 
     @Override
+    public boolean deactivateStation(String stationId) {
+        ChargingStationEntity station = chargingStationRepository.findByIdChargingStation(stationId);
+        if(station == null){
+            return false;
+        }
+        station.setActive(false);
+        chargingStationRepository.save(station);
+        return true;
+    }
+
+    @Override
     public ChargingStationEntity getStationByUserId(String userId) {
         return chargingStationRepository.findByUserManager_UserID(userId).orElse(null);
     }

@@ -133,7 +133,7 @@ public class StationController {
         return ResponseEntity.ok(posts);
     }
 
-//    @GetMapping("/available")
+    //    @GetMapping("/available")
 //    public ResponseEntity<List<StationAndPost>> getAllChargingStationsAvailable() {
 //        List<StationAndPost> stations = chargingStationService.getAllStationAvailable().stream().map(chargingStationEntity -> {
 //            StationAndPost stationDTO = new StationAndPost();
@@ -164,7 +164,7 @@ public class StationController {
     // agent xem trạm có đang hoạt động không lấy hết trạm lên bao gồm cả khoảng cách
     @PostMapping("/available")
     public ResponseEntity<List<StationAndPost>> findNearestStations(
-             @RequestBody LocationRequest request) {
+            @RequestBody LocationRequest request) {
 
         // 1. Lấy Entity từ Service
         List<ChargingStationEntity> stations = chargingStationService.findNearestStations(request);
@@ -176,5 +176,14 @@ public class StationController {
 
         return ResponseEntity.ok(stationDTOs);
     }
-}
 
+    @DeleteMapping("/deactivate/{stationId}")
+    public ResponseEntity<String> deactivateStation(@PathVariable String stationId) {
+        boolean result = chargingStationService.deactivateStation(stationId);
+        if (result) {
+            return ResponseEntity.ok("Station deactivated successfully.");
+        } else {
+            return ResponseEntity.badRequest().body("Failed to deactivate station. Station may not exist.");
+        }
+    }
+}
