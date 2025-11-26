@@ -77,7 +77,7 @@ public class StationController {
             stationDTO.setActive(station.isActive());
             stationDTO.setEstablishedTime(station.getEstablishedTime());
             stationDTO.setNumberOfPosts(station.getNumberOfPosts());
-            stationDTO.setUserManagerName(station.getUserManager().getLastName());
+            stationDTO.setUserManagerName(station.getUserManager().getUserID());
             stationDTO.setLatitude(station.getLatitude());
             stationDTO.setLongitude(station.getLongitude());
             stationDTO.setChargingPostsAvailable(chargingPostService.getPostAvailabilityMap(station.getChargingPosts()));
