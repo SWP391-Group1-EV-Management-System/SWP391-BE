@@ -124,9 +124,9 @@ public class PackageTransactionServiceImpl implements PackageTransactionService 
     public boolean deletePackageTransactionById(String packageTransactionId) {
         PackageTransactionEntity packageTransaction = packageTransactionRepository.findById(packageTransactionId).orElse(null);
         if (packageTransaction == null) {
-            return false;
+            throw new RuntimeException("Service package transaction with id " + packageTransactionId + " not found");
         }
-        packageTransactionRepository.delete(packageTransaction);
+        packageTransactionRepository.deleteById(packageTransactionId);
         return true;
     }
 

@@ -1,5 +1,6 @@
 package charging_manage_be.services.users;
 
+import charging_manage_be.model.dto.user.ProfileRequest;
 import charging_manage_be.model.dto.user.UserRequest;
 import charging_manage_be.model.entity.reputations.ReputationLevelEntity;
 import charging_manage_be.model.entity.reputations.UserReputationEntity;
@@ -83,6 +84,41 @@ public class UserServiceImpl implements UserService {
         }
         return true;
     }
+
+    @Override
+    public boolean updateProfileUser(String userId, ProfileRequest profileRequest) {
+        UserEntity user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return false;
+        }
+        else{
+            user.setFirstName(profileRequest.getFirstName());
+            user.setLastName(profileRequest.getLastName());
+            user.setGender(profileRequest.isGender());
+            user.setPhoneNumber(profileRequest.getPhone());
+            //user.setCreatedAt(user.getCreatedAt());
+            // không cho update ngày tạo tài khoản
+            userRepository.save(user);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean updatePasswordUser(String userId, String oldPassword, String newPassword) {
+        UserEntity user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return false;
+        }
+        else{
+            if(!user.getPassword().equals(oldPassword)) {
+                return  false;
+            }
+            user.setPassword(newPassword);
+            userRepository.save(user);
+        }
+        return true;
+    }
+
 
     @Override
     public boolean softDeleteUser(String userID) { // Hàm xóa này chỉ là xóa mềm, tức là chỉ set status = false

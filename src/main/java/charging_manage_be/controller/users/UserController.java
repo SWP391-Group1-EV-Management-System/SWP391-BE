@@ -1,8 +1,6 @@
 package charging_manage_be.controller.users;
 
-import charging_manage_be.model.dto.user.UserRequest;
-import charging_manage_be.model.dto.user.UserResponse;
-import charging_manage_be.model.dto.user.UserResponseForAdmin;
+import charging_manage_be.model.dto.user.*;
 import charging_manage_be.model.entity.reputations.UserReputationEntity;
 import charging_manage_be.model.entity.users.UserEntity;
 import charging_manage_be.services.user_reputations.UserReputationService;
@@ -67,6 +65,32 @@ public class UserController {
             return ResponseEntity.ok("User updated successfully");
         }
     }
+
+    @PutMapping("/updateProfile/{userID}")
+    public ResponseEntity<String> updateProfile(@PathVariable String userID, @RequestBody ProfileRequest profileRequest) {
+        Optional<UserEntity> findUser = userService.getUserByID(userID);
+        if (findUser.isEmpty()) {
+            throw new RuntimeException("User not found");
+        } else {
+            userService.updateProfileUser(userID, profileRequest);
+            return ResponseEntity.ok("User profile updated successfully");
+        }
+    }
+
+        @PutMapping("/updatePassword/{userID}")
+        public ResponseEntity<String> updatePassword(@PathVariable String userID, @RequestBody UpdatePasswordDTO updatePasswordDTO) {
+            Optional<UserEntity> findUser = userService.getUserByID(userID);
+            if (findUser.isEmpty()) {
+                throw new RuntimeException("User not found");
+            } else {
+                boolean updated = userService.updatePasswordUser(userID, updatePasswordDTO.getOldPassword(), updatePasswordDTO.getNewPassword());
+                if (updated) {
+                    return ResponseEntity.ok("Password updated successfully");
+                } else {
+                    return ResponseEntity.badRequest().body("Failed to update password");
+                }
+            }
+        }
 
     @DeleteMapping("/delete/{userID}")
     public ResponseEntity<String> deleteUser(@PathVariable String userID) { // @PathVariable để lấy userID từ URL
