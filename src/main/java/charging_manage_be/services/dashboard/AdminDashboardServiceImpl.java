@@ -1,6 +1,7 @@
 package charging_manage_be.services.dashboard;
 
 import charging_manage_be.model.dto.dashboard.DashboardAndHomeAdmin;
+import charging_manage_be.model.entity.charging.ChargingStationEntity;
 import charging_manage_be.services.charging_post.ChargingPostService;
 import charging_manage_be.services.charging_session.ChargingSessionService;
 import charging_manage_be.services.charging_station.ChargingStationService;
@@ -40,6 +41,18 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
         dashboardAndHomeAdmin.setTotalSessions(chargingSessionService.countTotalSessions());
         dashboardAndHomeAdmin.setTotalActiveUsers(userService.countTotalActiveUsers());
         dashboardAndHomeAdmin.setTotalReports(reportService.countAllReports());
+        ChargingStationEntity stationMost =chargingStationService.getStationById(chargingStationService.getStationMostSession());
+        dashboardAndHomeAdmin.setStationMostSession(stationMost.getNameChargingStation());
+        dashboardAndHomeAdmin.setStationMostSessionCount(stationMost.getChargingSession().size());
+        ChargingStationEntity stationLest =chargingStationService.getStationById(chargingStationService.getStationLestSession());
+        dashboardAndHomeAdmin.setStationLestSession(stationLest.getNameChargingStation());
+        dashboardAndHomeAdmin.setStationLestSessionCount(stationLest.getChargingSession().size());
         return dashboardAndHomeAdmin;
     }
 }
+/*
+    private String stationMostSession;
+    private long stationMostSessionCount;
+    private String stationLestSession;
+    private long stationLestSessionCount;
+ */

@@ -26,5 +26,7 @@ public interface ChargingStationService {
     ChargingStationEntity getStationByChargingPost(ChargingPostEntity chargingPost);
 
     boolean deactivateStation(String stationId);
-
+    String getStationMostSession();
+    String getStationLestSession();
+    long getStationSessionAmout(String  stationId);
 }

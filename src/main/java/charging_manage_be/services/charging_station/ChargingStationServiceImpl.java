@@ -257,6 +257,51 @@ public class ChargingStationServiceImpl implements  ChargingStationService {
     }
 
     @Override
+    public String getStationMostSession() {
+        List<ChargingStationEntity> allStations = chargingStationRepository.findAll();
+
+        ChargingStationEntity maxStation = null;
+        int maxSize = -1;
+
+        for (ChargingStationEntity station : allStations) {
+            int sessionCount = station.getChargingSession().size();
+            if (sessionCount > maxSize) {
+                maxSize = sessionCount;
+                maxStation = station;
+            }
+        }
+
+        return maxStation.getIdChargingStation();
+    }
+
+    @Override
+    public String getStationLestSession() {
+        List<ChargingStationEntity> allStations = chargingStationRepository.findAll();
+
+        ChargingStationEntity minStation = null;
+        int minSize = Integer.MAX_VALUE;
+
+        for (ChargingStationEntity station : allStations) {
+            int sessionCount = station.getChargingSession().size();
+            if (sessionCount < minSize) {
+                minSize = sessionCount;
+                minStation = station;
+            }
+        }
+
+        return minStation.getIdChargingStation();
+    }
+
+    @Override
+    public long getStationSessionAmout(String stationId) {
+        ChargingStationEntity station = chargingStationRepository.findById(stationId).orElse(null);
+        if(station != null){
+            return station.getChargingSession().size();
+        }
+        return 0;
+    }
+
+    @Override
     public ChargingStationEntity getStationByUserId(String userId) {
         return chargingStationRepository.findByUserManager_UserID(userId).orElse(null);
     }
