@@ -234,6 +234,14 @@ public class  DataInitializer  implements CommandLineRunner {
         driverBRep.setNotes("Initial reputation");
         userReputationRepository.save(driverBRep);
 
+        UserReputationEntity driverCRep = new UserReputationEntity();
+        driverCRep.setUserReputationID("REP003");
+        driverCRep.setUser(driverC);
+        driverCRep.setReputationLevel(good);
+        driverCRep.setCurrentScore(100);
+        driverCRep.setNotes("Initial reputation");
+        userReputationRepository.save(driverCRep);
+
         // Initialize Charging Types
         ChargingTypeEntity ccs = new ChargingTypeEntity();
         ccs.setIdChargingType(1);
@@ -311,7 +319,7 @@ public class  DataInitializer  implements CommandLineRunner {
         post1.setIdChargingPost(chargingPostService.generateUniqueId());
         post1.setChargingStation(stationA1);
         post1.setChargingType(Arrays.asList(type1, type2,type3));
-        post1.setChargingFeePerKWh(new BigDecimal("100"));
+        post1.setChargingFeePerKWh(new BigDecimal("3500"));
         post1.setMaxPower(new BigDecimal("250"));
         post1.setActive(true);
         chargingPostRepository.save(post1);
@@ -320,7 +328,7 @@ public class  DataInitializer  implements CommandLineRunner {
         post2.setIdChargingPost(chargingPostService.generateUniqueId());
         post2.setChargingStation(stationA1);
         post2.setChargingType(Arrays.asList(type1, type2,type3));
-        post2.setChargingFeePerKWh(new BigDecimal("100"));
+        post2.setChargingFeePerKWh(new BigDecimal("3500"));
         post2.setMaxPower(new BigDecimal("250"));
         post2.setActive(true);
         chargingPostRepository.save(post2);
@@ -329,7 +337,7 @@ public class  DataInitializer  implements CommandLineRunner {
         post3.setIdChargingPost(chargingPostService.generateUniqueId());
         post3.setChargingStation(stationA1);
         post3.setChargingType(Arrays.asList(type1, type2,type3, type4));
-        post3.setChargingFeePerKWh(new BigDecimal("100"));
+        post3.setChargingFeePerKWh(new BigDecimal("3500"));
         post3.setMaxPower(new BigDecimal("10000"));
         post3.setActive(true);
         chargingPostRepository.save(post3);
@@ -363,7 +371,7 @@ public class  DataInitializer  implements CommandLineRunner {
         post4.setIdChargingPost(chargingPostService.generateUniqueId());
         post4.setChargingStation(stationA2);
         post4.setChargingType(Arrays.asList(type1, type3));
-        post4.setChargingFeePerKWh(new BigDecimal("100"));
+        post4.setChargingFeePerKWh(new BigDecimal("3500"));
         post4.setMaxPower(new BigDecimal("250"));
         post4.setActive(true);
         chargingPostRepository.save(post4);
@@ -372,7 +380,7 @@ public class  DataInitializer  implements CommandLineRunner {
         post5.setIdChargingPost(chargingPostService.generateUniqueId());
         post5.setChargingStation(stationA2);
         post5.setChargingType(Arrays.asList(type2,type3));
-        post5.setChargingFeePerKWh(new BigDecimal("100"));
+        post5.setChargingFeePerKWh(new BigDecimal("3500"));
         post5.setMaxPower(new BigDecimal("250"));
         post5.setActive(true);
         chargingPostRepository.save(post5);
@@ -381,7 +389,7 @@ public class  DataInitializer  implements CommandLineRunner {
         post6.setIdChargingPost(chargingPostService.generateUniqueId());
         post6.setChargingStation(stationA2);
         post6.setChargingType(Arrays.asList(type1, type2,type3));
-        post6.setChargingFeePerKWh(new BigDecimal("100"));
+        post6.setChargingFeePerKWh(new BigDecimal("3500"));
         post6.setMaxPower(new BigDecimal("250"));
         post6.setActive(true);
         chargingPostRepository.save(post6);
@@ -389,7 +397,7 @@ public class  DataInitializer  implements CommandLineRunner {
         post7.setIdChargingPost(chargingPostService.generateUniqueId());
         post7.setChargingStation(stationA2);
         post7.setChargingType(Arrays.asList(type1, type2));
-        post7.setChargingFeePerKWh(new BigDecimal("100"));
+        post7.setChargingFeePerKWh(new BigDecimal("3500"));
         post7.setMaxPower(new BigDecimal("250"));
         post7.setActive(true);
         chargingPostRepository.save(post7);
