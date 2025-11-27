@@ -128,8 +128,8 @@ public class  DataInitializer  implements CommandLineRunner {
         // Initialize Users
         UserEntity driverA = new UserEntity();
         driverA.setUserID("DRV001");
-        driverA.setFirstName("Driver");
-        driverA.setLastName("A");
+        driverA.setFirstName("Bảo");
+        driverA.setLastName("Nguyễn");
         driverA.setBirthDate(new Date());
         driverA.setGender(true);
         driverA.setRole("DRIVER");
@@ -138,10 +138,11 @@ public class  DataInitializer  implements CommandLineRunner {
         driverA.setPhoneNumber("0123456789");
         driverA.setStatus(true);
         userRepository.save(driverA);
+
         UserEntity driverB = new UserEntity();
         driverB.setUserID("DRV002");
-        driverB.setFirstName("Driver");
-        driverB.setLastName("B");
+        driverB.setFirstName("Nhân");
+        driverB.setLastName("Lê");
         driverB.setBirthDate(new Date());
         driverB.setGender(true);
         driverB.setRole("DRIVER");
@@ -153,8 +154,8 @@ public class  DataInitializer  implements CommandLineRunner {
 
         UserEntity driverC = new UserEntity();
         driverC.setUserID("DRV003");
-        driverC.setFirstName("Driver");
-        driverC.setLastName("C");
+        driverC.setFirstName("Thiên");
+        driverC.setLastName("Chí");
         driverC.setBirthDate(new Date());
         driverC.setGender(true);
         driverC.setRole("DRIVER");
@@ -166,8 +167,8 @@ public class  DataInitializer  implements CommandLineRunner {
 
         UserEntity staff1 = new UserEntity();
         staff1.setUserID("STF001");
-        staff1.setFirstName("Staff1");
-        staff1.setLastName("Test");
+        staff1.setFirstName("Việt");
+        staff1.setLastName("Khanh");
         staff1.setBirthDate(new Date());
         staff1.setGender(true);
         staff1.setRole("STAFF");
@@ -179,8 +180,8 @@ public class  DataInitializer  implements CommandLineRunner {
 
         UserEntity staff2 = new UserEntity();
         staff2.setUserID("STF002");
-        staff2.setFirstName("Staff2");
-        staff2.setLastName("Test");
+        staff2.setFirstName("Khánh");
+        staff2.setLastName("Linh");
         staff2.setBirthDate(new Date());
         staff2.setGender(true);
         staff2.setRole("STAFF");
@@ -192,8 +193,8 @@ public class  DataInitializer  implements CommandLineRunner {
 
         UserEntity staff3 = new UserEntity();
         staff3.setUserID("STF003");
-        staff3.setFirstName("Staff3");
-        staff3.setLastName("Test");
+        staff3.setFirstName("Thảo ");
+        staff3.setLastName("Nguyên");
         staff3.setBirthDate(new Date());
         staff3.setGender(true);
         staff3.setRole("STAFF");
@@ -206,8 +207,8 @@ public class  DataInitializer  implements CommandLineRunner {
 
         UserEntity admin = new UserEntity();
         admin.setUserID("ADM001");
-        admin.setFirstName("Admin");
-        admin.setLastName("Test");
+        admin.setFirstName("Turkey");
+        admin.setLastName("Nguyen");
         admin.setBirthDate(new Date());
         admin.setGender(true);
         admin.setRole("ADMIN");
