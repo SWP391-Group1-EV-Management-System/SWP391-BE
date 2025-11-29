@@ -27,20 +27,21 @@ public class SecurityConfig {
 
         http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // Cho phép WebSocket connection
-                        .requestMatchers("/api/countdown/**").permitAll()
-                        .requestMatchers("/ws/**").permitAll()
-                        // Cho phép truy cập trạng thái trụ sạc (cho UI trụ ảo)
-                        .requestMatchers("/api/charging-post/**").permitAll()
-                        .requestMatchers("/api/packageTransaction/user/**").permitAll()
-                        // Cho phép MoMo gửi request
-                        .requestMatchers("/api/payment/ipn-handler").permitAll()
-                        .requestMatchers("/users/login", "/users/register/**", "/users/re-login", "/api/charging/session/progress/**").permitAll() // các end ponit auth không cần token ( login, register)
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/manager/**").hasRole("MANAGER")
-                        .requestMatchers("/api/staff/**").hasRole("STAFF")
-                        .requestMatchers("/api/driver/**").hasRole("DRIVER")
-                        .anyRequest().authenticated() // các end ponit khác cần token ( tức phải đăng nhập, nhưng không quan trọng role)
+//                        // Cho phép WebSocket connection
+//                        .requestMatchers("/api/countdown/**").permitAll()
+//                        .requestMatchers("/ws/**").permitAll()
+//                        // Cho phép truy cập trạng thái trụ sạc (cho UI trụ ảo)
+//                        .requestMatchers("/api/charging-post/**").permitAll()
+//                        .requestMatchers("/api/packageTransaction/user/**").permitAll()
+//                        // Cho phép MoMo gửi request
+//                        .requestMatchers("/api/payment/ipn-handler").permitAll()
+//                        .requestMatchers("/users/login", "/users/register/**", "/users/re-login", "/api/charging/session/progress/**").permitAll() // các end ponit auth không cần token ( login, register)
+//                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+//                        .requestMatchers("/api/manager/**").hasRole("MANAGER")
+//                        .requestMatchers("/api/staff/**").hasRole("STAFF")
+//                        .requestMatchers("/api/driver/**").hasRole("DRIVER")
+                        //.anyRequest().authenticated() // các end ponit khác cần token ( tức phải đăng nhập, nhưng không quan trọng role)
+                        .anyRequest().permitAll()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
