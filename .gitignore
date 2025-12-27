@@ -42,3 +42,8 @@ build/
 src/main/resources/application.properties
 src/main/resources/application-*.properties
 .env
+
+### Documentation - Local only ###
+CONFIG_SETUP.md
+HUONG_DAN_MOMO_UAT.md
+
