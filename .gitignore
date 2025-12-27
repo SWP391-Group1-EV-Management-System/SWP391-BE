@@ -37,3 +37,8 @@ build/
 ### Mac OS ###
 .DS_Store
 .idea/copilotDiffState.xml
+
+### Application Config - Hide sensitive data ###
+src/main/resources/application.properties
+src/main/resources/application-*.properties
+.env
